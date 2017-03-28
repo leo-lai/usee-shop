@@ -1,26 +1,48 @@
 @charset 'utf-8';
 /*自适应屏幕*/
 @media screen and (max-width: 319px) {
-  html { font-size: 17.0667px; }
+  html {
+    font-size: 17.0667px !important; 
+  } 
 }
 @media screen and (min-width: 320px) and (max-width: 359px) {
-  html { font-size: 17.0667px; }
+  html {
+    font-size: 17.0667px !important; 
+  } 
 }
 @media screen and (min-width: 360px) and (max-width: 374px) {
-  html { font-size: 19.2px; }
+  html {
+    font-size: 19.2px !important; 
+  } 
 }
-html,body{background: #f3f3f3; cursor: default; color: #333; height: 100%; overflow: hidden; user-select: none;}
-body{max-width: 750px;margin:auto;}
+@media only screen and (min-width: 400px) {
+  html {
+    font-size: 21.33333333px !important;
+  }
+}
+@media only screen and (min-width: 414px) {
+  html {
+    font-size: 22.08px !important;
+  }
+}
+@media only screen and (min-width: 480px) {
+  html {
+    font-size: 25.6px !important;
+  }
+}
+html,body{cursor: default; color: #333; height: 100%; user-select: none; overflow: hidden; }
+html{font-size: 20px;}
+body{max-width: 750px;margin:auto; font-size: 0.85rem; line-height: 1.6;}
 i{font-style: normal;}
-img{max-width: 100%}
-h3, h4{ font-weight: 500;}
+img{max-width: 100%; vertical-align: top;}
+h3, h4, strong, b, th{ font-weight: 500;}
+h3, h4, p{margin:0; line-height: inherit;}
 h3{font-size: 0.85rem;}
 h4{font-size: 0.7rem;}
-h3,h4,p{margin:0;}
+p{font-size: 0.85rem; color: inherit;}
 a:active{color: inherit;}
 a[disabled], button[disabled]{opacity: 0.3; filter: grayscale(50%);}
 button.l-btn-link{border: none;background:none; color: #3d93f5;}
-th{font-weight: 500;}
 /*
   http://www.css88.com/book/css/ 
   弹性布局===================
@@ -114,6 +136,7 @@ th{font-weight: 500;}
 .l-padding-s{padding: 0.5rem;}
 .l-padding-xs{padding: 0.375rem;}
 .l-padding-tb{padding-top:0.75rem;padding-bottom: 0.75rem;}
+.l-padding-tb-m{padding-top: 0.5rem;padding-bottom: 0.5rem;}
 .l-padding-tb-s{padding-top: 0.375rem;padding-bottom: 0.375rem;}
 .l-margin-0{margin:0 !important;}
 .l-margin-s{margin:0.375rem;}
@@ -122,6 +145,7 @@ th{font-weight: 500;}
 .l-margin-tb{margin-top: 0.75rem;margin-bottom: 0.75rem;}
 .l-margin-t{margin-top: 0.75rem;}
 .l-margin-t-s{margin-top: 0.375rem;}
+.l-margin-t-xs{margin-top: 0.25rem;}
 .l-margin-b{margin-bottom: 0.75rem;}
 .l-margin-l{margin-left: 0.75rem;}
 .l-margin-l-m{margin-left: 0.5rem !important;}
@@ -132,11 +156,11 @@ th{font-weight: 500;}
 /*字体与图标*/
 @font-face {
   font-family: 'l-iconfont';  /* project id 263712 */
-  src: url('//at.alicdn.com/t/font_k5kbxl20et1n61or.eot');
-  src: url('//at.alicdn.com/t/font_k5kbxl20et1n61or.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_k5kbxl20et1n61or.woff') format('woff'),
-  url('//at.alicdn.com/t/font_k5kbxl20et1n61or.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_k5kbxl20et1n61or.svg#l-iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_hnjksbev0614te29.eot');
+  src: url('//at.alicdn.com/t/font_hnjksbev0614te29.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_hnjksbev0614te29.woff') format('woff'),
+  url('//at.alicdn.com/t/font_hnjksbev0614te29.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_hnjksbev0614te29.svg#l-iconfont') format('svg');
 }
 .l-icon, .l-icon-radio{
   font-family: 'l-iconfont' !important;
@@ -181,7 +205,7 @@ th{font-weight: 500;}
 .l-fs-xs{font-size: 0.6rem !important;}
 .l-text-default{color: inherit !important;}
 .l-text-gray{color: #999 !important;}
-.l-text-warn{color: #ff9100 !important;}
+.l-text-warn{color: #f35b54 !important;}
 .l-text-ok{color: #66c214 !important;}
 .l-text-error{color: #ff2828 !important;}
 .l-text-hot{color: #e3243a !important;}
@@ -218,24 +242,24 @@ th{font-weight: 500;}
   background: url(~assets/images/arrow.png) no-repeat 100% center;
   background-size: 0.7rem;
 }
-.l-link:active, .l-link-arrow:active{background-color: #f8f8f8;}
+.l-link:active, .l-link-arrow:active{background-color: #eee;}
 a.l-link:not([class*='l-flex-']){display: block;}
 /*边框*/
 hr.l-line{
  transform: scale(0.5); transform-origin: 0 0; 
-  border:1px solid #f3f3f3; width: 200%; height: 0; font-size: 0;
+  border:1px solid #efeff4; width: 200%; height: 0; font-size: 0;
 }
 .l-border{border: 1px solid rgba(255, 255, 255, 0.5);}
 .l-border-t, .l-border-b, .l-border-l, .l-border-r{ position: relative; }
 .l-border-t:before, .l-border-b:after,
 .l-border-l:before, .l-border-r:after{
-  content:''; position: absolute;  border: 1px solid #f3f3f3; width: 0; height: 0; font-size: 0;
+  content:''; position: absolute;  background-color: #efeff4; font-size: 0;
   transform: scale(0.5); transform-origin: 0 0; box-sizing: border-box;
 }
-.l-border-t:before, .l-border-b:after{width: 200%;}
+.l-border-t:before, .l-border-b:after{width: 200%; height: 1px;}
 .l-border-t:before{ left: 0; top: 0; }
 .l-border-b:after{ left: 0; bottom: -1px; }
-.l-border-l:before, .l-border-r:after{height: 200%;}
+.l-border-l:before, .l-border-r:after{height: 200%; width: 1px;}
 .l-border-l:before{ top:0; left: 0; }
 .l-border-r:after{ top:0; right: 0; }
 
@@ -257,6 +281,7 @@ hr.l-line{
 .l-thumb-xs{width: 2.0rem; height: 2.0rem;}
 .l-thumb-circle{width: 3.0rem; height: 3.0rem; border-radius: 50%;}
 .l-thumb-circle-s{width: 2.5rem; height: 2.5rem; border-radius: 50%;}
+.l-bg-white{background-color: #fff;}
 .l-bg-cover{background: no-repeat 50% 50%; background-size: cover;}
 .l-bg-full{background: no-repeat 50% 50%; background-size: 100% 100%;}
 /*遮罩层*/
@@ -274,7 +299,6 @@ hr.l-line{
 .l-layer .l-close-radius{color: #fff;opacity: 0.8;margin-bottom: -1.5rem;}
 .l-layer .l-close-radius:active{opacity: 1;}
 .l-block{display: block;}
-.l-bg{background-color: #fff;}
 .l-sticky{position: relative; position: -webkit-sticky; position: sticky; top: 0; z-index: 20;}
 .l-close-radius{font-size: 1.8rem}
 .l-rel{position: relative;}

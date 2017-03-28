@@ -1,3 +1,68 @@
 @charset 'utf-8';
 /* vue style */
 [v-cloak]{display: none !important;}
+/* mui customized */
+.l-page{background-color: #efeff4; position: absolute; top: 0; left: 0; width: 100%; height: 100%;}
+.l-page:after{
+	content: '© 2017-2018 U视一号';
+	display: block; text-align: center; margin-top: -50px;
+	position: absolute; left: 0; bottom: 0; width: 100%;
+	padding: 15px 0; font-size: 0.6rem; color: #ccc; 
+}
+.mui-bar{box-shadow: 0 0 1px rgba(0, 0, 0, 0.3);}
+.mui-content{overflow: auto; position: absolute; top: 0; left: 0; bottom: 0; width: 100%;}
+.mui-content:after{content: ''; display: block; height: 1px; visibility: hidden;}
+.mui-bar-nav ~ .mui-content{top: 44px; padding-top: 0;}
+/* 轮播 */
+.mui-slider-indicator{
+	text-align: right; padding: 0 0.5rem; bottom: 0;
+	.mui-indicator{box-shadow:none; margin:0;}
+	.mui-indicator.mui-active{background: #f35b54; width: 10px; border-radius: 20px;}
+}
+.mui-slider .mui-slider-group .mui-slider-item img{height: 8.0rem;}
+.mui-bar.l-black{
+	background-color: #2c2c2c;
+	.mui-title{color: #fff;}
+	.mui-icon{color: #fff;}
+	.mui-icon:active{opacity: 1;}
+}
+/* 底部tab */
+.mui-icon .mui-badge{padding: 2px 5px 0;}
+.l-icon-home{background-image: url('~assets/images/nav-icon-01.png') !important;}
+.l-icon-shop{background-image: url('~assets/images/nav-icon-02.png') !important;}
+.l-icon-me{background-image: url('~assets/images/nav-icon-03.png') !important;}
+.l-bar-tab ~ .mui-content{bottom: 50px;}
+.l-bar-tab {bottom: 0; display: table; width: 100%; height: 50px; padding: 0; table-layout: fixed; border-top: 0; border-bottom: 0; } 
+.l-bar-tab ._item {display: table-cell; overflow: hidden; width: 1%; height: 50px; text-align: center; vertical-align: middle; white-space: nowrap; text-overflow: ellipsis; color: #929292; }
+.l-bar-tab ._item .mui-icon {top: 3px; width: 1.4rem; height: 1.4rem; background: no-repeat 50% 50%; background-size: contain;}
+.l-bar-tab ._item .mui-icon ~ .mui-tab-label {font-size: 0.6rem; line-height: 1.2; display: block; overflow: hidden; text-overflow: ellipsis; }
+.l-bar-tab ._item.mui-active{
+	color: #f35b54;
+	.l-icon-home{background-image: url('~assets/images/nav-icon-01_active.png') !important;}
+	.l-icon-shop{background-image: url('~assets/images/nav-icon-02_active.png') !important;}
+	.l-icon-me{background-image: url('~assets/images/nav-icon-03_active.png') !important;}
+}
+.mui-table-view:before, 
+.mui-table-view:after, 
+.mui-table-view-cell:after{background-color: #efeff4;}
+/* 商品列表 */
+.l-goods-item{
+	background: #fff;
+	._thumb{
+		img{ width: 100%; height: 10.0rem;}
+	}
+	._text{
+		text-align: center; padding: 0.5rem 0.75rem;
+		h3:before, h3:after{
+			content: '';
+			display: inline-block; vertical-align: middle;
+			width: 0.25rem; height: 0.25rem;
+			border-radius: 50%;
+			margin:0 0.5rem;
+			background-color: #f35b54;
+			font-weight: bold;
+		}
+	}
+
+}
+

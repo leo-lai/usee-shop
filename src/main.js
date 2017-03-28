@@ -8,13 +8,14 @@ import { storage, utils } from 'assets/js/utils'
 import server from './server'
 import routes from './routes'
 import App from './App'
-// FastClick.attach(document.body)
+FastClick.attach(document.body)
 
 // 组件通信中心
 const eventHub = new Vue()
 Vue.mixin({
   created() {
     this.$eventHub = eventHub
+    this.$mui = mui
   }
 })
 
@@ -93,7 +94,6 @@ window.addEventListener('popstate', function(e) {
 
 // 调用发生在整个切换流水线之前
 router.beforeEach((to, from, next) => {
-
   // 服务端渲染进入页面
   if(from.path === '/'){ 
     eventHub.$emit('APP-DIRECTION', 'page')
@@ -176,6 +176,12 @@ router.afterEach((route) => {
   _history.direction = ''
   storage.session.set('_history', _history)
   // $.hideIndicator()
+})
+
+router.onReady(()=>{
+  setTimeout(()=>{
+    mui.init()
+  }, 50) 
 })
 
 
