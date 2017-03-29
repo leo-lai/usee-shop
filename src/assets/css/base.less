@@ -30,19 +30,19 @@
     font-size: 25.6px !important;
   }
 }
-html,body{cursor: default; color: #333; height: 100%; user-select: none; overflow: hidden; }
+html,body{cursor: default; color: #333; height: 100%; user-select: none; overflow: hidden; max-width: 750px; position: relative; margin: auto; background-color: #efeff4;}
 html{font-size: 20px;}
-body{max-width: 750px;margin:auto; font-size: 0.85rem; line-height: 1.6;}
+body{font-size: 0.85rem; line-height: 1.6;}
 i{font-style: normal;}
 img{max-width: 100%; vertical-align: top;}
 h3, h4, strong, b, th{ font-weight: 500;}
 h3, h4, p{margin:0; line-height: inherit;}
 h3{font-size: 0.85rem;}
 h4{font-size: 0.7rem;}
-p{font-size: 0.85rem; color: inherit;}
-a:active{color: inherit;}
-a[disabled], button[disabled]{opacity: 0.3; filter: grayscale(50%);}
-button.l-btn-link{border: none;background:none; color: #3d93f5;}
+p{font-size: inherit; color: inherit;}
+/* a:active{color: #007aff !important;} */
+button.l-btn-link{border: none;background:none; color: #007aff;}
+ a[disabled], button[disabled]{opacity: 0.3; filter: grayscale(50%);} 
 /*
   http://www.css88.com/book/css/ 
   弹性布局===================
@@ -132,9 +132,11 @@ button.l-btn-link{border: none;background:none; color: #3d93f5;}
 /*弹性布局===================end*/
 
 /*边距*/
+.l-padding-btn{padding: 0.5rem 0.75rem;}
 .l-padding{padding:0.75rem;}
 .l-padding-s{padding: 0.5rem;}
 .l-padding-xs{padding: 0.375rem;}
+.l-padding-lr{padding-left:0.75rem;padding-right: 0.75rem;}
 .l-padding-tb{padding-top:0.75rem;padding-bottom: 0.75rem;}
 .l-padding-tb-m{padding-top: 0.5rem;padding-bottom: 0.5rem;}
 .l-padding-tb-s{padding-top: 0.375rem;padding-bottom: 0.375rem;}
@@ -156,11 +158,11 @@ button.l-btn-link{border: none;background:none; color: #3d93f5;}
 /*字体与图标*/
 @font-face {
   font-family: 'l-iconfont';  /* project id 263712 */
-  src: url('//at.alicdn.com/t/font_hnjksbev0614te29.eot');
-  src: url('//at.alicdn.com/t/font_hnjksbev0614te29.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_hnjksbev0614te29.woff') format('woff'),
-  url('//at.alicdn.com/t/font_hnjksbev0614te29.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_hnjksbev0614te29.svg#l-iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_9t5czwfvaphc9pb9.eot');
+  src: url('//at.alicdn.com/t/font_9t5czwfvaphc9pb9.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_9t5czwfvaphc9pb9.woff') format('woff'),
+  url('//at.alicdn.com/t/font_9t5czwfvaphc9pb9.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_9t5czwfvaphc9pb9.svg#l-iconfont') format('svg');
 }
 .l-icon, .l-icon-radio{
   font-family: 'l-iconfont' !important;
@@ -185,7 +187,7 @@ button.l-btn-link{border: none;background:none; color: #3d93f5;}
   text-align: center;
   color: #fff;
   border-radius: 2px;
-  background-color: #3d93f5;
+  background-color: #007aff;
 }
 .l-icon-fill-wx{background-color: #24b70f;}
 .l-checkbox{display: inline-block;font-weight: 400;}
@@ -209,12 +211,12 @@ button.l-btn-link{border: none;background:none; color: #3d93f5;}
 .l-text-ok{color: #66c214 !important;}
 .l-text-error{color: #ff2828 !important;}
 .l-text-hot{color: #e3243a !important;}
-.l-text-blue{color: #3d93f5 !important;}
+.l-text-blue{color: #007aff !important;}
 .l-text-right{text-align: right !important;}
 .l-text-center{text-align: center !important;}
 .l-text-nowrap{white-space: nowrap;}
 .l-text-upper{text-transform: uppercase;}
-.l-text-link{color: #3d93f5; text-decoration: underline;}
+.l-text-link{color: #007aff; text-decoration: underline;}
 .l-fs-xs.l-text-wrap2{line-height: 1.4;}
 .l-text-wrap1, .l-text-wrap2{
   text-overflow: ellipsis;
@@ -283,6 +285,7 @@ hr.l-line{
 .l-thumb-circle-s{width: 2.5rem; height: 2.5rem; border-radius: 50%;}
 .l-bg-white{background-color: #fff;}
 .l-bg-cover{background: no-repeat 50% 50%; background-size: cover;}
+.l-bg-contain{background: no-repeat 50% 50%; background-size: contain;}
 .l-bg-full{background: no-repeat 50% 50%; background-size: 100% 100%;}
 /*遮罩层*/
 .l-layer{
@@ -302,14 +305,14 @@ hr.l-line{
 .l-sticky{position: relative; position: -webkit-sticky; position: sticky; top: 0; z-index: 20;}
 .l-close-radius{font-size: 1.8rem}
 .l-rel{position: relative;}
-
+.l-zoom{overflow: hidden;}
 /*三角勾选*/
 .l-triangle-slt{border: 1px solid transparent; position: relative;}
-.l-triangle-slt.active{border-color: #3d93f5;overflow: hidden;border-radius: 1px;}
+.l-triangle-slt.active{border-color: #007aff;overflow: hidden;border-radius: 1px;}
 .l-triangle-slt.active:after{
   font-family: 'l-iconfont';
   content: '\e667';
-  color: #3d93f5;
+  color: #007aff;
   position: absolute;
   right: -2px;
   bottom: -8px;

@@ -40,7 +40,7 @@
       <!-- menu end-->
       
       <!-- recommend -->
-      <div class="l-text-center l-padding-tb l-margin-t l-bg-white l-border-b">
+      <div class="l-text-center l-padding-btn l-margin-t l-bg-white l-border-b">
         <span>推荐商品</span>
         <span class="l-text-gray"> / Recommend</span>
       </div>
@@ -75,7 +75,7 @@ export default {
   computed: {
    
   },
-  created() {
+  mounted() {
     this.$nextTick(()=>{
       this.$mui('.mui-slider').slider({
         interval: 3000

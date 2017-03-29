@@ -10,6 +10,11 @@ import routes from './routes'
 import App from './App'
 FastClick.attach(document.body)
 
+// 添加插件
+mui.use = function(plugName){
+  mui.isFunction(plugName) && plugName(mui, window, document)
+}
+
 // 组件通信中心
 const eventHub = new Vue()
 Vue.mixin({
@@ -181,6 +186,9 @@ router.afterEach((route) => {
 router.onReady(()=>{
   setTimeout(()=>{
     mui.init()
+    mui(document).on('tap', '._nav-back', function(e){
+      router.back()
+    })
   }, 50) 
 })
 

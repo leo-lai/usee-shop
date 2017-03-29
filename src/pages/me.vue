@@ -18,10 +18,10 @@
         </div>
       </div>
       <div class="mui-row l-text-center l-bg-white l-border-t">
-        <a class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link">
+        <router-link class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link" to="/shop/car">
           <p><img style="height: 2rem;" src="~assets/images/icon-004.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">购物车</p>
-        </a>
+        </router-link>
         <a class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link">
           <p><img style="height: 2rem;" src="~assets/images/icon-005.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">我的报告</p>
