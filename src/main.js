@@ -54,7 +54,6 @@ const router = new VueRouter({
 //   next()
 // })
 
-
 Vue.mixin({
   created() {
     // 可访问外部链接
@@ -69,6 +68,21 @@ Vue.mixin({
           storage.session.set('_history', _history)
         }
         this.$router.push(url)
+      }
+    }
+
+    // 跳转内页
+    this.$pageTo = function(toPageId, title){
+      let fromPage = document.querySelector('#page-main')
+      let toPage = document.querySelector(toPageId)
+      fromPage && utils.addClass(fromPage, 'page-in-leave-active')
+      if(toPage){
+        utils.addClass(toPage, 'page-in-enter-active')
+        if(title){
+          router.currentRoute.meta._title = router.currentRoute.meta.title
+          router.currentRoute.meta.title = title
+        }
+        router.push(toPageId)
       }
     }
   }
@@ -89,16 +103,31 @@ const initHistory = [{
 initHistory.index = 0
 let _history = storage.session.get('_history') || initHistory
 
-// 监听浏览器前进后退事件
-window.addEventListener('popstate', function(e) {
-  // console.log(e)
-}, false)
-
-// 监听浏览器滚动
-
-
-// 调用发生在整个切换流水线之前
+// 控制内页跳转
 router.beforeEach((to, from, next) => {
+  let toPage = document.querySelector('#page-main')
+  if(from.hash && /^#page-/.test(from.hash) && toPage){
+    if(router.currentRoute.meta._title){
+      router.currentRoute.meta.title = router.currentRoute.meta._title
+    }
+    
+    let fromPage = document.querySelector(from.hash)
+    utils.addClass(fromPage, 'page-out-leave-active')
+    utils.removeClass(fromPage, 'page-in-enter-active')
+    
+    utils.addClass(toPage, 'page-out-enter-active')
+    utils.removeClass(toPage, 'page-in-leave-active')
+    setTimeout(()=>{
+      utils.removeClass(fromPage, 'page-out-leave-active')
+      utils.removeClass(toPage, 'page-out-enter-active')
+    }, 500)  
+  }
+  next()
+})
+
+// 控制页面转场动画
+router.beforeEach((to, from, next) => {
+
   // 服务端渲染进入页面
   if(from.path === '/'){ 
     eventHub.$emit('APP-DIRECTION', 'page')
@@ -185,7 +214,7 @@ router.afterEach((route) => {
 
 router.onReady(()=>{
   setTimeout(()=>{
-    mui.init()
+    // mui.init()
     mui(document).on('tap', '._nav-back', function(e){
       router.back()
     })

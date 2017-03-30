@@ -13,8 +13,8 @@
         </router-link>
       </div>
       <div class="_btn">
-        <button type="button" style="width: 6rem;" class="mui-btn l-btn-warn _inner">加入购物车</button>
-        <button type="button" style="width: 6rem;" class="mui-btn l-btn-main _inner l-margin-l-m">立即购买</button>
+        <button type="button" style="width: 6rem;" class="mui-btn l-btn-warn _inner" @click="addToCar">加入购物车</button>
+        <button type="button" style="width: 6rem;" class="mui-btn l-btn-main _inner l-margin-l-m" @click="buyNow">立即购买</button>
       </div>
     </footer>
     <div class="mui-content">
@@ -35,19 +35,19 @@
       </div>
       <!-- banner end-->
       <!-- info -->
-      <div class="l-goods-item">
-        <div class="_text l-border-t">
+      <div class="l-goods-item l-border-tb">
+        <div class="_text">
           <h3>喷喷喷喷喷喷喷喷喷喷</h3>
           <p class="l-fs-m">喷一喷，9秒亮瞎眼</p>
           <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>268.00</p>
         </div>
       </div>
-      <div class="l-border-t l-padding-btn l-bg-white mui-navigate-right">
-        <i class="l-icon l-text-ok l-fs-l l-margin-r-xs">&#xe626;</i>
-        <span>正品保障</span>
-        <span class="l-text-gray">/</span>
-        <span>售后服务</span>
-        <span class="l-text-gray">/</span>
+      <div class="l-padding-btn l-bg-white l-fs-m l-text-gray l-link-arrow" @click="showSupport">
+        <i class="l-icon l-text-ok">&#xe626;</i>
+        <span class="l-margin-r-xs">正品保障</span>
+        <i class="l-icon l-text-ok">&#xe626;</i>
+        <span class="l-margin-r-xs">售后服务</span>
+        <i class="l-icon l-text-ok">&#xe626;</i>
         <span>无忧退货</span>
       </div>
       <!-- info end-->
@@ -66,6 +66,80 @@
       </div>
       <!-- details end-->
     </div>
+    <!-- 选择商品规格 -->
+    <div class="l-popup-bottom" :class="{'_show': isShowSpec}"  @click="showSpec">
+      <div class="_inner">
+        <i class="_close l-icon">&#xe605;</i>
+        <div class="_content l-padding-lr" @click.stop>
+          <div class="l-flex-hc l-padding-tb l-padding-r-xl l-border-b">
+            <div class="l-thumb l-bg-contain l-margin-r" style="background-image: url('http://placeholdit.imgix.net/~text?txtsize=33&bg=ff784e&txtclr=fff&txt=thumb&w=120&h=120')"></div>
+            <div class="l-rest l-fs-s">
+              <p class="l-text-wrap2">Lamp C091Lamp C091LampLamp C091Lamp C091LampLamp C091Lamp C091LampLamp C091Lamp C091Lamp </p>
+              <div class="l-margin-m1">
+                <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span>
+              </div>
+            </div>
+          </div>
+          <div class="_scroll">
+            <div class="l-padding-tb l-fs-s l-border-b l-text-gray">
+              <span class="l-margin-r-xs"><i class="l-icon l-text-ok">&#xe626; </i>7天无理由退换</span>
+              <span class="l-margin-r-xs"><i class="l-icon l-text-ok">&#xe626; </i>15天免费换货</span>
+              <span class="l-margin-r-xs"><i class="l-icon l-text-ok">&#xe626; </i>1年免费维修</span>
+            </div>
+            <div class="l-padding-tb l-fs-s l-border-b">
+              <p>颜色分类</p>
+              <ul class="l-slt-list">
+                <li class="_item _active">科技黑</li>
+                <li class="_item">科技黑</li>
+                <li class="_item">科技黑</li>
+                <li class="_item">科技黑</li>
+                <li class="_item">科技黑</li>
+                <li class="_item">科技黑</li>
+                <li class="_item">科技黑</li>
+              </ul>
+            </div>
+            <div class="l-padding-tb l-fs-s l-flex-hc">
+              <p class="l-rest">购买数量</p>
+              <span class="l-numbox mui-pull-right">
+                <i class="l-icon _minus">&#xe631;</i>
+                <input class="_num" type="tel" value="1">
+                <i class="l-icon _add">&#xe602;</i>
+              </span>
+            </div>
+          </div>
+          <div class="l-padding-tb l-border-t">
+            <button type="button" class="mui-btn l-btn-main" @click="sltSpecOk">确定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 选择商品规格 end-->
+
+    <!-- 三包说明 -->
+    <div class="l-popup-bottom" :class="{'_show': isShowSupport}" @click="showSupport">
+      <div class="_inner">
+        <div class="_content l-padding" @click.stop>
+          <div class="_scroll">
+            <div class="l-border-b l-padding-b">
+              <h3><i class="l-icon l-text-ok">&#xe626; </i>正品保障</h3>
+              <p class="l-text-gray">U视一号承诺商城购买所有商品均为官方正品</p>
+            </div>
+            <div class="l-border-b l-padding-tb">
+              <h3><i class="l-icon l-text-ok">&#xe626; </i>售后服务</h3>
+              <p class="l-text-gray">如果商品在保修期内或者存在下次的质量问题，可以第一时间联系客服解决</p>
+            </div>
+            <div class="l-padding-tb">
+              <h3><i class="l-icon l-text-ok">&#xe626; </i>正品保障</h3>
+              <p class="l-text-gray">商品收到7天内若因主观原因不愿完成交易，在不影响二次销售的前提下，可办理退货，邮费需自理（食品、保健品以及部分特殊声明的商品除外）</p>
+            </div>
+          </div>
+          <div class="l-padding-t l-border-t">
+            <button type="button" class="mui-btn l-btn-main" @click="showSupport">我知道了</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 三包说明 end-->
   </div>
 </template>
 <script>
@@ -78,7 +152,25 @@ export default {
   },
   data () {
     return {
-      
+      isShowSupport: false,
+      isShowSpec: false
+    }
+  },
+  methods: {
+    showSupport() {
+      this.isShowSupport = !this.isShowSupport
+    },
+    showSpec() {
+      this.isShowSpec = !this.isShowSpec
+    },
+    addToCar() {
+      this.showSpec()
+    },
+    buyNow() {
+      this.showSpec()
+    },
+    sltSpecOk() {
+      this.$router.push('/shop/order/create')
     }
   },
   created() {

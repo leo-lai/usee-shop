@@ -2,10 +2,12 @@ import index from './pages/index'
 import shop from './pages/shop'
 import shopCar from './pages/shop-car'
 import goodsInfo from './pages/goods-info'
+import orderCreate from './pages/order-create'
 import me from './pages/me'
 import login from './pages/login'
 import register from './pages/register'
 import pwd from './pages/pwd'
+
 const routes = [
   { 
     path: '/', 
@@ -50,6 +52,11 @@ const routes = [
     path: '/shop/goods/info',
     meta: { title: '商品详情'},
     component: goodsInfo
+  },
+  {
+    path: '/shop/order/create',
+    meta: { title: '确认订单'},
+    component: orderCreate
   }
 ]
 

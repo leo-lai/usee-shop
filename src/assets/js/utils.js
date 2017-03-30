@@ -41,6 +41,28 @@ Array.prototype.find = Array.prototype.find || function(func) {
   return returnArray
 }
 
+function _hasClass(elem, cls) {
+  cls = cls || '';
+  if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
+  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+}
+
+function _addClass(elem, cls) {
+  if (!_hasClass(elem, cls)) {
+    elem.className = elem.className == '' ? cls : elem.className + ' ' + cls;
+  }
+}
+
+function _removeClass(elem, cls) {
+  if (_hasClass(elem, cls)) {
+    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+    while (newClass.indexOf(' ' + cls + ' ') >= 0) {
+      newClass = newClass.replace(' ' + cls + ' ', ' ');
+    }
+    elem.className = newClass.replace(/^\s+|\s+$/g, '');
+  }
+}
+
 
 
 /*========本地存储===========*/
@@ -158,6 +180,8 @@ export let utils = {
   regexp: {
     mobile: /^\s*1\d{10}\s*$/
   },
+  addClass: _addClass,
+  removeClass: _removeClass,
   noop(){},
   extend(target, ...objs) {
     if(!utils.isPlainObject(target)) return null
@@ -312,7 +336,9 @@ export let utils = {
     }
   },
   history: {
-    push() {},
+    push(url = '', title = '') { 
+      window.history.pushState({}, title,  url)
+    },
     replace() {}
   },
   image: {

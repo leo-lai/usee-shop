@@ -17,7 +17,7 @@
     <div class="mui-content">
       <!-- 购物车列表 -->
       <div class="l-shopcar-list l-margin-b" v-if="true">
-        <div class="l-padding l-text-gray l-border-b">
+        <div class="l-padding-btn l-text-gray l-border-b l-bg-white l-sticky">
           <span class="mui-pull-right">删除</span>
           <span>商品总数：5件</span>
         </div>
@@ -25,14 +25,14 @@
           <div class="mui-checkbox"><label></label><input type="checkbox"></div>
           <div class="_thumb l-bg-contain" style="background-image: url('http://placeholdit.imgix.net/~text?txtsize=33&bg=ff784e&txtclr=fff&txt=thumb&w=120&h=120')"></div>
           <div class="_main l-rest">
-            <h3 class="_tit l-text-wrap2">Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091</h3>
-            <div class="_price">
+            <p class="_tit l-text-wrap2">Lamp C091Lamp</p>
+            <div class="_price l-flex-hc">
+              <p class="l-text-warn l-rest"><b class="l-icon">&#xe6cb;</b>268.00</p>
               <span class="l-numbox mui-pull-right">
                 <i class="l-icon _minus">&#xe631;</i>
                 <input class="_num" type="tel" value="1">
                 <i class="l-icon _add">&#xe602;</i>
               </span>
-              <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span>
             </div>
           </div>
         </div>
@@ -40,14 +40,14 @@
           <div class="mui-checkbox"><label></label><input type="checkbox"></div>
           <div class="_thumb l-bg-contain" style="background-image: url('http://placeholdit.imgix.net/~text?txtsize=33&bg=ff784e&txtclr=fff&txt=thumb&w=120&h=120')"></div>
           <div class="_main l-rest">
-            <h3 class="_tit l-text-wrap2">Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091</h3>
-            <div class="_price">
+            <p class="_tit l-text-wrap2">Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091Lamp C091</p>
+            <div class="_price l-flex-hc">
+              <p class="l-text-warn l-rest"><b class="l-icon">&#xe6cb;</b>268.00</p>
               <span class="l-numbox mui-pull-right">
                 <i class="l-icon _minus">&#xe631;</i>
                 <input class="_num" type="tel" value="1">
                 <i class="l-icon _add">&#xe602;</i>
               </span>
-              <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span>
             </div>
           </div>
         </div>
