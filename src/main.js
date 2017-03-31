@@ -12,7 +12,7 @@ FastClick.attach(document.body)
 
 // 添加插件
 mui.use = function(plugName){
-  mui.isFunction(plugName) && plugName(mui, window, document)
+  mui.isFunction(plugName) && plugName(mui, window, document, undefined)
 }
 
 // 组件通信中心
@@ -35,24 +35,41 @@ const router = new VueRouter({
   }
 })
 
-// 验证登陆
-// if(window.location.hostname === '192.168.0.134'){ // 本地测试
-//   storage.local.set('openid', 'odjF11oC5FsVYkaKgsyoE7fsmglQ')
-//   storage.local.set('token', 'UfD0a7yJGtnINJR6q4wenQrJbd80HBr5OJ5S56x2FEuVwtK1J7fNt_b_bv0azgvqHs49bnNbkdTYQUJRLnwQi6PhvUzxIxw6QdUNnNL6COMKo_c')
-// }
 
-// router.beforeEach((to, from, next) => {
-//   let isCheckLogin = to.meta.auth
-  
-//   if(isCheckLogin === undefined) {
-//     isCheckLogin = true
-//   }
-//   if(isCheckLogin && !storage.local.get('token')){
-//     server.logout()
-//     next(false)
-//   }
-//   next()
-// })
+function _pageTo(toPageId, title){
+  let fromPage = document.querySelector('.l-page._active')
+  let toPage = document.querySelector(toPageId)
+  if(toPage){
+    utils.addClass(fromPage, 'page-in-leave-active').removeClass(fromPage, '_active')
+    utils.addClass(toPage, 'page-in-enter-active').addClass(toPage, '_active')
+    if(title){
+      router.currentRoute.meta._title = router.currentRoute.meta.title
+      router.currentRoute.meta.title = title
+    }
+    router.push(toPageId)
+    setTimeout(()=>{
+      utils.removeClass(fromPage, 'page-in-leave-active')
+      utils.removeClass(toPage, 'page-in-enter-active')
+    }, 600)
+  }
+}
+
+function _pageBack(toPageId, title){
+  let fromPage = document.querySelector('.l-page._active')
+  let toPage = toPageId ? document.querySelector(toPageId) : document.querySelector('.l-page')
+  if(toPage){
+    utils.addClass(fromPage, 'page-out-leave-active').removeClass(fromPage, '_active')
+    utils.addClass(toPage, 'page-out-enter-active').addClass(toPage, '_active')
+    if(title){
+      router.currentRoute.meta._title = router.currentRoute.meta.title
+      router.currentRoute.meta.title = title
+    }
+    setTimeout(()=>{
+      utils.removeClass(fromPage, 'page-out-leave-active')
+      utils.removeClass(toPage, 'page-out-enter-active')
+    }, 600)
+  }
+}
 
 Vue.mixin({
   created() {
@@ -72,21 +89,28 @@ Vue.mixin({
     }
 
     // 跳转内页
-    this.$pageTo = function(toPageId, title){
-      let fromPage = document.querySelector('#page-main')
-      let toPage = document.querySelector(toPageId)
-      fromPage && utils.addClass(fromPage, 'page-in-leave-active')
-      if(toPage){
-        utils.addClass(toPage, 'page-in-enter-active')
-        if(title){
-          router.currentRoute.meta._title = router.currentRoute.meta.title
-          router.currentRoute.meta.title = title
-        }
-        router.push(toPageId)
-      }
-    }
+    this.$pageTo = _pageTo
   }
 })
+
+// 验证登陆
+// if(window.location.hostname === '192.168.0.134'){ // 本地测试
+//   storage.local.set('openid', 'odjF11oC5FsVYkaKgsyoE7fsmglQ')
+//   storage.local.set('token', 'UfD0a7yJGtnINJR6q4wenQrJbd80HBr5OJ5S56x2FEuVwtK1J7fNt_b_bv0azgvqHs49bnNbkdTYQUJRLnwQi6PhvUzxIxw6QdUNnNL6COMKo_c')
+// }
+
+// router.beforeEach((to, from, next) => {
+//   let isCheckLogin = to.meta.auth
+  
+//   if(isCheckLogin === undefined) {
+//     isCheckLogin = true
+//   }
+//   if(isCheckLogin && !storage.local.get('token')){
+//     server.logout()
+//     next(false)
+//   }
+//   next()
+// })
 
 // 记录微信的Landing Page，用于当前目录地址授权验证
 storage.session.set('wx_url', window.location.href)
@@ -105,23 +129,22 @@ let _history = storage.session.get('_history') || initHistory
 
 // 控制内页跳转
 router.beforeEach((to, from, next) => {
-  let toPage = document.querySelector('#page-main')
-  if(from.hash && /^#page-/.test(from.hash) && toPage){
-    if(router.currentRoute.meta._title){
-      router.currentRoute.meta.title = router.currentRoute.meta._title
-    }
-    
-    let fromPage = document.querySelector(from.hash)
-    utils.addClass(fromPage, 'page-out-leave-active')
-    utils.removeClass(fromPage, 'page-in-enter-active')
-    
-    utils.addClass(toPage, 'page-out-enter-active')
-    utils.removeClass(toPage, 'page-in-leave-active')
-    setTimeout(()=>{
-      utils.removeClass(fromPage, 'page-out-leave-active')
-      utils.removeClass(toPage, 'page-out-enter-active')
-    }, 500)  
+
+  if(from.hash && /^#page-/.test(from.hash)){ // 从内页返回
+    _pageBack(to.hash, router.currentRoute.meta._title || router.currentRoute.meta.title)
   }
+
+  if(from.path === '/'){
+    
+    if(to.hash && /^#page-/.test(to.hash)){
+      console.log(document.querySelector(to.hash))
+      setTimeout(()=>{
+        utils.addClass(document.querySelector(to.hash), '_active')
+        utils.removeClass(document.querySelector('.l-page._active'), '_active')
+      }, 2000)
+    }
+  }
+
   next()
 })
 
@@ -214,9 +237,12 @@ router.afterEach((route) => {
 
 router.onReady(()=>{
   setTimeout(()=>{
-    // mui.init()
-    mui(document).on('tap', '._nav-back', function(e){
+    mui.init()
+    mui(document).on('click', '._nav-back', function(e){
       router.back()
+    })
+    mui(document).on('click', '._nav-reload', function(e){
+      window.location.reload()
     })
   }, 50) 
 })

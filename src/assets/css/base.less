@@ -42,7 +42,7 @@ h4{font-size: 0.7rem;}
 p{font-size: inherit; color: inherit;}
 /* a:active{color: #007aff !important;} */
 button.l-btn-link{border: none;background:none; color: #007aff;}
- a[disabled], button[disabled]{opacity: 0.3; filter: grayscale(50%);} 
+a[disabled], button[disabled]{opacity: 0.3; filter: grayscale(50%);}
 /*
   http://www.css88.com/book/css/ 
   弹性布局===================
@@ -126,6 +126,7 @@ button.l-btn-link{border: none;background:none; color: #007aff;}
 */
 [class*='l-flex-'] > .l-rest {
   /*如果只有设置其中一个子项，其将霸占剩余部分*/
+  display: block;
   flex: 1;
 }
 /*弹性布局===================end*/
@@ -277,6 +278,8 @@ a.l-link:not([class*='l-flex-']){display: block;}
 .l-sticky{position: relative; position: -webkit-sticky; position: sticky; top: 0; z-index: 20;}
 .l-close-radius{font-size: 1.8rem}
 .l-rel{position: relative;}
+.l-fl{float: left;}
+.l-fr{float: right;}
 .l-zoom{overflow: hidden;}
 /*三角勾选*/
 .l-triangle-slt{border: 1px solid transparent; position: relative;}

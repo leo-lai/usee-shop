@@ -11,7 +11,7 @@
         合计：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span>
       </div>
       <div class="_btn">
-        <button type="button" class="mui-btn l-btn-main _inner">结算(5)</button>
+        <button type="button" class="mui-btn l-btn-main _m">结算(5)</button>
       </div>
     </footer>
     <div class="mui-content">
@@ -59,7 +59,7 @@
         <div class="_icon"><i class="l-icon">&#xe63f;</i></div>
         <p class="_text">购物车空空如也</p>
         <div class="_btn">
-          <button type="button" class="mui-btn l-btn-main _inner">去购买</button>
+          <button type="button" class="mui-btn l-btn-main _m">去购买</button>
         </div>
       </div>
       <!-- 空数据 end-->

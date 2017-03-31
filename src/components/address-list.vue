@@ -10,7 +10,7 @@
       </div>
       <div class="_ft l-text-right l-border-t">
         <span class="mui-pull-left l-text-warn">默认地址</span>
-        <span class="l-margin-l-s"><i class="l-icon">&#xe630; </i>编辑</span>
+        <router-link class="l-margin-l-s" to="/address/edit"><i class="l-icon">&#xe630; </i>编辑</router-link>
         <span class="l-margin-l-s"><i class="l-icon">&#xe600; </i>删除</span>
       </div>
     </div>
@@ -24,7 +24,7 @@
       </div>
       <div class="_ft l-text-right l-border-t">
         <span class="mui-pull-left">设为默认</span>
-        <span class="l-margin-l-s"><i class="l-icon">&#xe630; </i>编辑</span>
+        <router-link class="l-margin-l-s" to="/address/edit"><i class="l-icon">&#xe630; </i>编辑</router-link>
         <span class="l-margin-l-s"><i class="l-icon">&#xe600; </i>删除</span>
       </div>
     </div>
@@ -40,3 +40,20 @@ export default {
   }
 }
 </script>
+<style scoped lang="less">
+/* 收货地址 */
+.l-address-item{
+  background: #fff; display: block; color: inherit;
+  a{ color: inherit; }
+  ._bd{ padding: 0.5rem  0.75rem; }
+  ._ft{ padding: 0.5rem 0.75rem; color: #666; font-size: 0.75rem;}
+  .mui-radio input{top: 1rem;}
+  .mui-radio.mui-left label{padding: 0 0 0 1.75rem;}
+  ._address{font-size: 0.75rem; line-height: 1.2; color: #999;word-break: break-all; margin-top: 0.125rem;}
+}
+.l-address-noslt{
+
+  .mui-radio input{display: none;} 
+  .mui-radio.mui-left label{padding-left: 0;}
+}
+</style>

@@ -3,10 +3,13 @@ import shop from './pages/shop'
 import shopCar from './pages/shop-car'
 import goodsInfo from './pages/goods-info'
 import orderCreate from './pages/order-create'
+import orderList from './pages/order-list'
+import orderEvaluate from './pages/order-evaluate'
 import me from './pages/me'
 import login from './pages/login'
 import register from './pages/register'
 import pwd from './pages/pwd'
+import addressInfo from './pages/address-info'
 
 const routes = [
   { 
@@ -57,6 +60,26 @@ const routes = [
     path: '/shop/order/create',
     meta: { title: '确认订单'},
     component: orderCreate
+  },
+  {
+    path: '/order/list',
+    meta: { title: '我的订单'},
+    component: orderList
+  },
+  {
+    path: '/order/evaluate',
+    meta: { title: '订单评价'},
+    component: orderEvaluate
+  },
+  {
+    path: '/address/add',
+    meta: { title: '新增收货地址'},
+    component: addressInfo
+  },
+  {
+    path: '/address/edit',
+    meta: { title: '编辑收货地址'},
+    component: addressInfo
   }
 ]
 

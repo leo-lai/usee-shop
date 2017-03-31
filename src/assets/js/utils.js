@@ -42,28 +42,28 @@ Array.prototype.find = Array.prototype.find || function(func) {
 }
 
 function _hasClass(elem, cls) {
-  cls = cls || '';
-  if (cls.replace(/\s/g, '').length == 0) return false; //当cls没有参数时，返回false
-  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ');
+  if(!elem || !cls) return false
+  if (cls.replace(/\s/g, '').length == 0) return false
+  return new RegExp(' ' + cls + ' ').test(' ' + elem.className + ' ')
 }
 
 function _addClass(elem, cls) {
-  if (!_hasClass(elem, cls)) {
-    elem.className = elem.className == '' ? cls : elem.className + ' ' + cls;
+  if (elem && !_hasClass(elem, cls)) {
+    elem.className = elem.className == '' ? cls : elem.className + ' ' + cls
   }
+  return this
 }
 
 function _removeClass(elem, cls) {
   if (_hasClass(elem, cls)) {
-    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' ';
+    var newClass = ' ' + elem.className.replace(/[\t\r\n]/g, '') + ' '
     while (newClass.indexOf(' ' + cls + ' ') >= 0) {
-      newClass = newClass.replace(' ' + cls + ' ', ' ');
+      newClass = newClass.replace(' ' + cls + ' ', ' ')
     }
-    elem.className = newClass.replace(/^\s+|\s+$/g, '');
+    elem.className = newClass.replace(/^\s+|\s+$/g, '')
   }
+  return this
 }
-
-
 
 /*========本地存储===========*/
 const STORE_PREFIX = '_dcsx_client_'

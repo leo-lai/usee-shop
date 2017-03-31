@@ -31,7 +31,7 @@
       <div class="l-margin-tb">
         <ul class="mui-table-view mui-table-view-chevron">
           <li class="mui-table-view-cell">
-            <a class="mui-navigate-right">我的订单</a>
+            <router-link class="mui-navigate-right" to="/order/list">我的订单</router-link>
           </li>
           <li class="mui-table-view-cell">
             <a class="mui-navigate-right">我的预约</a>

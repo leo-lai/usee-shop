@@ -3,7 +3,6 @@
     <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
-      <a class="mui-icon mui-icon-bars mui-pull-right"></a>
     </header>
     <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr">
       <div class="l-rest">
@@ -13,8 +12,8 @@
         </router-link>
       </div>
       <div class="_btn">
-        <button type="button" style="width: 6rem;" class="mui-btn l-btn-warn _inner" @click="addToCar">加入购物车</button>
-        <button type="button" style="width: 6rem;" class="mui-btn l-btn-main _inner l-margin-l-m" @click="buyNow">立即购买</button>
+        <button type="button" style="width: 6rem;" class="mui-btn l-btn-warn _m" @click="addToCar">加入购物车</button>
+        <button type="button" style="width: 6rem;" class="mui-btn l-btn-main _m l-margin-l-s" @click="buyNow">立即购买</button>
       </div>
     </footer>
     <div class="mui-content">
