@@ -19,6 +19,8 @@ export default {
     this.$eventHub.$on('APP-DIRECTION', (data)=>{
       this.direction = data
     })
+
+    // this.$mui.post('http://119.23.30.245:8081/useeproject/interface/shopUsers/phoneVerifyCode')
     
 	},
   mounted() {

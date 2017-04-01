@@ -1,8 +1,8 @@
 <template>
   <div class="l-page-group">
-    <div class="l-page" id="page-main">
+    <div class="l-page">
       <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
-        <h1 class="mui-title">{{ $route.meta.title }}</h1>
+        <h1 class="mui-title">确认订单</h1>
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>
       <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr">
@@ -117,7 +117,8 @@
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>
       <footer class="mui-bar mui-bar-footer l-flex-hc l-transparent">
-        <router-link class="mui-btn l-btn-main" to="/address/add">添加新地址</router-link>
+        <!-- <router-link class="mui-btn l-btn-main" to="/address/add">添加新地址</router-link> -->
+        <button class="mui-btn l-btn-main" @click="$pageTo('#page-invoice', '发票信息')">发票信息</button>
       </footer>
       <div class="mui-content">
         <address-list :mode="2"></address-list>

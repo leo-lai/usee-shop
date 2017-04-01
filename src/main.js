@@ -40,14 +40,17 @@ function _pageTo(toPageId, title){
   let fromPage = document.querySelector('.l-page._active')
   let toPage = document.querySelector(toPageId)
   if(toPage){
-    utils.addClass(fromPage, 'page-in-leave-active').removeClass(fromPage, '_active')
-    utils.addClass(toPage, 'page-in-enter-active').addClass(toPage, '_active')
+    utils.addClass(fromPage, 'page-in-leave-active')
+    utils.addClass(toPage, 'page-in-enter-active')
     if(title){
-      router.currentRoute.meta._title = router.currentRoute.meta.title
+      router.currentRoute.meta[toPageId + '_title'] = router.currentRoute.meta.title
       router.currentRoute.meta.title = title
     }
+    router.currentRoute.meta.type = 'to'
     router.push(toPageId)
+    
     setTimeout(()=>{
+      router.currentRoute.meta.type = ''
       utils.removeClass(fromPage, 'page-in-leave-active')
       utils.removeClass(toPage, 'page-in-enter-active')
     }, 600)
@@ -61,7 +64,6 @@ function _pageBack(toPageId, title){
     utils.addClass(fromPage, 'page-out-leave-active').removeClass(fromPage, '_active')
     utils.addClass(toPage, 'page-out-enter-active').addClass(toPage, '_active')
     if(title){
-      router.currentRoute.meta._title = router.currentRoute.meta.title
       router.currentRoute.meta.title = title
     }
     setTimeout(()=>{
@@ -127,30 +129,29 @@ const initHistory = [{
 initHistory.index = 0
 let _history = storage.session.get('_history') || initHistory
 
-// 控制内页跳转
+// 控制内联页面跳转
 router.beforeEach((to, from, next) => {
-
-  if(from.hash && /^#page-/.test(from.hash)){ // 从内页返回
-    _pageBack(to.hash, router.currentRoute.meta._title || router.currentRoute.meta.title)
+  // 从内页返回 e.g. page/path#page-inner -> page/path
+  if(from.hash && /^#page-/.test(from.hash) && to.path.indexOf(from.path) === 0 && router.currentRoute.meta.type !== 'to'){
+    _pageBack(to.hash, router.currentRoute.meta[from.hash + '_title'] || router.currentRoute.meta.title)
   }
 
-  if(from.path === '/'){
-    
-    if(to.hash && /^#page-/.test(to.hash)){
-      console.log(document.querySelector(to.hash))
-      setTimeout(()=>{
-        utils.addClass(document.querySelector(to.hash), '_active')
+  setTimeout(()=>{
+    if(to.hash){
+      if(/^#page-/.test(to.hash)){
         utils.removeClass(document.querySelector('.l-page._active'), '_active')
-      }, 2000)
+        utils.addClass(document.querySelector(to.hash), '_active') 
+      }
+    }else{
+      // 默认第一个展示
+      utils.addClass(document.querySelector('.l-page-group .l-page'), '_active')
     }
-  }
-
+  }, 50)
   next()
 })
 
 // 控制页面转场动画
 router.beforeEach((to, from, next) => {
-
   // 服务端渲染进入页面
   if(from.path === '/'){ 
     eventHub.$emit('APP-DIRECTION', 'page')
