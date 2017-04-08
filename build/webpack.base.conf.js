@@ -65,14 +65,6 @@ let webpackConfig = {
         ],
         exclude: /node_modules/
       },
-      // {
-      //   test: /\.css$/, 
-      //   loader: 'style!css'
-      // },
-      // {
-      //   test: /\.less$/, 
-      //   loader: 'style!css!less'
-      // },
       {
         test: /\.json$/,
         loader: 'json',
@@ -85,7 +77,7 @@ let webpackConfig = {
         loader: 'url',
         query: {
           limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
+          name: utils.assetsPath('images/[name].[hash:7].[ext]')
         }
       },
       {

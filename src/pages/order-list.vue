@@ -55,7 +55,9 @@ import orderList from 'components/order-list'
 import pullToRefresh from 'libs/mui/js/mui.pullToRefresh'
 import pullToRefreshMaterial from 'libs/mui/js/mui.pullToRefresh.material'
 
-var count = 0;
+let preventDefault = function(e){
+  e.preventDefault()
+}
 export default {
   components: {
     orderList
@@ -90,43 +92,31 @@ export default {
           //   callback: function() {
           //     var self = this;
           //     setTimeout(function() {
-          //       var ul = self.element.querySelector('.mui-table-view');
-          //       ul.insertBefore(createFragment(ul, index, 10, true), ul.firstChild);
           //       self.endPullDownToRefresh();
           //     }, 1000);
           //   }
           // },
           up: {
             callback: function() {
-              var self = this;
+              var self = this
               setTimeout(function() {
-                // var ul = self.element.querySelector('.mui-table-view');
-                // ul.appendChild(createFragment(ul, index, 5));
-                self.endPullUpToRefresh();
-              }, 1000);
+                self.endPullUpToRefresh()
+              }, 1000)
             }
           }
-        });
-      });
-      var createFragment = function(ul, index, count, reverse) {
-        var length = ul.querySelectorAll('li').length;
-        var fragment = document.createDocumentFragment();
-        var li;
-        for(var i = 0; i < count; i++) {
-          li = document.createElement('li');
-          li.className = 'mui-table-view-cell';
-          li.innerHTML = '第' + (index + 1) + '个选项卡子项-' + (length + (reverse ? (count - i) : (i + 1)));
-          fragment.appendChild(li);
-        }
-        return fragment;
-      };
+        })
+      })
+
+      document.addEventListener('touchmove', preventDefault, false)
     }
-    
   },
   created() {
     this.$nextTick(()=>{
       this.scrollInit()
     })
+  },
+  beforeDestroy() {
+    document.removeEventListener('touchmove', preventDefault, false)
   }
 }
 </script>

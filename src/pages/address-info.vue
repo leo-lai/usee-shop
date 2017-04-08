@@ -5,20 +5,20 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <footer class="mui-bar mui-bar-footer l-flex-hc l-transparent">
-      <button type="button" class="mui-btn l-btn-main" @click="sltInvoiceOk">提交</button>
+      <button type="button" class="mui-btn l-btn-main" :disabled="submiting" @click="submit">提交</button>
     </footer>
     <div class="mui-content">
       <div class="l-panel-group l-form">
         <div class="_item l-flex-hc">
           <label class="_tit">收货人姓名</label>
           <div class="_ipt l-rest">
-            <input type="text" placeholder="请输入姓名" maxlength="100">
+            <input type="text" placeholder="请输入收货人姓名" maxlength="100" v-model="formData.name">
           </div>
         </div>
         <div class="_item l-flex-hc">
           <label class="_tit">收货人手机</label>
           <div class="_ipt l-rest">
-            <input type="tel" placeholder="请输入手机号码" maxlength="11">
+            <input type="tel" placeholder="请输入手机号码" maxlength="11" v-model="formData.phoneNumber">
           </div>
         </div>
         <div class="_item l-flex-h">
@@ -30,7 +30,7 @@
         </div>
         <div class="_item l-flex-h">
           <label class="_tit">详细地址</label>
-          <textarea class="l-textarea" rows="3" placeholder="请输入详细地址(街道、门牌)"></textarea>
+          <textarea class="l-textarea" rows="3" maxlength="200" placeholder="请输入详细地址(如街道、门牌号)" v-model="formData.address"></textarea>
         </div>
       </div>
     </div>
@@ -48,28 +48,16 @@ export default {
   },
   data () {
     return {
-	  isShowPay: false,
-      invoiceType: ['不开发票', '普通发票', '增值税发票'],
-      invoiceIndex: 0,
-      sltedCityText: ''
+      submiting: false,
+      sltedCityText: '',
+      formData: {
+        name: '',           // 收货人姓名
+        phoneNumber: '',    // 收货人电话
+        address: ''         // 详细地址
+      }
     }
   },
   methods: {
-	showPay() {
-      this.isShowPay = !this.isShowPay
-    },
-    pay() {
-      this.showPay()
-    },
-    sltInvoiceType(type = 0) {
-      this.invoiceIndex = type
-      if(type == 0){
-        this.$router.back()
-      }
-    },
-    sltInvoiceOk() {
-      this.$router.back()
-    },
     pickerCity() {
       // 选择地区
       if(!this.cityPicker){
@@ -77,21 +65,76 @@ export default {
           layer: 3
         })
         this.cityPicker.setData(cityData)
+        this.formData.provinceId && this.cityPicker.pickers[0].setSelectedValue(this.formData.provinceId)
+        this.formData.cityId && this.cityPicker.pickers[1].setSelectedValue(this.formData.cityId)
+        this.formData.areaId && this.cityPicker.pickers[2].setSelectedValue(this.formData.areaId)
       }
       this.cityPicker.show((items)=>{
-        this.sltedCityText = (items[0] || {}).text + ' ' + (items[1] || {}).text + ' ' + (items[2] || {}).text
+        this.sltedCityText = items.map((item)=>{
+          return item.text || ''
+        }).join(' ')
+
+        this.formData.provinceId = items[0].value
+        this.formData.province = items[0].text
+        this.formData.cityId = items[1].value || ''
+        this.formData.city = items[1].text || ''
+        this.formData.areaId = items[2].value || ''
+        this.formData.area = items[2].text || ''
       })
     },
-    orderSubmit() {
-      this.showPay()
+    submit() {
+      if(!this.formData.name){
+        this.$mui.toptip('请输入收货人姓名')
+        return
+      }
+      if(!this.formData.phoneNumber){
+        this.$mui.toptip('请输入收货人手机')
+        return
+      }
+      if(!this.formData.provinceId){
+        this.$mui.toptip('请选择地区')
+        return
+      }
+      if(!this.formData.address){
+        this.$mui.toptip('请输入详细地址')
+        return
+      }
+
+      this.$mui.showWaiting()
+      this.submiting = true
+      this.$server.address.eidtInfo(this.formData).then(({data})=>{
+        this.$mui.toast(this.$route.params.id ? '修改收货地址成功' : '添加收货地址成功')
+        if(this.$route.query.type === 'slt'){
+          this.$storage.local.set('buy_slted_address', data)
+          this.$eventHub.$emit('APP-SLTED-ADDRESS', data, 1)
+        }
+        this.$router.back()
+      }).finally(()=>{
+        this.submiting = false
+        this.$mui.hideWaiting()
+      })
     }
   },
   created() {
     this.$mui.use(picker)
     this.$mui.use(popPicker)
-  },
-  mounted() {
-      
+
+    if(this.$route.params.id){
+      this.formData.addressId = this.$route.params.id
+      let addressInfo = this.$storage.session.get('temp_address_info')
+      if(addressInfo){
+        this.formData.name = addressInfo.name
+        this.formData.phoneNumber = addressInfo.phoneNumber
+        this.formData.province = addressInfo.province
+        this.formData.provinceId = addressInfo.provinceId
+        this.formData.city = addressInfo.city
+        this.formData.cityId = addressInfo.cityId
+        this.formData.area = addressInfo.area
+        this.formData.areaId = addressInfo.areaId
+        this.formData.address = addressInfo.address
+        this.sltedCityText = this.formData.province + ' ' + this.formData.city + ' ' + this.formData.area
+      }
+    }
   }
 }
 </script>

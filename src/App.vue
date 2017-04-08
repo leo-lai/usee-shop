@@ -5,6 +5,9 @@
 </template>
 
 <script>
+const scrollCallback = function(e){
+  console.log(e)
+}
 export default {
 	data() {
 		return {
@@ -12,22 +15,28 @@ export default {
 		}
 	},
   methods: {
-    
+    scroll() {
+      this.$nextTick(()=>{
+        var scrollContent = document.querySelector('.mui-scroll')
+        scrollContent.removeEventListener('scroll', scrollCallback, false)  
+        scrollContent.addEventListener('scroll', scrollCallback, false)  
+      })
+    }
   },
 	created() {
     // 监听页面切换
     this.$eventHub.$on('APP-DIRECTION', (data)=>{
       this.direction = data
     })
-
-    // this.$mui.post('http://119.23.30.245:8081/useeproject/interface/shopUsers/phoneVerifyCode')
-    
 	},
   mounted() {
     // console.log('app mounted')
+    // this.scroll()
+    
   },
   updated() {
     // console.log('app updated')
+    // this.scroll()
   }
 }
 </script>

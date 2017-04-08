@@ -1,33 +1,21 @@
 <template>
   <div :class="{'l-address-noslt': mode == 1}">
-    <div class="l-address-item l-margin-b">
+    <div class="l-address-item l-margin-b" v-for="item in addressList">
       <div class="_bd mui-radio mui-left">
         <label>
-          <p><span class="mui-pull-right">18610888888</span><span>张铁锤</span></p>
-          <p class="_address">北京 北京市 海淀区 </p>
+          <p><span class="mui-pull-right">{{item.phoneNumber}}</span><span>{{item.name}}</span></p>
+          <p class="_address">{{item.province+item.city+item.area+item.address}}</p>
         </label>
-        <input name="address" type="radio">
+        <input @click="slt(item)" name="address" type="radio" :checked="item.checked">
       </div>
       <div class="_ft l-text-right l-border-t">
-        <span class="mui-pull-left l-text-warn">默认地址</span>
-        <router-link class="l-margin-l-s" to="/address/edit"><i class="l-icon">&#xe630; </i>编辑</router-link>
-        <span class="l-margin-l-s"><i class="l-icon">&#xe600; </i>删除</span>
+        <span class="mui-pull-left" :class="{'l-text-warn': item.isDefault }" @click="setDefault(item)">设为默认</span>
+        <span class="l-margin-l-s" @click="edit(item)"><i class="l-icon">&#xe630; </i>编辑</span>
+        <span class="l-margin-l-s" @click="del(item.addressId)"><i class="l-icon">&#xe600; </i>删除</span>
       </div>
     </div>
-    <div class="l-address-item l-margin-b" v-for="item in 5">
-      <div class="_bd mui-radio mui-left">
-        <label>
-          <p><span class="mui-pull-right">18610888888</span><span>张铁锤</span></p>
-          <p class="_address">北京 北京市 海淀区 </p>
-        </label>
-        <input name="address" type="radio">
-      </div>
-      <div class="_ft l-text-right l-border-t">
-        <span class="mui-pull-left">设为默认</span>
-        <router-link class="l-margin-l-s" to="/address/edit"><i class="l-icon">&#xe630; </i>编辑</router-link>
-        <span class="l-margin-l-s"><i class="l-icon">&#xe600; </i>删除</span>
-      </div>
-    </div>
+
+    <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
   </div>
 </template>
 <script>
@@ -37,6 +25,71 @@ export default {
       type: Number,
       default: 1
     }
+  },
+  data() {
+    return {
+      loading: false,
+      addressList: null
+    }
+  },
+  methods: {
+    edit(item) {
+      this.$storage.session.set('temp_address_info', item)
+      this.$link('/address/edit/' + item.addressId, 'page-in')
+    },
+    del(addressId) {
+      this.$mui.confirm('确定删除？', (e)=>{
+        if(e.index == 1){
+          this.$mui.showWaiting()
+          this.$server.address.del(addressId).then(()=>{
+            this.$mui.toast('删除成功')
+            this.addressList = this.addressList.filter((item)=>{
+              return item.addressId !== addressId
+            })
+            if(this.sltedAddress && this.sltedAddress.addressId === addressId){
+              this.$storage.local.remove('buy_slted_address')
+              this.$eventHub.$emit('APP-SLTED-ADDRESS', null, this.addressList.length)
+            }
+          }).finally(()=>{
+            this.$mui.hideWaiting()
+          })
+        }
+      })
+    },
+    setDefault(item) {
+      this.$mui.showWaiting()
+      this.$server.address.setDefault(item.addressId).then(()=>{
+        this.addressList.forEach((item)=>{
+          item.isDefault = false
+        })
+        item.isDefault = true
+      }).finally(()=>{
+        this.$mui.hideWaiting()
+      })
+    },
+    slt(item) {
+      this.$storage.local.set('buy_slted_address', item)
+      this.$eventHub.$emit('APP-SLTED-ADDRESS', item, this.addressList.length)
+      this.$router.back()
+    }
+  },
+  created() {
+    this.$server.address.getList().then(({data})=>{
+      this.sltedAddress = this.$storage.local.get('buy_slted_address')
+      if(!this.sltedAddress){
+        data.forEach((item)=>{ // 选中默认地址
+          item.isDefault && (this.sltedAddress = item)
+        })
+      }
+
+      this.addressList = data.map((item)=>{
+        this.sltedAddress && this.sltedAddress.addressId === item.addressId && (item.checked = true)  
+        return item
+      })
+
+      this.$storage.local.set('buy_slted_address', this.sltedAddress)
+      this.$eventHub.$emit('APP-SLTED-ADDRESS', this.sltedAddress, this.addressList.length)
+    })
   }
 }
 </script>

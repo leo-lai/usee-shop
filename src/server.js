@@ -1,72 +1,77 @@
+import mui from 'libs/mui/js/mui'
 import Vue from 'vue'
 import { storage, utils } from 'assets/js/utils'
 
 // 测试
-let appid = 'wx8069d2775c2f68ab'
-let baseUrl = 'http://twww.dongcheshixiong.com'
+let appid = 'wxb022237ad49ef61f'
+let baseUrl = 'http://119.23.30.245:8080/useeproject/interface'
 
 // 正式
-if(window.location.origin === 'http://wx.dongcheshixiong.com'){
+if(window.location.origin === 'http://shop.usee.com'){
   appid = 'wxa68cfebf01268d68'
-  baseUrl = 'http://sas.dongcheshixiong.com'
+  baseUrl = 'http://api.usee.com'
 }
 
+const errorPromise = function(message = ''){
+  return new Promise((resolve ,reject)=>{
+    reject({ message })
+  })
+}
 const _http = {
   ajax(url = '', data = {}, type  = 'GET', contentType = 'form') {
     url = baseUrl + url
     let headers = {
-      'Token': storage.local.get('token') || '',
+      // 'sessionId': storage.local.get('sessionId') || '',
       'Content-Type': 'application/x-www-form-urlencoded'
     }
 
     if(contentType === 'json' || type === 'PUT'){
-      headers['Content-Type'] = 'text/plain'
+      // headers['Content-Type'] = 'text/plain'
       data = JSON.stringify(data)
     }
+    
+    // if(Vue._router.currentRoute.meta.auth){
+      data.sessionId = storage.local.get('sessionId')
+    // }
+    
     return new Promise((resolve, reject)=>{
-      $.ajax({
-        url,
+      mui.ajax(url, {
         data,
         type,
         headers,
         dataType: 'json',
         timeout: 60000,
         success(response, status, xhr) {
-          // 登录失效 800001 800002 800003
-          $.closeModal()
-          if(response.status_code === 800001 || response.status_code === 800002 || 
-            response.status_code === 800003) { 
-            $.hideIndicator()
-            $.alert(response.status_msg, ()=>{
-              _server.logout()
+          mui.closePopups()
+          !response.message && (response.message = '系统繁忙')
+          if(response.resultCode === 4002) { 
+            mui.hideWaiting()
+            mui.alert(response.message, ()=>{
+              _server.logout(false)
             })
-            reject(response.status_msg)
-          }else if(response.status_code !== 0){
-            $.hideIndicator()
-            $.alert(response.status_msg)
-            reject(response.status_msg)
+            reject(response.message)
+          }else if(response.resultCode !== 200){
+            mui.hideWaiting()
+            mui.alert(response.message)
+            reject(response.message)
           }else{
             // 修正接口数据规范
-            !response.list && (response.list = [])
-            !response.obj && (response.obj = {})
             resolve(response)
           }
         },
         error(xhr, errorType, error){
-          $.hideIndicator()
-          $.closeModal()
-          $.alert('请求失败，请检查网络。')
+          mui.hideWaiting()
+          mui.closePopups()
+          mui.alert('请求失败，请检查网络。')
           reject(error)
         }
       })
     })
   },
-  get(url = '', ...data) {
-    url = url + '/' + data.join('/')
+  get(url = '', data) {
     return this.ajax(url)
   },
-  delete(url = '', ...data){
-    url = url + '/' + data.join('/')
+  delete(url = '', data){
     return this.ajax(url, undefined, 'DELETE')
   },
   post(url, data, contentType = 'form') {
@@ -214,14 +219,7 @@ const _server = {
   getGrantUrl(url, params) {
     if(!url) return ''
     url = window.location.origin + utils.url.setArgs(url, params)
-    return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=snsapi_userinfo&state=dcsx#wechat_redirect`
-  },
-  // 获取微信信息
-  getWxByCode(code = '') {
-    return _http.get('/Member/login', code).then((response)=>{
-      storage.local.set('openid', response.obj.openid)
-      return response
-    })
+    return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) { 
@@ -249,11 +247,11 @@ const _server = {
           return
         }
 
-        _http.post('/Member/verify/js_config', { url }).then(({ obj })=>{
-          config.appId = obj.appid
-          config.timestamp = obj.timestamp
-          config.nonceStr = obj.noncestr
-          config.signature = obj.signature
+        _http.post('/shopOrderPay/getConfig', { url }).then(({ data })=>{
+          config.appId = data.appid
+          config.timestamp = data.timestamp
+          config.nonceStr = data.noncestr
+          config.signature = data.signature
 
           window.wx.config(config)
 
@@ -285,41 +283,29 @@ const _server = {
     })
     return promise
   },
-  getWxPayConfig(order_id) { // 微信支付配置
+  getWxPayConfig(formData = {}) { // 微信支付配置
     let promise = new Promise((resolve, reject)=>{
-      const openid = storage.local.get('openid')
-      if(!order_id){
+      if(!formData.orderId){
         reject('支付失败：订单id不存在')
-        $.alert('支付失败：订单id不存在')
+        mui.alert('支付失败：订单id不存在')
         return
       }
-
-      if(!openid){
-        reject('获取不到openid，请重新登录')
-        $.alert('获取不到openid，请重新登录', ()=>{
-          this.logout()
-        })
-        return
-      }
-
-      _http.post('/Api/Payment/wx_pay', {
-        openid, order_id
-      }).then(resolve).catch(reject)
+      _http.post('/shopOrderPay/pay/prepare', formData).then(resolve).catch(reject)
     })
 
     return promise
   },
-  chooseWXPay(order_id) { // 微信支付
+  chooseWXPay(orderId) { // 微信jssdk支付
     let promise = new Promise((resolve, reject)=>{
       if(!utils.device.isWechat){
-        $.alert('请在微信浏览器进行支付')
+        mui.alert('请在微信浏览器进行支付')
         reject('请在微信浏览器进行支付')
         return
       }
 
       this.getWxConfig().then((wx)=>{
         if(wx._ready){
-          this.getWxPayConfig(order_id).then(({obj})=>{
+          this.getWxPayConfig(orderId).then(({obj})=>{
             wx.chooseWXPay({
               timestamp: obj.timeStamp, 
               nonceStr: obj.nonceStr, 
@@ -332,7 +318,7 @@ const _server = {
                 }else if(res.err_msg === 'get_brand_wcpay_request:cancel'){
                   reject('cancel')
                 }else if(res.err_msg === 'get_brand_wcpay_request:fail'){
-                  $.alert('支付失败，如有疑问请联系客服')
+                  mui.alert('支付失败，如有疑问请联系客服')
                   reject('fail')
                 }else{
                   resolve('支付回调成功')
@@ -341,28 +327,28 @@ const _server = {
             })
           }).catch(reject)
         }else{
-          $.alert('微信jsdk不可用')
+          mui.alert('微信jsdk不可用')
           reject('微信jsdk不可用')
         }
       })
     })
     return promise
   },
-  chooseWXPay2(order_id) {
+  chooseWXPay2(formData) { // 微信浏览器支付
     let promise = new Promise((resolve, reject)=>{
       if(!utils.device.isWechat){
-        $.alert('请在微信浏览器进行支付')
+        mui.alert('请在微信浏览器进行支付')
         reject('请在微信浏览器进行支付')
         return
       }
-      this.getWxPayConfig(order_id).then(({obj})=>{
+      this.getWxPayConfig(formData).then(({obj})=>{
         WeixinJSBridge.invoke('getBrandWCPayRequest', obj, (res)=>{
           if(res.err_msg === 'get_brand_wcpay_request:ok') {
             resolve('ok')
           }else if(res.err_msg === 'get_brand_wcpay_request:cancel'){
             reject('cancel')
           }else if(res.err_msg === 'get_brand_wcpay_request:fail'){
-            $.alert('支付失败，如有疑问请联系客服')
+            mui.alert('支付失败，如有疑问请联系客服')
             reject('fail')
           }else{
             resolve('支付回调成功')
@@ -374,21 +360,21 @@ const _server = {
     return promise
   },
   previewImage(imgs = [], index = 0) {
-    $.showIndicator()
+    mui.showWaiting()
     this.getWxConfig().then((wx)=>{
       if(wx._ready){
         wx.previewImage({
           current: imgs[index],     // 当前显示图片的http链接
           urls: imgs,               // 需要预览的图片http链接列表
           fail(err) {
-            $.alert('预览图片失败：' + err.errMsg)
+            mui.alert('预览图片失败：' + err.errMsg)
           }
         })    
       }else{
-        $.alert('请在微信浏览器打开')
+        mui.alert('请在微信浏览器打开')
       }
     }).finally(()=>{
-      $.hideIndicator()
+      mui.hideWaiting()
     })
   },
   // 获取当前经纬度 成功失败都返回一个对象
@@ -459,7 +445,7 @@ const _server = {
         resolve(address)
       }else{
         self.getPosition().then((position)=>{
-          $.ajaxJSONP('http://apis.map.qq.com/ws/geocoder/v1/', {
+          mui.ajaxJSONP('http://apis.map.qq.com/ws/geocoder/v1/', {
             params: {
               location: position.latitude + ',' + position.longitude,
               key: 'GPIBZ-V7YH3-CD735-3HDQM-CNM3F-4PFQP',
@@ -521,9 +507,9 @@ const _server = {
   },
   // 发送手机验证码
   sendMobiCode(phone, btn) {
-    if(!phone) {
-      $.alert('请输入正确手机号码')
-      return
+    if(!/^1\d{10}$/.test(phone)) {
+      mui.alert('请输入正确手机号码')
+      return errorPromise('请输入正确手机号码')
     }
 
     let time = 30
@@ -534,7 +520,7 @@ const _server = {
       oldtext = btn.textContent
       timeid = setInterval(()=>{
         if(--time >= 0){
-          btn.textContent = `${time}s后重新获取`
+          btn.textContent = `${time}s`
         }else{
           clearInterval(timeid)
           btn.removeAttribute('disabled')
@@ -543,9 +529,11 @@ const _server = {
       }, 1000)
     }
 
-    let promise = _http.get(`/Member/verify/sms/${phone}`)
+    let promise = _http.post('/shopUsers/phoneVerifyCode', { phoneNumber: phone })
     promise.then((response)=>{
-      $.toast('验证码已发送到您的手机上', 2000, 'l-toast')
+      mui.toast('验证码已发送到您的手机上')
+      // response.data = response.data ? response.data : '1234'
+      return response
     }).catch(()=>{
       clearInterval(timeid)
       btn.removeAttribute('disabled')
@@ -555,216 +543,116 @@ const _server = {
     return promise
   },
   // 注销
-  logout(isRemote, toUrl = window.location.pathname) {
-    storage.local.remove('token')
+  logout (tipText = '请先登录', toUrl = window.location.pathname) {
+    let sessionId = storage.local.get('sessionId')
+    if(sessionId){
+      _http.post('/shopUsers/loginOut', { sessionId })
+      storage.local.remove('sessionId')
+      storage.local.remove('userInfo')
+    }
+    
+    tipText && mui.toast(tipText)
     if(utils.device.isWechat){
       // 避免登录后跳转到登录页面
       toUrl = toUrl === '/login' ? '/index' : toUrl
       window.location.replace(_server.getGrantUrl('/login', {to: toUrl}))
     }else{
-      Vue._router.push('/login')
+      Vue._link(`/login?to=${toUrl}`, 'page-in')
     }
+  },
+  // 检测登录
+  checkLogin() {
+    return storage.local.get('sessionId')
   },
   // 登录
-  login(formData) {
-    return _http.post('/Member/login', formData)
+  login(type, formData) {
+    var url = type == 1 ? '/shopUsers/loginPassword' : '/shopUsers/loginCode'
+    return _http.post(url, formData).then((response)=>{
+      !response.data && (response.data = {})
+      response.data.avatar = utils.image.wxHead(response.data.image)
+      storage.local.set('userInfo', response.data)
+      return response
+    })
   },
-  // 电子报告
-  getReport(carid) {
-    return _http.get('/Member/electronic/report', carid)
+  // 注册
+  register(formData) {
+    return _http.post('/shopUsers/register', formData).then((response)=>{
+      !response.data && (response.data = {})
+      response.data.avatar = utils.image.wxHead(response.data.image)
+      storage.local.set('userInfo', response.data)
+      return response
+    })
   },
-  // 车主资料
-  user: {
-    // 我的资料
-    getInfo() {
-      return _http.get('/Member/User/get_info')
-    },
-    // 我的优惠券
-    getCoupons(type = 1) {
-      return new List('UserCoupons', [type])
-    },
-    // 我的套餐
-    getCombos() {
-      return new List('UserCombos')
-    },
-    // 查询账户
-    getCash() {
-      return _http.get('/Member/pay/cash')
-    },
-    // 个人钱包支付
-    cashPay(formData) {
-      return _http.post('/Member/pay/cash_pay', formData)
-    },
-    // 钱包充值
-    recharge(money = 0) {
-      return _http.post('/Member/order/recharge', { money })
-    }
+  // 修改密码、找回密码
+  changePwd(formData) {
+    return _http.post('/shopUsers/forgetPassword', formData).then((response)=>{
+      !response.data && (response.data = {})
+      return response
+    })
   },
-  // 分销商
-  agent: {
-    getQrcode() { // 分销商二维码
-      return _http.get('/Member/User/get_grcode')
-    },
-    isTrue() { // 是否为分销商
-      return _http.get('/Member/user/judge')
-    },
-    apply(formData) { // 申请为分销商
-      return _http.post('/Member/user/apply', formData)
-    },
-    getRecord() { // 分销记录
-      return new List('AgentRecord')
-    }
+  // 首页幻灯片
+  getBanner() {
+    return _http.post('/carouselFigure/getImages').then((response)=>{
+      !response.data && (response.data = [])
+      return response
+    })
   },
-  // 股东
-  holder: {
-    getQrcode() {
-      return _http.get('/Member/User/get_holder')
-    },
-    isTrue() { // 是否为股东
-      return _http.get('/Member/holder/judge_holder')
-    },
-    // 股东信息
-    getInfo() {
-      return _http.get('/Member/holder/info')
-    },
-    // 提现记录
-    getDrawal() {
-      return new List('HolderDrawal')
-    },
-    // 我的人脉
-    getMember() {
-      return new List('HolderMember')
-    },
-    // 分红记录
-    getRebate() {
-      return new List('HolderRebate')
-    }
-  },
-  // 活动信息
-  activity: {
+  // 地址
+  address: {
     getList() {
-      return _http.get('/Member/Activity/list')
-    }
-  },
-  // 有关车辆接口
-  car: {
-    getList() {
-      return _http.get('/Member/Car/list')
+      return _http.post('/shopUsers/myAddressList').then((response)=>{
+        !response.data && (response.data = [])
+        return response
+      })
     },
-    getInfo(id) {
-      return _http.get('/Member/Car/info', id)
+    eidtInfo(formData) {
+      return _http.post('/shopUsers/addOrEditAddress', formData)
     },
-    edit(id, formData) {
-      return _http.put(`/Member/Car/set/${id}`, formData)
+    del(addressId) {
+      return _http.post('/shopUsers/delAddress', { addressId })
     },
-    add(formData) {
-      return _http.post('/Member/Car/add', formData)
-    },
-    del(id){
-      return _http.delete(`/Member/Car/delete/${id}`)
-    },
-    getBrands() {
-      return _http.get('/Member/Car/brand')
-    },
-    getFamily(id) {
-      return _http.get('/Member/car/family', id)
-    },
-    getGroup(id) {
-      return _http.get('/Member/car/group', id)
-    },
-    getPailiang(id) {
-      return _http.get('/Member/car/pailiang', id)
-    },
-    getModel(id) {
-      return _http.get('/Member/car/model', id)
-    }
-  },
-  // 优惠券
-  coupon: {
-    getList() {
-      return new List('Coupons')
-    },
-    pick(coupon_id) {
-      return _http.get('/Member/coupon/pick', coupon_id)
-    }
-  },
-  // 套餐年卡
-  combo: {
-    getList() {
-      return new List('Combos')
-    },
-    getInfo(suit_id) {
-      return _http.get('/Member/combo/info', suit_id)
-    },
-    getService(suit_id, carid) {
-      return _http.get('/Member/combo/detail', suit_id, carid)
-    },
-    getParts(service_id, carid) {
-      return _http.get('/Member/combo/change_parts', service_id, carid)
-    },
-    // 购买套餐
-    order(jsonData) {
-      jsonData = JSON.stringify(jsonData)
-      return _http.post('/Member/order/combo_order', {jsonstr: jsonData} )
-    },
-    pay(formData) { // 套餐支付
-      return _http.post('/Member/pay/pay_combo', formData)
+    setDefault(addressId) {
+      return _http.post('/shopUsers/setAddressIsDefault', { addressId })
     }
   },
   // 商城
   shop: {
-    // 一级分类
-    getCategory1(page = 1, row = 50) { 
-      return _http.get('/Member/shopping/fist_category_list', page, row)
+    getGoodsList(recommend = '') {
+      return _http.post('/shopGoods/goodsSearch', {isIndex: recommend}).then((response)=>{
+        !response.data && (response.data = [])
+        return response
+      })
     },
-    // 二级分类
-    getCategory2(category1_id) {
-      return _http.get('/Member/shopping/second_category_list', category1_id)
-    },
-    // 商品列表
-    getGoodsList(category1_id = 0, category2_id = 0, desc = 'DESC') {
-      return new List('Goods', [desc, category1_id, category2_id])
-    },
-    // 商品详情
-    getGoodsInfo(id){
-      return _http.get('/Member/shopping/goods_detail', id)
-    },
-    // 获取立即购买信息
-    getBuyInfo(id, longitude = 0, latitude = 0) {
-      return _http.post('/Member/Shopping/order_info', {
-        id,
-        longitude,
-        latitude
+    getGoodsInfo(goodsId = '') {
+      return _http.post('/shopGoods/goodsInfo', { goodsId }).then((response)=>{
+        !response.data && (response.data = {})
+        return response
       })
     }
   },
   // 购物车
   shopcar: {
     getList() {
-      return _http.get('/Member/cart/list')
+      return _http.post('/shopGoods/shoppingCartList').then((response)=>{
+        !response.data && (response.data = [])
+        return response
+      })
     },
     // 修改购物车数量
-    editNum(id, goods_number = 1) {
-      return _http.post('/Member/cart/add_num_info', {
-        id, goods_number
+    editNum(shoppingCartId, number = 1) {
+      return _http.post('/shopGoods/changeShoppingCart', {
+        shoppingCartId, number
       })
     },
     // 添加商品到购物车
-    add(id, goods_number = 1) {
-      return _http.post('/Member/cart/add', {
-        id, goods_number
-      })
+    add(formData) {
+      return _http.post('/shopGoods/addShoppingCart', formData)
     },
     // 删除一个或多个购物车商品
-    del(id) { // id = '1,2,3'
-      return _http.post('/Member/cart/delete', {
-        id
+    del(shoppingCartIds) { // id = '1,2,3'
+      return _http.post('/shopGoods/delShoppingCart', {
+        shoppingCartIds
       })
-    },
-    // 获取购物车结算信息
-    getBuyInfo(jsonData) {
-      jsonData = JSON.stringify(jsonData)
-      return _http.post('/Member/cart/settle', {jsonstr: jsonData} )
     }
   },
   // 订单
@@ -772,33 +660,29 @@ const _server = {
     getList( type = 1) { // 订单列表
       return new List('Order', [type])
     },
-    getInfo(order_id) {
-      return _http.get('/Member/order/info', order_id)
+    getInfo(orderId) {
+      return _http.get('/Member/order/info', orderId)
     },
-    add(formData) { // 单个商品下单
-      return _http.post('/Member/order/goods', formData)
+    addFromGoodsInfo(formData) { // 1从订单详情下单
+      return _http.post('/shopGoods/addOrders', formData)
     },
-    add2(jsonData) { // 多个商品下单
-      jsonData = JSON.stringify(jsonData)
-      return _http.post('/Member/order/cart_goods', {jsonstr: jsonData} )
+    addFromShopcar(formData) { // 2从购物车下单
+      return _http.post('/shopGoods/addOrdersOfshoppingCart', formData)
     },
-    getHistory() { // 订单(消费)记录
-      return new List('OrderHistory')
+    cancel(orderId) {
+      return _http.put(`/Member/order/cancel/${orderId}`)
     },
-    cancel(order_id) {
-      return _http.put(`/Member/order/cancel/${order_id}`)
+    recive(orderId) {
+      return _http.put(`/Member/order/order_recive/${orderId}`)
     },
-    recive(order_id) {
-      return _http.put(`/Member/order/order_recive/${order_id}`)
-    }
-  },
-  // 门店
-  store: {
-    getList(longitude = 0, latitude = 0) {
-      return new List('Store', { longitude, latitude }, 'POST')
+    editInvoice(formData) {
+      return _http.post('/shopUsers/addOrEditInvoiceInfo', formData)
     },
-    getInfo(id) {
-      return _http.get('/Member/store/info', id)
+    getInvoice() {
+      return _http.post('/shopUsers/myInvoiceInfo').then((response)=>{
+        !response.data && (response.data = {})
+        return response
+      })
     }
   }
 }

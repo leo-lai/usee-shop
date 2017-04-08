@@ -2,19 +2,20 @@
   <div class="l-page">
     <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
-      <!-- <a class="mui-icon mui-icon-arrowleft mui-pull-left"></a> -->
-      <!-- <a class="mui-icon mui-icon-bars mui-pull-right"></a> -->
     </header>
     <nav-tab></nav-tab>
     <div class="mui-content">
       <div class="l-card-me">
-        <div class="_bg" :style="{'background-image': 'url('+ userInfo.avator +')'}"></div>
+        <div class="_bg" :style="{'background-image': 'url('+ userInfo.avatar +')'}"></div>
         <div class="_inner l-flex-hc">
           <div class="l-rest">
-            <h3>用户昵称</h3>
-            <p>13800138000</p>
+            <template v-if="userInfo">
+              <h3>{{userInfo.userName}}</h3>
+              <p>{{userInfo.phoneNumber}}</p>
+            </template>
+            <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">你还未未登录</span>
           </div>
-          <div class="l-avatar" :style="{'background-image': 'url('+ userInfo.avator +')'}"></div>
+          <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
         </div>
       </div>
       <div class="mui-row l-text-center l-bg-white l-border-t">
@@ -22,7 +23,7 @@
           <p><img style="height: 2rem;" src="~assets/images/icon-004.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">购物车</p>
         </router-link>
-        <a class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link">
+        <a class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link l-disabled" @click="$mui.coding">
           <p><img style="height: 2rem;" src="~assets/images/icon-005.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">我的报告</p>
         </a>
@@ -33,24 +34,25 @@
           <li class="mui-table-view-cell">
             <router-link class="mui-navigate-right" to="/order/list">我的订单</router-link>
           </li>
-          <li class="mui-table-view-cell">
-            <a class="mui-navigate-right">我的预约</a>
+          <li class="mui-table-view-cell l-disabled">
+            <a class="mui-navigate-right" @click="$mui.coding">我的预约</a>
           </li>
-          <li class="mui-table-view-cell">
-            <a class="mui-navigate-right">我的疗程</a>
+          <li class="mui-table-view-cell l-disabled">
+            <a class="mui-navigate-right" @click="$mui.coding">我的疗程</a>
           </li>
-          <li class="mui-table-view-cell">
-            <a class="mui-navigate-right">我的验光单</a>
+          <li class="mui-table-view-cell l-disabled">
+            <a class="mui-navigate-right" @click="$mui.coding">我的验光单</a>
           </li>
         </ul>
       </div>
 
-      <div class="l-margin-tb l-text-center l-padding-tb-m l-bg-white l-text-gray l-link" @click="logout">退出登录</div>
+      <div class="l-margin-tb l-text-center l-padding-tb-m l-bg-white l-text-gray l-link" @click="logout" v-if="userInfo">退出登录</div>
     </div>
   </div>
 </template>
 <script>
 import navTab from 'components/nav-tab'
+let avatar = require('assets/images/avatar.jpg')
 
 export default {
   components: {
@@ -58,22 +60,21 @@ export default {
   },
   data () {
     return {
-      userInfo: {
-        avator: require('assets/images/avatar.jpg')
-      }
+      defaultAvatar: avatar,
+      userInfo: null
     }
   },
   methods: {
     logout() {
       this.$mui.confirm('是否退出登录？', null, null, (e)=>{
         if(e.index == 1){
-          this.$router.push('/login')
+          this.$server.logout(false)
         }
       })
     }
   },
   created() {
-
+    this.userInfo = this.$storage.local.get('userInfo')
   }
 }
 </script>

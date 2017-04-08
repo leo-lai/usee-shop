@@ -4,35 +4,31 @@
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
     </header>
     <nav-tab></nav-tab>
-    <div class="mui-content">
+    <div class="mui-content mui-scroll">
       <!-- banner -->
       <div class="mui-slider">
-        <div class="mui-slider-group mui-slider-loop">
-          <div class="mui-slider-item mui-slider-item-duplicate"><a><img src="~assets/images/temp-001.jpg" /></a></div>
-          <div class="mui-slider-item"><a><img src="~assets/images/temp-001.jpg" /></a></div>
-          <div class="mui-slider-item"><a><img src="~assets/images/temp-001.jpg" /></a></div>
-          <div class="mui-slider-item"><a><img src="~assets/images/temp-001.jpg" /></a></div>
-          <div class="mui-slider-item mui-slider-item-duplicate"><a><img src="~assets/images/temp-001.jpg" /></a></div>
+        <div class="mui-slider-group mui-slider-loop" v-if="bannerList">
+          <div class="mui-slider-item mui-slider-item-duplicate" v-if="bannerList.length > 1"><a><img :src="bannerList[0].imagePath" /></a></div>
+          <div class="mui-slider-item" v-for="item in bannerList"><a><img :src="item.imagePath" /></a></div>
+          <div class="mui-slider-item mui-slider-item-duplicate" v-if="bannerList.length > 1"><a><img :src="bannerList[bannerList.length-1].imagePath" /></a></div>
         </div>
         <div class="mui-slider-indicator">
-          <div class="mui-indicator mui-active"></div>
-          <div class="mui-indicator"></div>
-          <div class="mui-indicator"></div>
+          <div class="mui-indicator" :class="{'mui-active': index === 0}" v-for="(item,index) in bannerList"></div>
         </div>
       </div>
       <!-- banner end-->
 
       <!-- menu -->
       <div class="mui-row l-text-center l-bg-white l-border-t">
-        <a class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link">
+        <a class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link l-disabled" @click="$mui.coding">
           <p><img style="height: 2rem;" src="~assets/images/icon-001.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">服务预约</p>
         </a>
-        <a class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link">
+        <a class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link l-disabled" @click="$mui.coding">
           <p><img style="height: 2rem;" src="~assets/images/icon-002.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">护眼方案</p>
         </a>
-        <a class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link">
+        <a class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link l-disabled" @click="$mui.coding">
           <p><img style="height: 2rem;" src="~assets/images/icon-003.png" alt=""></p>
           <p class="l-margin-t-xs l-fs-m">视保定制</p>
         </a>
@@ -45,16 +41,17 @@
         <span class="l-text-gray"> / Recommend</span>
       </div>
       <div class="l-goods-list">
-        <div class="l-goods-item l-margin-b">
+        <router-link class="l-goods-item l-margin-b" tag="div" v-for="item in goodsList" :to="'/shop/goods/info/' + item.goodsId">
           <div class="_thumb">
-            <img src="~assets/images/temp-002.jpg" alt="">
+            <img :src="item.image">
           </div>
           <div class="_text l-border-t">
-            <h3>喷喷喷喷喷喷喷喷喷喷</h3>
-            <p class="l-fs-m">喷一喷，9秒亮瞎眼</p>
-            <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>268.00</p>
+            <h3>{{item.goodsName}}</h3>
+            <p class="l-fs-m">{{item.goodsBrief}}</p>
+            <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</p>
           </div>
-        </div>
+        </router-link>
+        <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
       </div>
       <!-- recommend end-->
     </div>
@@ -69,16 +66,28 @@ export default {
   },
   data () {
     return {
-      
+      loading: false,
+      goodsList: null,
+      bannerList: null
     }
   },
-  computed: {
-   
-  },
-  mounted() {
-    this.$nextTick(()=>{
-      this.$mui('.mui-slider').slider({
-        interval: 3000
+  created() {
+    this.loading = true
+    this.$server.shop.getGoodsList(1).then(({data})=>{
+      setTimeout(()=>{
+        this.goodsList = data
+        this.loading = false
+      }, 600)
+    }).catch(()=>{
+      this.loading = false
+    })
+
+    this.$server.getBanner().then(({data})=>{
+      this.bannerList = data
+      this.$nextTick(()=>{
+        this.$mui('.mui-slider').slider({
+          interval: 3000
+        })
       })
     })
   }

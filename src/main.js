@@ -8,21 +8,24 @@ import { storage, utils } from 'assets/js/utils'
 import server from './server'
 import routes from './routes'
 import App from './App'
+
 FastClick.attach(document.body)
 
 // 添加插件
 mui.use = function(plugName){
   mui.isFunction(plugName) && plugName(mui, window, document, undefined)
 }
+// 顶部提示
+mui.toptip = utils.toptip
+// 等待框
+mui.showWaiting = utils.showWaiting
+mui.hideWaiting = utils.hideWaiting
+mui.coding = function() {
+  mui.alert('该功能开发中，敬请期待！')
+}
 
 // 组件通信中心
 const eventHub = new Vue()
-Vue.mixin({
-  created() {
-    this.$eventHub = eventHub
-    this.$mui = mui
-  }
-})
 
 // 路由
 Vue.use(VueRouter)
@@ -35,7 +38,7 @@ const router = new VueRouter({
   }
 })
 
-
+// 进入内页
 function _pageTo(toPageId, title){
   let fromPage = document.querySelector('.l-page._active')
   let toPage = document.querySelector(toPageId)
@@ -57,6 +60,7 @@ function _pageTo(toPageId, title){
   }
 }
 
+// 内页返回
 function _pageBack(toPageId, title){
   let fromPage = document.querySelector('.l-page._active')
   let toPage = toPageId ? document.querySelector(toPageId) : document.querySelector('.l-page')
@@ -73,46 +77,29 @@ function _pageBack(toPageId, title){
   }
 }
 
-Vue.mixin({
-  created() {
-    // 可访问外部链接
-    this.$link = function(url, direction){
-      if(!url) return
+// 跳转
+function _link(url, direction){
+  if(!url) return
 
-      if(/^http(s?)/i.test(url)){
-        window.location.assign(url)
-      }else{
-        if(_history && direction){
-          _history.direction = direction
-          storage.session.set('_history', _history)
-        }
-        this.$router.push(url)
-      }
+  if(/^http(s?)/i.test(url)){
+    window.location.assign(url)
+  }else{
+    if(_history && direction){
+      _history.direction = direction
+      storage.session.set('_history', _history)
     }
-
-    // 跳转内页
-    this.$pageTo = _pageTo
+    router.push(url)
   }
-})
+}
 
 // 验证登陆
-// if(window.location.hostname === '192.168.0.134'){ // 本地测试
-//   storage.local.set('openid', 'odjF11oC5FsVYkaKgsyoE7fsmglQ')
-//   storage.local.set('token', 'UfD0a7yJGtnINJR6q4wenQrJbd80HBr5OJ5S56x2FEuVwtK1J7fNt_b_bv0azgvqHs49bnNbkdTYQUJRLnwQi6PhvUzxIxw6QdUNnNL6COMKo_c')
-// }
-
-// router.beforeEach((to, from, next) => {
-//   let isCheckLogin = to.meta.auth
-  
-//   if(isCheckLogin === undefined) {
-//     isCheckLogin = true
-//   }
-//   if(isCheckLogin && !storage.local.get('token')){
-//     server.logout()
-//     next(false)
-//   }
-//   next()
-// })
+router.beforeEach((to, from, next) => {
+  if(to.meta.auth && !storage.local.get('sessionId')){
+    server.logout()  
+    next(false)
+  }
+  next()
+})
 
 // 记录微信的Landing Page，用于当前目录地址授权验证
 storage.session.set('wx_url', window.location.href)
@@ -248,8 +235,18 @@ router.onReady(()=>{
   }, 50) 
 })
 
-
 Vue._router = router
+Vue._link = _link
+
+Vue.mixin({
+  created() {
+    this.$link = _link
+    this.$pageTo = _pageTo
+    this.$eventHub = eventHub
+    this.$mui = mui
+  }
+})
+
 /* eslint-disable no-new */
 const vm = new Vue({
   router,

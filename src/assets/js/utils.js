@@ -162,6 +162,7 @@ export let storage = {
 }
 /*========utils小工具===========*/
 // 参考jq源码
+let toptipTimeid = null
 const class2type = (function(){
   let ret = {}
   'Boolean Number String Function Array Date RegExp Object Error'.split(' ').forEach((name) => {
@@ -365,6 +366,39 @@ export let utils = {
       }
       return src.replace(/\/0$/, '/64')
     }
+  },
+  toptip(text, ms = 3000) {
+    if(!text) return
+    let toptip = document.querySelector('#l-toptip')
+    if(!toptip){
+      toptip = document.createElement('div')
+      toptip.id = 'l-toptip'
+      toptip.className = 'l-toptip'
+      document.body.appendChild(toptip)
+    }
+    
+    clearTimeout(toptipTimeid)
+    toptip.innerHTML = text
+    toptip.classList.add('_show')
+    toptipTimeid = setTimeout(function(){
+      toptip.classList.remove('_show')
+    }, ms)
+  },
+  showWaiting(text = '') {
+    let waiting = document.querySelector('#l-waiting')
+    if(!waiting){
+      waiting = document.createElement('div')
+      waiting.id = 'l-waiting'
+      waiting.className = 'l-waiting'
+      waiting.innerHTML = '<div class="_inner"><i class="mui-spinner"></i><p class="_txt"></p></div>'
+      document.body.appendChild(waiting)
+    }
+    document.querySelector('#l-waiting ._txt').innerHTML = text
+    waiting.classList.remove('_hide')
+  },
+  hideWaiting() {
+    let waiting = document.querySelector('#l-waiting')
+    waiting && waiting.classList.add('_hide')
   }
 }
 

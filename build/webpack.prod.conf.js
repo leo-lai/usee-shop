@@ -44,7 +44,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     // see https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       // title: '',
-      favicon: 'src/asset/favicon.png',
+      favicon: 'src/assets/favicon.png',
       filename: process.env.NODE_ENV === 'testing'
         ? 'index.html'
         : config.build.index,

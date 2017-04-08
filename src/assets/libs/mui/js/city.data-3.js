@@ -11549,9 +11549,5 @@ export default [{
 	}]
 }, {
 	value: '990000',
-	text: '海外',
-	children: [{
-		value: "990100",
-		text: "海外"
-	}]
+	text: '海外'
 }]
