@@ -9,7 +9,7 @@
       <div class="mui-slider">
         <div class="mui-slider-group mui-slider-loop" v-if="bannerList">
           <div class="mui-slider-item mui-slider-item-duplicate" v-if="bannerList.length > 1"><a><img :src="bannerList[0].imagePath" /></a></div>
-          <div class="mui-slider-item" v-for="item in bannerList"><a><img :src="item.imagePath" /></a></div>
+          <div class="mui-slider-item" v-for="item in bannerList"><a @click="$link(item.clickURL)"><img :src="item.imagePath" /></a></div>
           <div class="mui-slider-item mui-slider-item-duplicate" v-if="bannerList.length > 1"><a><img :src="bannerList[bannerList.length-1].imagePath" /></a></div>
         </div>
         <div class="mui-slider-indicator">
