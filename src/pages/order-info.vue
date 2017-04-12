@@ -6,16 +6,17 @@
     </header>
     <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr">
       <div class="l-rest"></div>
-      <a class="mui-btn l-btn-white _s">取消订单</a>
-      <a class="mui-btn l-btn-main _s l-margin-l-m">确认收货</a>
-      <router-link class="mui-btn l-btn-main _s l-margin-l-m" to="/order/evaluate">去付款</router-link>
-      <router-link class="mui-btn l-btn-main _s l-margin-l-m" to="/order/evaluate">去评价</router-link>
+      <div v-if="orderInfo">
+        <a class="mui-btn l-margin-l-s l-btn-white _s" v-if="orderInfo.ordersState == 1" @click="cancel(orderInfo.orderId)">取消订单</a>
+        <a class="mui-btn l-margin-l-s l-btn-main _s" v-if="orderInfo.ordersState == 1" @click="pay()">去付款</a>
+        <a class="mui-btn l-margin-l-s l-btn-main _s" v-if="orderInfo.ordersState == 3" @click="receive(orderInfo.orderId)">确认收货</a>
+      </div>
     </footer>
-    <div class="mui-content l-fs-s">
+    <div class="mui-content l-fs-s" v-if="orderInfo">
       <!-- 收货地址 -->
       <div class="l-bg-white">
         <div class="l-order-state l-flex-hc">
-          <span class="l-rest">代付款</span>
+          <span class="l-rest">{{ordersState[orderInfo.ordersState]}}</span>
           <span><i class="l-icon">&#xe634;</i></span>
         </div>
         <div class="l-flex-hc l-padding-btn l-border-b">
@@ -23,7 +24,8 @@
             <i class="l-icon">&#xe647;</i>
           </div>
           <div class="l-rest">
-            物流单号：123132056512
+            <p>物流公司：{{orderInfo.expressName || '无'}}</p>
+            <p>物流单号：{{orderInfo.expressCode || '无'}}</p>
           </div>
         </div>
         <div class="l-flex-hc l-padding-btn">
@@ -32,10 +34,10 @@
           </div>
           <div class="l-rest">
             <p class="l-margin-b-xs">
-              <span class="mui-pull-right">18602029524</span>
-              <span>收货人：赖国聪</span>
+              <span class="mui-pull-right">{{address[1]}}</span>
+              <span>收货人：{{address[0]}}</span>
             </p>
-            <p class="l-lh-s">收货地址：广东省广州市天河区5号空间广东省广州市天河区5号空间</p>
+            <p class="l-lh-s">收货地址：{{address[2]}}</p>
           </div>
         </div>
         <div class="l-line-color"></div>  
@@ -46,32 +48,32 @@
           <span>购买的商品</span>
         </div>
         <div class="l-panel-group">
-          <div class="_item l-flex-hc" v-for="item in 3">
-            <div class="l-thumb l-bg-contain l-margin-r" style="background-image: url('http://placeholdit.imgix.net/~text?txtsize=33&bg=ff784e&txtclr=fff&txt=thumb&w=120&h=120')"></div>
+          <div class="_item l-flex-hc" v-for="goods in orderInfo.ordersInfo">
+            <div class="l-thumb l-bg-contain l-margin-r" :style="{'background-image': 'url('+ goods.image +')'}"></div>
             <div class="l-rest">
-              <p class="l-text-wrap2">Lamp C091Lamp C091LampLamp C091Lamp C091LampLamp C091Lamp C091LampLamp C091Lamp C091Lamp </p>
+              <p class="l-text-wrap2">{{goods.goodsName}}</p>
               <div class="l-margin-m1">
                 <p class="mui-pull-right">
-                  <span><b class="l-icon">&#xe6cb;</b>268.00</span>
-                  <span class="l-text-gray">x3</span>
+                  <span><b class="l-icon">&#xe6cb;</b>{{goods.amount}}</span>
+                  <span class="l-text-gray">x{{goods.goodsNumber}}</span>
                 </p>
-                <span class="l-text-gray">颜色：苹果红</span>
+                <span class="l-text-gray" v-show="goods.colorId">颜色：{{goods.colorName}}</span>
               </div>
             </div>
           </div>
         </div>
         <div class="l-padding-btn l-bg-white l-border-t">
-          <p class="mui-pull-right">实付款：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span></p>
-          <span>订单总价：<b class="l-icon">&#xe6cb;</b>268.00</span>
+          <p class="mui-pull-right">实付款：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{orderInfo.amount}}</span></p>
+          <span>订单总价：<b class="l-icon">&#xe6cb;</b>{{orderInfo.amount}}</span>
         </div>
       </div>
       <!-- 订单时间 -->
       <div class="l-margin-t l-bg-white l-padding-btn l-text-gray l-margin-b">
-        <p>订单编号：6464123564654</p>
-        <p>创建时间：2019-12-12 12:12:12</p>
-        <p>付款时间：2019-12-12 12:12:12</p>
-        <p>发货时间：2019-12-12 12:12:12</p>
-        <p>收货时间：2019-12-12 12:12:12</p>
+        <p>订单编号：{{orderInfo.orderCode}}</p>
+        <p>创建时间：{{orderInfo.startDate}}</p>
+        <p>付款时间：{{orderInfo.payDate}}</p>
+        <p>发货时间：{{orderInfo.deliverGoodsDate}}</p>
+        <p>收货时间：{{orderInfo.goodsReceiptDate}}</p>
       </div>
     </div>
   </div>
@@ -83,14 +85,68 @@ export default {
   },
   data () {
     return {
-      
+      ordersState: ['', '未付款', '已付款', '已发货', '已收货'],
+      orderInfo: null
     }
   },
   computed: {
-   
+    address() {
+      return this.orderInfo && this.orderInfo.address ? this.orderInfo.address.split('|') : ['','','']
+    }
+  },
+  methods: {
+    cancel(orderId) {
+      this.$mui.confirm('确定取消订单？', (e)=>{
+        if(e.index == 1){
+          this.$mui.showWaiting()
+          this.$server.order.changeStatus(orderId, 'CANCEL').then(()=>{
+            this.$mui.toast('取消成功')
+            this.timeid = setTimeout(()=>{
+              this.$router.back()  
+            }, 2000)
+          }).finally(()=>{
+            this.$mui.hideWaiting()
+          })
+        }
+      })
+    },
+    receive(orderId) {
+      this.$mui.confirm('确定已收到商品？', (e)=>{
+        if(e.index == 1){
+          this.$mui.showWaiting()
+          this.$server.order.changeStatus(orderId, 'RECEIVE').then(()=>{
+            this.$mui.toast('收货成功')
+            this.getInfo()
+          }).finally(()=>{
+            this.$mui.hideWaiting()
+          })
+        }
+      })
+    },
+    pay() {
+      this.$storage.session.set('temp_pay_info', {
+        orderId: this.orderInfo.orderId,
+        orderCode: this.orderInfo.orderCode,
+        amount: this.orderInfo.amount
+      })
+      window.location.replace(this.$server.getGrantUrl('/pay/?to=/order/list?tab=1'))
+    },
+    getInfo() {
+      this.$mui.showWaiting()
+      this.$server.order.getInfo(this.$route.params.id).then(({data})=>{
+        setTimeout(()=>{
+          this.orderInfo = data[0] || data  
+        }, 600)
+      }).finally(()=>{
+        this.$mui.hideWaiting()
+      })
+    }
   },
   created() {
-    
+    this.getInfo()
+  },
+  beforeDestroy() {
+    clearTimeout(this.timeid)
   }
 }
 </script>

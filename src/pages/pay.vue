@@ -41,18 +41,18 @@ export default {
   methods: {
     pay() {
       this.submiting = true
-      this.$mui.showWaiting('支付中...')
       this.$server.chooseWXPay2(this.formData).then(()=>{
         this.$mui.confirm('支付成功', '', ['返回', '查看订单'], (e)=>{
+          this.isPay = true
           if(e.index == 1){
-            
+            this.$router.replace('/order/list?tab=2')
           }else{
-            this.$router.back()
+            this.$router.replace(this.$route.query.to || '/index')
+            // this.$router.back()
           }
         })
       }).finally(()=>{
         this.submiting = false
-        this.$mui.hideWaiting()
       })
     }
   },
@@ -61,15 +61,24 @@ export default {
       this.$mui.alert('微信授权失败')
       window.location.replace(this.$server.getGrantUrl('/pay', this.$route.query))
     }
-
     this.payInfo = this.$storage.session.get('temp_pay_info')
     this.formData.code = this.$route.query.code
     this.formData.orderId = this.payInfo.orderId
     this.formData.amount = this.payInfo.amount
-
-    this.$nextTick(()=>{
+  },
+  mounted() {
+    setTimeout(()=>{
       this.pay()
-    })
+    }, 100)
+  },
+  beforeRouteLeave(to, from, next) {
+    if(!this.isPay){
+      this.$mui.alert('可在【我的->我的订单】完成支付', '未支付成功', (e)=>{
+        next()
+      })
+    }else{
+      next()
+    }
   }
 }
 </script>

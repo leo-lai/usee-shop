@@ -42,7 +42,7 @@ export default {
         if(e.index == 1){
           this.$mui.showWaiting()
           this.$server.address.del(addressId).then(()=>{
-            this.$mui.toast('删除成功')
+            this.$mui.toast('取消订单成功')
             this.addressList = this.addressList.filter((item)=>{
               return item.addressId !== addressId
             })
@@ -68,9 +68,11 @@ export default {
       })
     },
     slt(item) {
-      this.$storage.local.set('buy_slted_address', item)
-      this.$eventHub.$emit('APP-SLTED-ADDRESS', item, this.addressList.length)
-      this.$router.back()
+      if(this.mode == 2){
+        this.$storage.local.set('buy_slted_address', item)
+        this.$eventHub.$emit('APP-SLTED-ADDRESS', item, this.addressList.length)
+        this.$router.back()  
+      }
     }
   },
   created() {
@@ -81,7 +83,6 @@ export default {
           item.isDefault && (this.sltedAddress = item)
         })
       }
-
       this.addressList = data.map((item)=>{
         this.sltedAddress && this.sltedAddress.addressId === item.addressId && (item.checked = true)  
         return item

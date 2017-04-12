@@ -12,6 +12,8 @@ import register       from './pages/register'
 import pwd            from './pages/pwd'
 import addressInfo    from './pages/address-info'
 import pay            from './pages/pay'
+import rebate         from './pages/rebate'
+import qrcode         from './pages/qrcode'
 
 const routes = [
   { 
@@ -73,7 +75,7 @@ const routes = [
     component: orderList
   },
   {
-    path: '/order/info',
+    path: '/order/info/:id',
     meta: { title: '订单详情', auth: true},
     component: orderInfo
   },
@@ -96,6 +98,16 @@ const routes = [
     path: '/pay',
     meta: { title: '支付信息', auth: true},
     component: pay
+  },
+  {
+    path: '/me/rebate',
+    meta: { title: '我的返利'},
+    component: rebate
+  },
+  {
+    path: '/me/qrcode',
+    meta: { title: '我的二维码'},
+    component: qrcode
   }
 ]
 

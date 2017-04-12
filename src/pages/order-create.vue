@@ -131,7 +131,7 @@
           <div class="l-bg-white l-margin-b">
             <div class="l-padding-btn l-border-b">发票抬头</div>
             <div class="l-padding-btn">
-              <textarea class="l-textarea" rows="3" placeholder="请输入发票抬头"></textarea>
+              <textarea class="l-textarea" rows="3" placeholder="请输入发票抬头" v-model="orderFormData.paperCheckHear"></textarea>
             </div>
           </div>
           <div class="l-bg-white l-margin-b">
@@ -268,12 +268,15 @@ export default {
     sltInvoiceType(type = 0) {
       this.orderFormData.invoiceType = type
       if(type == 0){
+        this.orderFormData.invoiceId = ''
         this.$router.back()
+      }else if(type == 1){
+
       }else if(type == 2){
         if(!this.invoiceFormData.invoiceId){
           this.$mui.showWaiting()
           this.$server.order.getInvoice().then(({data})=>{
-            this.invoiceFormData = data
+            Object.assign(this.invoiceFormData, data)
           }).finally(()=>{
             this.$mui.hideWaiting()
           })
@@ -335,15 +338,16 @@ export default {
           this.submiting = false
           this.$mui.hideWaiting()
         })
+
+        return
       }else if(this.orderFormData.invoiceType == 1){
+        this.orderFormData.invoiceId = ''
         if(!this.orderFormData.paperCheckHear){
           this.$mui.alert('请输入发票抬头')
           return
         }
-        this.$router.back()
-      }else{
-        this.$router.back()
       }
+      this.$router.back()
     },
     pickerCity() {
       // 选择地区
@@ -357,6 +361,7 @@ export default {
         this.sltedAddress.cityId && this.cityPicker.pickers[1].setSelectedValue(this.sltedAddress.cityId)
         this.sltedAddress.areaId && this.cityPicker.pickers[2].setSelectedValue(this.sltedAddress.areaId)
       }
+
       this.cityPicker.show((items)=>{
         this.invoiceFormData.locationArea = items.map((item)=>{
           return item.text || ''
@@ -368,21 +373,18 @@ export default {
         this.$mui.toptip('请选择收货地址')
         return
       }
-
       if(this.orderFormData.invoiceType == 1){
         if(!this.orderFormData.paperCheckHear){
           this.$mui.alert('请输入发票抬头')
           return
         }
       }
-
       if(this.orderFormData.invoiceType == 2){
         if(!this.orderFormData.invoiceId){
           this.$mui.alert('请填写增值税发票信息')
           return
         }
       }
-
       if(!this.buyGoodsInfo || this.buyGoodsInfo.length === 0){
         this.$mui.alert('没有获取到购买商品的信息')
         return
@@ -412,7 +414,8 @@ export default {
         if(data){
           this.$mui.toast('提交订单成功')
           this.$storage.session.set('temp_pay_info', data)
-          window.location.replace(this.$server.getGrantUrl('/pay'))
+          // this.$storage.local.remove('buy_slted_address')
+          window.location.replace(this.$server.getGrantUrl('/pay/'))
         }else{
           this.$mui.alert('提交订单失败')
         }
@@ -440,6 +443,9 @@ export default {
           && (this.invoiceFormData.detailedAddress = addressInfo.address)
       }
     })
+  },
+  beforeDestroy() {
+    this.$mui.closePopups()
   }
 }
 </script>

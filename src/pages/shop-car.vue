@@ -5,7 +5,7 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       <!-- <a class="mui-icon mui-icon-bars mui-pull-right"></a> -->
     </header>
-    <footer class="mui-bar mui-bar-footer l-flex-hc l-shop-bar" v-show="shopcarNumber > 0">
+    <footer class="mui-bar mui-bar-footer l-flex-hc l-shop-bar" v-show="goodsList && goodsList.length > 0">
       <div class="mui-checkbox"><label>全选</label><input type="checkbox" @click="sltAll" :checked="checkAll"></div>
       <div class="l-rest l-text-center">
         合计：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{payTotalMoney.toFixed(2)}}</span>
@@ -20,7 +20,7 @@
         <div class="_icon"><i class="l-icon">&#xe63f;</i></div>
         <p class="_text">购物车空空如也</p>
         <div class="_btn">
-          <router-link class="mui-btn l-btn-main _m" to="/shop">去购买</router-link>
+          <button class="mui-btn l-btn-main _m" @click="$link('/shop', 'page-in')">去购买</button>
         </div>
       </div>
       <!-- 空数据 end-->
@@ -29,13 +29,13 @@
 
       <!-- 购物车列表 -->
       <div class="l-shopcar-list l-margin-b">
-        <div class="l-padding-btn l-text-gray l-border-b l-bg-white l-sticky" v-show="shopcarNumber > 0">
+        <div class="l-padding-btn l-text-gray l-border-b l-bg-white l-fs-s l-sticky" v-show="goodsList && goodsList.length > 0">
           <span class="mui-pull-right" @click="del">删除</span>
-          <span>共 {{shopcarNumber}} 件商品</span>
+          <span>共 {{shopcarNum}} 件商品</span>
         </div>
         <div class="l-shopcar-item l-flex-hc l-border-t" v-for="item in goodsList">
           <div class="mui-checkbox"><label></label><input type="checkbox" @click="slt(item)" :checked="item.checked"></div>
-          <div class="_thumb l-bg-contain" :style="{'background-image': 'url('+ item.image +')'}"></div>
+          <div class="_thumb l-bg-contain" :style="{'background-image': 'url('+ item.image +')'}" @click="slt(item)"></div>
           <div class="_main l-rest">
             <p class="_tit l-text-wrap1">{{item.goodsName}}</p>
             <p class="l-text-gray l-fs-xs" v-show="item.colorId">颜色：{{item.colorName}}</p>
@@ -43,7 +43,7 @@
               <p class="l-text-warn l-rest"><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</p>
               <span class="l-numbox mui-pull-right">
                 <i class="l-icon _minus" @click="numberMinus(item)">&#xe631;</i>
-                <input class="_num" type="tel" value="1" @change="editNum(item)" v-model="item.number">
+                <input class="_num" type="tel" pattern="[0-9]*" value="1" step="1" min="1" maxlength="6" @change="editNum(item, $event)" :value="item.number" >
                 <i class="l-icon _add" @click="numberAdd(item)">&#xe602;</i>
               </span>
             </div>
@@ -61,6 +61,7 @@ export default {
     return {
       checkAll: false,
       loading: false,
+      shopcarNum: 0,
       payTotalNum: 0,
       payTotalMoney: 0,
       goodsList: null
@@ -69,15 +70,6 @@ export default {
   computed: {
     isNull() {
       return this.goodsList && this.goodsList.length === 0
-    },
-    shopcarNumber() {
-      let number = 0
-      if(this.goodsList){
-        this.goodsList.forEach((item)=>{
-          number += item.number
-        })
-      }
-      return number
     }
   },
   methods: {
@@ -95,15 +87,42 @@ export default {
         item.checked = this.checkAll
         return item
       })
+      this.calu()
     },
     slt(goodsItem) {
       goodsItem.checked = !goodsItem.checked
+      this.calu()
     },
-    editNum(goodsItem) {
-      clearTimeout(this.timeId)
+    editNum(goodsItem, event) {
+      let num
+      if(event){
+        this.isVaildNum = true
+        num = Math.floor(Number(event.target.value))
+        if(Number.isNaN(num) || num < 1 || num > 9999){
+          this.isVaildNum = false
+          this.$mui.toast('商品数量超出范围~')
+          event.target.value = goodsItem.oldNumber
+          setTimeout(()=>{
+            this.isVaildNum = true
+          }, 50)
+          return
+        } 
+        event.target.value = num
+      }else{
+        num = goodsItem.number
+      }
+
+      goodsItem.number = num
+      this.calu()
+
       this.timeId = setTimeout(()=>{
-        this.$server.shopcar.editNum(goodsItem.shoppingCartId, goodsItem.number)
-      }, 1000)
+        this.$server.shopcar.editNum(goodsItem.shoppingCartId, num).then(()=>{
+          goodsItem.oldNumber = num
+        }).catch(()=>{
+          goodsItem.number = goodsItem.oldNumber
+          this.calu()
+        })
+      }, 300)  
     },
     del() {
       if(this.shoppingCartIds && this.shoppingCartIds.length > 0){
@@ -126,8 +145,44 @@ export default {
         this.$mui.toast('您还没选择商品喔~')
       }
     },
+    calu() {
+      let shopcarNum = 0
+      let payTotalNum = 0
+      let payTotalMoney = 0
+      let shoppingCartIds = []
+      let sltedGoods = []
+
+      this.isVaildNum = true
+      this.goodsList.forEach((item)=>{
+        let num = Math.floor(Number(item.number))
+        if(Number.isNaN(num) || num < 1 || num > 9999){
+          this.isVaildNum = false
+          num = item.oldNumber
+        }
+
+        shopcarNum += num
+        if(item.checked){
+          sltedGoods.push(item)
+          shoppingCartIds.push(item.shoppingCartId)
+          payTotalNum += num
+          payTotalMoney += item.price * num
+        }
+      })
+
+      this.checkAll = this.goodsList.length === sltedGoods.length
+
+      this.sltedGoods = sltedGoods
+      this.shoppingCartIds = shoppingCartIds
+      this.shopcarNum = shopcarNum
+      this.payTotalNum = payTotalNum
+      this.payTotalMoney = payTotalMoney
+    },
     submit() {
       if(this.sltedGoods && this.sltedGoods.length > 0){
+        if(!this.isVaildNum){
+          this.$mui.toast('商品数量超出范围~')
+          return
+        }
         this.$storage.session.set('temp_buy_info', this.sltedGoods)
         this.$storage.session.set('temp_buy_type', 2) // 从购物车下单
         this.$link('/shop/order/create', 'page-in')
@@ -141,36 +196,45 @@ export default {
     this.$server.shopcar.getList().then(({data})=>{
       setTimeout(()=>{
         this.goodsList = data.map((item)=>{
+          item.oldNumber = item.number
           item.checked = false
           return item
         })
+
+        this.calu()
         this.loading = false
       }, 600)
     }).catch(()=>{
       this.loading = false
     })
 
-    this.$watch('goodsList', (newValue, oldValue)=>{
-      let payTotalNum = 0
-      let payTotalMoney = 0
-      let shoppingCartIds = []
-      let sltedGoods = []
-      newValue.forEach((item)=>{
-        if(item.checked){
-          sltedGoods.push(item)
-          shoppingCartIds.push(item.shoppingCartId)
-          payTotalNum += item.number
-          payTotalMoney += item.price * item.number
-        }
-      })
+    // this.$watch('goodsList', (newValue, oldValue)=>{
+    //   let shopcarNum = 0
+    //   let payTotalNum = 0
+    //   let payTotalMoney = 0
+    //   let shoppingCartIds = []
+    //   let sltedGoods = []
+    //   newValue.forEach((item)=>{
+    //     let num = Math.floor(Number(item.number))
+    //     if(!Number.isNaN(num) && num > 0 && num < 10000){
+    //       shopcarNum += num
+    //       if(item.checked){
+    //         sltedGoods.push(item)
+    //         shoppingCartIds.push(item.shoppingCartId)
+    //         payTotalNum += num
+    //         payTotalMoney += item.price * item.number
+    //       }
+    //     }
+    //   })
 
-      this.checkAll = newValue.length === sltedGoods.length
+    //   this.checkAll = newValue.length === sltedGoods.length
 
-      this.sltedGoods = sltedGoods
-      this.shoppingCartIds = shoppingCartIds
-      this.payTotalNum = payTotalNum
-      this.payTotalMoney = payTotalMoney
-    }, { deep: true} )
+    //   this.sltedGoods = sltedGoods
+    //   this.shoppingCartIds = shoppingCartIds
+    //   this.shopcarNum = shopcarNum
+    //   this.payTotalNum = payTotalNum
+    //   this.payTotalMoney = payTotalMoney
+    // }, { deep: true} )
   }
 }
 </script>

@@ -166,7 +166,7 @@ export default function($, window, document, undefined) {
 		}, false);
 		//--
 		self.list.addEventListener('tap', function(event) {
-			elementItem = event.target;
+			var elementItem = event.target;
 			if (elementItem.tagName == 'LI') {
 				self.setSelectedIndex(self.elementItems.indexOf(elementItem), 200);
 			}

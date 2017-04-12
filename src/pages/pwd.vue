@@ -9,13 +9,13 @@
         <div class="_tr l-flex-hc l-border-b">
           <i class="l-icon">&#xe613;</i>
           <div class="l-rest mui-input-row">
-            <input type="tel" v-model="formData.phoneNumber" class="mui-input-clear" maxlength="11"  placeholder="请输入手机号码">
+            <input class="mui-input-clear" type="tel" pattern="[0-9]*" value="1" step="1" min="1" maxlength="11" v-model="formData.phoneNumber" placeholder="请输入手机号码">
           </div>
         </div>
         <div class="_tr l-flex-hc l-border-b">
           <i class="l-icon">&#xe62f;</i>
           <div class="l-rest mui-input-row">
-            <input type="tel" v-model="formData.phoneCode" maxlength="5" placeholder="请输入短信验证码">
+            <input type="tel" pattern="[0-9]*" value="1" step="1" min="1" maxlength="5" v-model="formData.phoneCode" placeholder="请输入短信验证码">
           </div>
           <button ref="sendBtn" class="mui-btn mui-btn-link" @click="sendAuthCode">获取验证码</button>
         </div>

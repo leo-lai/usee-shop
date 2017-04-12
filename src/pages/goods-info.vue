@@ -8,7 +8,7 @@
       <div class="l-rest">
         <a class="l-shopcar-icon" @click="$link('/shop/car', 'page-in')">
           <i class="l-icon">&#xe63f;</i>
-          <span class="mui-badge mui-badge-danger">{{shopcarNumber}}</span>
+          <span class="mui-badge mui-badge-danger">{{shopcarNumber > 99 ? '99+' : shopcarNumber}}</span>
         </a>
       </div>
       <div class="_btn">
@@ -18,7 +18,7 @@
     </footer>
     <div class="mui-content">
       <!-- banner -->
-      <div class="mui-slider">
+      <!-- <div class="mui-slider">
         <div class="mui-slider-group mui-slider-loop" v-if="goodsImages">
           <div class="mui-slider-item mui-slider-item-duplicate" v-if="goodsImages.length > 1"><a><img :src="goodsImages[0].imagePath" /></a></div>
           <div class="mui-slider-item" v-for="item in goodsImages"><a><img :src="item.imagePath" /></a></div>
@@ -27,35 +27,43 @@
         <div class="mui-slider-indicator">
           <div class="mui-indicator" :class="{'mui-active': index === 0}" v-for="(item,index) in goodsImages"></div>
         </div>
-      </div>
+      </div> -->
+      
       <!-- banner end-->
       <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
-      <!-- info -->
-      <div class="l-goods-item l-border-tb" v-if="goodsInfo">
-        <div class="_text">
-          <h3>{{goodsInfo.goodsName}}</h3>
-          <p class="l-fs-m">{{goodsInfo.goodsBrief}}</p>
-          <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>{{goodsInfo.priceStr}}</p>
-        </div>
-      </div>
-      <div class="l-padding-btn l-bg-white l-fs-m l-text-gray l-link-arrow" @click="showSupport" v-if="goodsService">
-        <template v-for="item in goodsService">
-          <i class="l-icon l-text-ok">&#xe626;</i>
-          <span class="l-margin-r-s">{{item.name}}</span>  
-        </template>
-      </div>
-      <!-- info end-->
-      <!-- details -->
       <template v-if="goodsInfo">
+        <div class="l-text-center">
+          <img style="height: 10rem; width: 100%;" :src="goodsInfo.image" alt="">
+        </div>
+        <!-- info -->
+        <div class="l-goods-item l-border-tb">
+          <div class="_text">
+            <h3>{{goodsInfo.goodsName}}</h3>
+            <p class="l-fs-m">{{goodsInfo.goodsBrief}}</p>
+            <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>{{goodsInfo.priceStr}}</p>
+          </div>
+        </div>
+        <div class="l-padding-btn l-bg-white l-fs-m l-text-gray l-link-arrow" @click="showSupport" v-if="goodsService">
+          <template v-for="item in goodsService">
+            <i class="l-icon l-text-ok">&#xe626;</i>
+            <span class="l-margin-r-s">{{item.name}}</span>  
+          </template>
+        </div>
+        <!-- info end-->
+        <!-- details -->
         <div class="l-padding-btn l-margin-t l-bg-white l-border-b">
           <span>商品详情</span>
           <span class="l-text-gray"> / Details</span>
         </div>
         <div class="l-goods-details l-padding-btn l-bg-white l-fs-m l-margin-b l-zoom">
-          {{goodsInfo.goodsIntroduce}}
+          <!-- {{goodsInfo.goodsIntroduce}} -->
+          <div class="l-text-center">
+            <img :src="img.imagePath" alt="" v-for="(img, index) in goodsImages" @click="previewImage(index)">
+          </div>
         </div>
+        <!-- details end-->
       </template>
-      <!-- details end-->
+      
     </div>
     <!-- 选择商品规格 -->
     <div class="l-popup-bottom" :class="{'_show': isShowSpec}"  @click="showSpec">
@@ -88,7 +96,7 @@
               <p class="l-rest">购买数量</p>
               <span class="l-numbox mui-pull-right">
                 <i class="l-icon _minus" @click="numberMinus">&#xe631;</i>
-                <input class="_num" type="tel" v-model="buyNumber">
+                <input class="_num" type="tel" pattern="[0-9]*" value="1" step="1" min="1" maxlength="6" v-model="buyNumber">
                 <i class="l-icon _add" @click="numberAdd">&#xe602;</i>
               </span>
             </div>
@@ -124,7 +132,7 @@
 </template>
 <script>
 import navTab from 'components/nav-tab'
-import previewImage from 'libs/mui/js/mui.preview-image'
+// import previewImage from 'libs/mui/js/mui.preview-image'
 
 export default {
   components: {
@@ -182,6 +190,14 @@ export default {
         return
       }
 
+      let num = Math.floor(Number(this.buyNumber))
+      if(Number.isNaN(num) || num < 1 || num > 9999){
+        this.$mui.toast('商品数量超出范围~')
+        this.buyNumber = 1
+        return
+      }
+      this.buyNumber = num
+
       let formData = {
         goodsId: this.goodsInfo.goodsId,
         goodTypeId: this.goodsInfo.goodTypeId,
@@ -191,12 +207,12 @@ export default {
       }
 
       if(this.btnType === 1){ // 加入购物车
-        this.$mui.showWaiting(false)
+        this.$mui.showWaiting()
         formData.sessionId = this.$storage.local.get('sessionId')
         this.$server.shopcar.add(formData).then(({data})=>{
           this.$mui.toast('已加入购物车')
           this.isShowSpec = false
-          this.shopcarNumber += this.buyNumber
+          this.shopcarNumber += Number(this.buyNumber)
         }).finally(()=>{
           this.$mui.hideWaiting()
         })
@@ -208,6 +224,9 @@ export default {
         this.$storage.session.set('temp_buy_type', 1) // 从商品详情下单
         this.$link('/shop/order/create', 'page-in')
       }
+    },
+    previewImage(index) {
+      this.$server.previewImage(this.goodsImages.map((item)=>item.imagePath), index)
     }
   },
   created() {
@@ -242,15 +261,9 @@ export default {
       this.loading = false
     })
 
-    if(this.$server.checkLogin()){
-      this.$server.shopcar.getList().then(({data})=>{
-        let shopcarNumber = 0
-        data.forEach((item)=>{
-          shopcarNumber += item.number
-        })
-        this.shopcarNumber = shopcarNumber
-      })
-    }
+    this.$server.shopcar.getNum().then(({data})=>{
+      this.shopcarNumber = data
+    })
   }
 }
 </script>

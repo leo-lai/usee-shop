@@ -19,14 +19,19 @@
         </div>
       </div>
       <div class="mui-row l-text-center l-bg-white l-border-t">
-        <router-link class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link" to="/shop/car">
-          <p><img style="height: 2rem;" src="~assets/images/icon-004.png" alt=""></p>
+        <div class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link" @click="$link('/shop/car', 'page-in')">
+          <p>
+            <span class="l-rel">
+              <img style="height: 2rem;" src="~assets/images/icon-004.png" alt="">
+              <i class="mui-badge mui-badge-danger l-abs" style="left: 1.4rem;">{{shopcarNumber > 99 ? '99+' : shopcarNumber}}</i>
+            </span>
+          </p>
           <p class="l-margin-t-xs l-fs-m">购物车</p>
-        </router-link>
-        <a class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link l-disabled" @click="$mui.coding">
+        </div>
+        <router-link class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link" to="/me/rebate">
           <p><img style="height: 2rem;" src="~assets/images/icon-005.png" alt=""></p>
-          <p class="l-margin-t-xs l-fs-m">我的报告</p>
-        </a>
+          <p class="l-margin-t-xs l-fs-m">我的返利</p>
+        </router-link>
       </div>
 
       <div class="l-margin-tb">
@@ -34,11 +39,17 @@
           <li class="mui-table-view-cell">
             <router-link class="mui-navigate-right" to="/order/list">我的订单</router-link>
           </li>
+          <li class="mui-table-view-cell">
+            <router-link class="mui-navigate-right" to="/me/qrcode">我的二维码</router-link>
+          </li>
           <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的预约</a>
           </li>
           <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的疗程</a>
+          </li>
+          <li class="mui-table-view-cell l-disabled">
+            <a class="mui-navigate-right" @click="$mui.coding">我的报告</a>
           </li>
           <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的验光单</a>
@@ -61,6 +72,7 @@ export default {
   data () {
     return {
       defaultAvatar: avatar,
+      shopcarNumber: 0,
       userInfo: null
     }
   },
@@ -75,6 +87,10 @@ export default {
   },
   created() {
     this.userInfo = this.$storage.local.get('userInfo')
+
+    this.$server.shopcar.getNum().then(({data})=>{
+      this.shopcarNumber = data
+    })
   }
 }
 </script>
@@ -84,7 +100,7 @@ export default {
   ._bg {
     background: no-repeat 50% 50%; background-size: cover;
     position: absolute; left:0; top:0; width:100%; height: 100%;
-    z-index: -1; filter: blur(10px);
+    z-index: -1; filter: blur(1px);
   }
   ._inner{
     position: relative; padding: 1.2rem 1rem;
