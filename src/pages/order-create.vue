@@ -102,7 +102,7 @@
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>
       <footer class="mui-bar mui-bar-footer l-flex-hc l-transparent">
-        <router-link class="mui-btn l-btn-main" to="/address/add">添加新地址</router-link>
+        <router-link class="mui-btn l-btn-main" to="/address/add" tag="button">添加新地址</router-link>
       </footer>
       <div class="mui-content">
         <address-list :mode="2"></address-list>
@@ -412,7 +412,7 @@ export default {
 
       promise.then(({data})=>{
         if(data){
-          this.$mui.toast('提交订单成功')
+          // this.$mui.toast('提交订单成功')
           this.$storage.session.set('temp_pay_info', data)
           // this.$storage.local.remove('buy_slted_address')
           window.location.replace(this.$server.getGrantUrl('/pay/'))
@@ -420,8 +420,10 @@ export default {
           this.$mui.alert('提交订单失败')
         }
       }).finally(()=>{
-        this.submiting = false
-        this.$mui.hideWaiting()
+        setTimeout(()=>{
+          this.submiting = false
+          this.$mui.hideWaiting()  
+        }, 50)
       })
     }
   },
@@ -443,10 +445,11 @@ export default {
           && (this.invoiceFormData.detailedAddress = addressInfo.address)
       }
     })
-  },
-  beforeDestroy() {
-    this.$mui.closePopups()
   }
+  // ,
+  // beforeRouteLeave() {
+  //   this.$mui.closePopups()
+  // }
 }
 </script>
 <style scoped>

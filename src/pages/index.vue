@@ -4,19 +4,16 @@
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
     </header>
     <nav-tab></nav-tab>
-    <div class="mui-content mui-scroll">
+    <div class="mui-content">
       <!-- banner -->
-      <div class="mui-slider">
-        <div class="mui-slider-group mui-slider-loop" v-if="bannerList">
-          <div class="mui-slider-item mui-slider-item-duplicate" v-if="bannerList.length > 1"><a><img :src="bannerList[bannerList.length-1].imagePath" /></a></div>
-          <div class="mui-slider-item" v-for="item in bannerList"><a @click="$link(item.clickURL)"><img :src="item.imagePath" /></a></div>
-          <div class="mui-slider-item mui-slider-item-duplicate" v-if="bannerList.length > 1"><a><img :src="bannerList[0].imagePath" /></a></div>
-        </div>
-        <div class="mui-slider-indicator">
-          <div class="mui-indicator" :class="{'mui-active': index === 0}" v-for="(item,index) in bannerList"></div>
-        </div>
-      </div>
-      <!-- banner end-->
+      <swiper :options="swiperOption" ref="lSwiper" class="l-swiper">
+        <swiper-slide v-for="slide in swiperSlides">
+          <a @click="$link(slide.clickURL)"><img class="_item" :src="slide.imagePath" /></a>
+        </swiper-slide>
+        <!-- Optional controls -->
+        <div class="swiper-pagination"  slot="pagination"></div>
+      </swiper>
+     <!-- banner end--> 
 
       <!-- menu -->
       <div class="mui-row l-text-center l-bg-white l-border-t">
@@ -58,17 +55,36 @@
   </div>
 </template>
 <script>
+import { swiper, swiperSlide } from 'vue-awesome-swiper'
 import navTab from 'components/nav-tab'
 
 export default {
   components: {
-    navTab
+    navTab, swiper, swiperSlide
   },
   data () {
     return {
       loading: false,
       goodsList: null,
-      bannerList: null
+      swiperOption: {
+        // notNextTick是一个组件自有属性，如果notNextTick设置为true，组件则不会通过NextTick来实例化swiper，也就意味着你可以在第一时间获取到swiper对象，假如你需要刚加载遍使用获取swiper对象来做什么事，那么这个属性一定要是true
+        notNextTick: true,
+        // swiper configs 所有的配置同swiper官方api配置
+        initialSlide: 1,
+        loop: true,
+        autoplay: 5000,
+        direction : 'horizontal',
+        autoHeight: true,
+        pagination : '.swiper-pagination',
+        paginationClickable :true,
+        mousewheelControl : true,
+        observeParents:true,
+        // swiper的各种回调函数也可以出现在这个对象中，和swiper官方一样
+        onTransitionStart(swiper){
+          // console.log(swiper)
+        }
+      },
+      swiperSlides: []
     }
   },
   created() {
@@ -83,16 +99,12 @@ export default {
     })
 
     this.$server.getBanner().then(({data})=>{
-      this.bannerList = data
-      this.$nextTick(()=>{
-        this.$mui('.mui-slider').slider({
-          interval: 3000
-        })
-      })
+      this.swiperSlides = data
     })
   }
 }
 </script>
 <style scoped>
-
+.l-swiper{height: 10rem;}
+.l-swiper ._item{width:100%; height: 10rem;}
 </style>

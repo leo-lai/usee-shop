@@ -8,21 +8,21 @@
 }
 
 .page-in-enter-active {
-  animation: pageFromRightToCenter 0.5s forwards;
+  animation: pageFromRightToCenter 0.5s forwards; backface-visibility:hidden; perspective:1000; transform-style: preserve-3d;
   position: absolute; top: 0; left: 0; width: 100%; z-index: 999; 
   transform: translate3d(100%, 0, 0); visibility: hidden;
 }
 
 .page-in-leave-active {
-  display: block !important;
+  display: block !important; backface-visibility:hidden; perspective:1000; transform-style: preserve-3d;
   animation: pageFromCenterToLeft 0.5s forwards;
 }
 
 .page-out-enter-active {
-  animation: pageFromLeftToCenter 0.5s forwards;
+  animation: pageFromLeftToCenter 0.5s forwards; backface-visibility:hidden; perspective:1000; transform-style: preserve-3d;
 }
 .page-out-leave-active {
-  display: block !important;
+  display: block !important; backface-visibility:hidden; perspective:1000; transform-style: preserve-3d;
   animation: pageFromCenterToRight 0.5s forwards;
   position: absolute; top: 0; left: 0; width: 100%; z-index: 999; 
   transform: translate3d(0, 0, 0); visibility: visible;
@@ -56,7 +56,7 @@
     transform: translate3d(0, 0, 0);
   }
   to {
-    opacity: 0.5; visibility: hidden;
+    opacity: .5; visibility: hidden;
     transform: translate3d(-20%, 0, 0);
   }
 }

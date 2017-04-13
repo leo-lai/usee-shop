@@ -5,11 +5,13 @@ import { storage, utils } from 'assets/js/utils'
 // 测试
 let appid = 'wxb022237ad49ef61f'
 let baseUrl = 'http://119.23.30.245:8080/useeproject/interface'
+let qrcode = require('assets/images/usee-test.jpg')
 
 // 正式
-if (window.location.origin === 'http://shop.usee.com') {
-  appid = 'wxa68cfebf01268d68'
-  baseUrl = 'http://api.usee.com'
+if (['h5.usee1.com.cn', 'h5.ushiyihao.com'].indexOf(window.location.host) > -1) {
+  // appid = 'wxc81b31922070b7ae'
+  baseUrl = 'https://bird.ioliu.cn/v1?url=http://119.23.30.245:8080/useeproject/interface'
+  // qrcode = require('assets/images/usee-online.jpg')
 }
 
 const errorPromise = function(message = '') {
@@ -44,10 +46,12 @@ const _http = {
           if (response.resultCode === 4002) { // 登录失效
             mui.hideWaiting()
             storage.local.remove('sessionId')
-            mui.toast(response.message)
-            setTimeout(()=>{
+            mui.alert(response.message, ()=>{
               _server.logout(false)
-            }, 2000)
+            })
+            setTimeout(()=>{
+              mui.closePopups()
+            }, 3000)
             reject(response.message)
           } else if (response.resultCode !== 200) {
             mui.hideWaiting()
@@ -214,6 +218,9 @@ class List {
 }
 
 const _server = {
+  getWxQrcode() {
+    return qrcode
+  },
   // 获取微信授权路径 url为绝对路径
   getGrantUrl(url, params) {
     if (!url) return ''
@@ -612,6 +619,13 @@ const _server = {
       !response.data && (response.data = [])
       return response
     })
+  },
+  user: {
+    getInfo() {
+      return new Promise((resolve)=>{
+        resolve(storage.local.get('userInfo') || {})
+      })
+    }
   },
   // 地址
   address: {

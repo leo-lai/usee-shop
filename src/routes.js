@@ -13,7 +13,10 @@ import pwd            from './pages/pwd'
 import addressInfo    from './pages/address-info'
 import pay            from './pages/pay'
 import rebate         from './pages/rebate'
+import customer       from './pages/customer'
 import qrcode         from './pages/qrcode'
+import withdrawal     from './pages/withdrawal'
+import payResult      from './pages/pay-result'
 
 const routes = [
   { 
@@ -100,14 +103,29 @@ const routes = [
     component: pay
   },
   {
+    path: '/pay/result',
+    meta: { title: '支付结果', auth: true},
+    component: payResult
+  },
+  {
     path: '/me/rebate',
-    meta: { title: '我的返利'},
+    meta: { title: '我的返利', auth: true},
     component: rebate
   },
   {
+    path: '/me/customer',
+    meta: { title: '我的人脉', auth: true},
+    component: customer
+  },
+  {
     path: '/me/qrcode',
-    meta: { title: '我的二维码'},
+    meta: { title: '我的二维码', auth: true},
     component: qrcode
+  },
+  {
+    path: '/me/rebate/withdrawal',
+    meta: { title: '提现申请', auth: true},
+    component: withdrawal
   }
 ]
 

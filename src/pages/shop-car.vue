@@ -15,18 +15,6 @@
       </div>
     </footer>
     <div class="mui-content">
-      <!-- 空数据 -->
-      <div class="l-data-null" v-if="isNull">
-        <div class="_icon"><i class="l-icon">&#xe63f;</i></div>
-        <p class="_text">购物车空空如也</p>
-        <div class="_btn">
-          <button class="mui-btn l-btn-main _m" @click="$link('/shop', 'page-in')">去购买</button>
-        </div>
-      </div>
-      <!-- 空数据 end-->
-      
-      <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
-
       <!-- 购物车列表 -->
       <div class="l-shopcar-list l-margin-b">
         <div class="l-padding-btn l-text-gray l-border-b l-bg-white l-fs-s l-sticky" v-show="goodsList && goodsList.length > 0">
@@ -51,6 +39,16 @@
         </div>
       </div>
       <!-- 购物车列表 end-->
+      <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
+      <!-- 空数据 -->
+      <div class="l-data-null" v-if="isNull">
+        <div class="_icon"><i class="l-icon">&#xe63f;</i></div>
+        <p class="_text">购物车空空如也</p>
+        <div class="_btn">
+          <button class="mui-btn l-btn-main _m" :disabled="submiting" @click="$link('/shop', 'page-in')">去购买</button>
+        </div>
+      </div>
+      <!-- 空数据 end-->
     </div>
   </div>
 </template>
@@ -64,6 +62,7 @@ export default {
       shopcarNum: 0,
       payTotalNum: 0,
       payTotalMoney: 0,
+      submiting: false,
       goodsList: null
     }
   },
@@ -185,7 +184,11 @@ export default {
         }
         this.$storage.session.set('temp_buy_info', this.sltedGoods)
         this.$storage.session.set('temp_buy_type', 2) // 从购物车下单
-        this.$link('/shop/order/create', 'page-in')
+        this.submiting = true
+        setTimeout(()=>{
+          this.$link('/shop/order/create', 'page-in')
+          this.submiting = false
+        }, 50)
       }else{
         this.$mui.toast('您还没选择商品喔~')
       }
@@ -207,34 +210,6 @@ export default {
     }).catch(()=>{
       this.loading = false
     })
-
-    // this.$watch('goodsList', (newValue, oldValue)=>{
-    //   let shopcarNum = 0
-    //   let payTotalNum = 0
-    //   let payTotalMoney = 0
-    //   let shoppingCartIds = []
-    //   let sltedGoods = []
-    //   newValue.forEach((item)=>{
-    //     let num = Math.floor(Number(item.number))
-    //     if(!Number.isNaN(num) && num > 0 && num < 10000){
-    //       shopcarNum += num
-    //       if(item.checked){
-    //         sltedGoods.push(item)
-    //         shoppingCartIds.push(item.shoppingCartId)
-    //         payTotalNum += num
-    //         payTotalMoney += item.price * item.number
-    //       }
-    //     }
-    //   })
-
-    //   this.checkAll = newValue.length === sltedGoods.length
-
-    //   this.sltedGoods = sltedGoods
-    //   this.shoppingCartIds = shoppingCartIds
-    //   this.shopcarNum = shopcarNum
-    //   this.payTotalNum = payTotalNum
-    //   this.payTotalMoney = payTotalMoney
-    // }, { deep: true} )
   }
 }
 </script>

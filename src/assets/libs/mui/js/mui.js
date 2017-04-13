@@ -7406,9 +7406,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
             }
         }
         if (!$.os.plus || type === 'div') {
-            return createPopup(createInner(message, title || '提示') + createButtons([btnValue || '确定']), callback);
+            return createPopup(createInner(message, title || '系统提示') + createButtons([btnValue || '确定']), callback);
         }
-        return plus.nativeUI.alert(message, callback, title || '提示', btnValue || '确定');
+        return plus.nativeUI.alert(message, callback, title || '系统提示', btnValue || '确定');
     };
     var createConfirm = function(message, title, btnArray, callback, type) {
         if (typeof message === 'undefined') {
@@ -7426,7 +7426,7 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
             }
         }
         if (!$.os.plus || type === 'div') {
-            return createPopup(createInner(message, title || '提示') + createButtons(btnArray || ['取消', '确认']), callback);
+            return createPopup(createInner(message, title || '系统提示') + createButtons(btnArray || ['取消', '确认']), callback);
         }
         return plus.nativeUI.confirm(message, callback, title, btnArray || ['取消', '确认']);
     };
@@ -7452,9 +7452,9 @@ Function.prototype.bind = Function.prototype.bind || function(to) {
             }
         }
         if (!$.os.plus || type === 'div') {
-            return createPopup(createInner(message, title || '提示', createInput(placeholder)) + createButtons(btnArray || ['取消', '确认']), callback);
+            return createPopup(createInner(message, title || '系统提示', createInput(placeholder)) + createButtons(btnArray || ['取消', '确认']), callback);
         }
-        return plus.nativeUI.prompt(message, callback, title || '提示', placeholder, btnArray || ['取消', '确认']);
+        return plus.nativeUI.prompt(message, callback, title || '系统提示', placeholder, btnArray || ['取消', '确认']);
     };
     var closePopup = function() {
         if (popupStack.length) {

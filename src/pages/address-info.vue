@@ -135,6 +135,9 @@ export default {
         this.sltedCityText = this.formData.province + ' ' + this.formData.city + ' ' + this.formData.area
       }
     }
+  },
+  beforeDestroy() {
+    this.cityPicker && this.cityPicker.hide()
   }
 }
 </script>

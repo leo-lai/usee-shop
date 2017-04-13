@@ -17,20 +17,6 @@
       </div>
     </footer>
     <div class="mui-content">
-      <!-- banner -->
-      <!-- <div class="mui-slider">
-        <div class="mui-slider-group mui-slider-loop" v-if="goodsImages">
-          <div class="mui-slider-item mui-slider-item-duplicate" v-if="goodsImages.length > 1"><a><img :src="goodsImages[0].imagePath" /></a></div>
-          <div class="mui-slider-item" v-for="item in goodsImages"><a><img :src="item.imagePath" /></a></div>
-          <div class="mui-slider-item mui-slider-item-duplicate" v-if="goodsImages.length > 1"><a><img :src="goodsImages[goodsImages.length-1].imagePath" /></a></div>
-        </div>
-        <div class="mui-slider-indicator">
-          <div class="mui-indicator" :class="{'mui-active': index === 0}" v-for="(item,index) in goodsImages"></div>
-        </div>
-      </div> -->
-      
-      <!-- banner end-->
-      <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
       <template v-if="goodsInfo">
         <div class="l-text-center">
           <img style="height: 10rem; width: 100%;" :src="goodsInfo.image" alt="">
@@ -63,7 +49,7 @@
         </div>
         <!-- details end-->
       </template>
-      
+      <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
     </div>
     <!-- 选择商品规格 -->
     <div class="l-popup-bottom" :class="{'_show': isShowSpec}"  @click="showSpec">

@@ -1,12 +1,3 @@
-// 检测设备
-const ua = navigator.userAgent
-const isAndroid = /(Android);?[\s\/]+([\d.]+)?/.test(ua)
-const isIpad = /(iPad).*OS\s([\d_]+)/.test(ua)
-const isIpod = /(iPod)(.*OS\s([\d_]+))?/.test(ua)
-const isIphone = !isIpad && /(iPhone\sOS)\s([\d_]+)/.test(ua)
-const isWechat = /micromessenger/i.test(ua)
-
-
 Promise.prototype.done = Promise.prototype.done || function (onFulfilled, onRejected) {
   this.then(onFulfilled, onRejected)
     .catch(function (reason) {
@@ -14,7 +5,6 @@ Promise.prototype.done = Promise.prototype.done || function (onFulfilled, onReje
       setTimeout(() => { throw reason }, 0)
     })
 }
-
 Promise.prototype.finally = Promise.prototype.finally || function (callback) {
   let P = this.constructor
   return this.then(
@@ -22,7 +12,6 @@ Promise.prototype.finally = Promise.prototype.finally || function (callback) {
     reason => P.resolve(callback()).then(() => { throw reason })
   )
 }
-
 Array.prototype.find = Array.prototype.find || function(func) {
   let returnArray = false
   for (let i=0; i<this.length; i++) {
@@ -40,6 +29,44 @@ Array.prototype.find = Array.prototype.find || function(func) {
   }
   return returnArray
 }
+/*
+  对Date的扩展，将 Date 转化为指定格式的String * 月(M)、日(d)、12小时(h)、24小时(H)、分(m)、秒(s)、周(E)、季度(q)
+  可以用 1-2 个占位符 * 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
+  eg:
+  (newDate()).pattern("yyyy-MM-dd hh:mm:ss.S")==> 2006-07-02 08:09:04.423      
+  (new Date()).pattern("yyyy-MM-dd E HH:mm:ss") ==> 2009-03-10 二 20:09:04      
+  (new Date()).pattern("yyyy-MM-dd EE hh:mm:ss") ==> 2009-03-10 周二 08:09:04      
+  (new Date()).pattern("yyyy-MM-dd EEE hh:mm:ss") ==> 2009-03-10 星期二 08:09:04      
+  (new Date()).pattern("yyyy-M-d h:m:s.S") ==> 2006-7-2 8:9:4.18      
+*/
+Date.prototype.format = function (fmt) {
+  var o = {
+      "M+": this.getMonth() + 1, //月份 
+      "d+": this.getDate(), //日 
+      "h+": this.getHours(), //小时 
+      "m+": this.getMinutes(), //分 
+      "s+": this.getSeconds(), //秒 
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+      "S": this.getMilliseconds() //毫秒 
+  }
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length))
+  }
+  for (var k in o){
+    if (new RegExp('(' + k + ')').test(fmt)){
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
+    }
+  }
+  return fmt
+}
+
+// 检测设备
+const ua = navigator.userAgent
+const isAndroid = /(Android);?[\s\/]+([\d.]+)?/.test(ua)
+const isIpad = /(iPad).*OS\s([\d_]+)/.test(ua)
+const isIpod = /(iPod)(.*OS\s([\d_]+))?/.test(ua)
+const isIphone = !isIpad && /(iPhone\sOS)\s([\d_]+)/.test(ua)
+const isWechat = /micromessenger/i.test(ua)
 
 function _hasClass(elem, cls) {
   if(!elem || !cls) return false
@@ -256,15 +283,17 @@ export let utils = {
     // 判断是否为ios设备的微信浏览器，加载iframe来刷新title
     if (isWechat && isIphone) {
       let iframe = document.createElement('iframe')
-      iframe.setAttribute('src', '//m.baidu.com/favicon.ico')
+    
       iframe.setAttribute('style','position:absolute;visibility:hidden;height:0;width:0;');
       iframe.addEventListener('load', function load() {
-        setTimeout(() => {
-          iframe.removeEventListener('load', load)
-          document.body.removeChild(iframe)
-        }, 50)
+        iframe.removeEventListener('load', load)
+        document.body.removeChild(iframe)
       })
-      document.body.appendChild(iframe)
+
+      setTimeout(()=>{
+        iframe.setAttribute('src', '//m.baidu.com/favicon.ico')
+        document.body.appendChild(iframe)
+      }, 650)
     }
 	},
   url: {

@@ -11,17 +11,15 @@ import App from './App'
 
 FastClick.attach(document.body)
 
-// 添加插件
+// // mui扩展插件
 mui.use = function(plugName){
   mui.isFunction(plugName) && plugName(mui, window, document, undefined)
 }
-// 顶部提示
 mui.toptip = utils.toptip
-// 等待框
 mui.showWaiting = utils.showWaiting
 mui.hideWaiting = utils.hideWaiting
 mui.coding = function() {
-  mui.alert('该功能开发中，敬请期待！')
+  mui.toast('该功能开发中')
 }
 
 // 组件通信中心
@@ -37,60 +35,6 @@ const router = new VueRouter({
     // console.log(to, from, savedPosition)
   }
 })
-
-// 进入内页
-function _pageTo(toPageId, title){
-  let fromPage = document.querySelector('.l-page._active')
-  let toPage = document.querySelector(toPageId)
-  if(toPage){
-    utils.addClass(fromPage, 'page-in-leave-active')
-    utils.addClass(toPage, 'page-in-enter-active')
-    if(title){
-      router.currentRoute.meta[toPageId + '_title'] = router.currentRoute.meta.title
-      router.currentRoute.meta.title = title
-    }
-    router.currentRoute.meta.type = 'to'
-    router.push(toPageId)
-    
-    setTimeout(()=>{
-      router.currentRoute.meta.type = ''
-      utils.removeClass(fromPage, 'page-in-leave-active')
-      utils.removeClass(toPage, 'page-in-enter-active')
-    }, 600)
-  }
-}
-
-// 内页返回
-function _pageBack(toPageId, title){
-  let fromPage = document.querySelector('.l-page._active')
-  let toPage = toPageId ? document.querySelector(toPageId) : document.querySelector('.l-page')
-  if(toPage){
-    utils.addClass(fromPage, 'page-out-leave-active').removeClass(fromPage, '_active')
-    utils.addClass(toPage, 'page-out-enter-active').addClass(toPage, '_active')
-    if(title){
-      router.currentRoute.meta.title = title
-    }
-    setTimeout(()=>{
-      utils.removeClass(fromPage, 'page-out-leave-active')
-      utils.removeClass(toPage, 'page-out-enter-active')
-    }, 600)
-  }
-}
-
-// 跳转
-function _link(url, direction){
-  if(!url) return
-
-  if(/^http(s?)/i.test(url)){
-    window.location.assign(url)
-  }else{
-    if(_history && direction){
-      _history.direction = direction
-      storage.session.set('_history', _history)
-    }
-    router.push(url)
-  }
-}
 
 // 验证登陆
 router.beforeEach((to, from, next) => {
@@ -131,13 +75,14 @@ router.beforeEach((to, from, next) => {
       }
     }else{
       // 默认第一个展示
+      console.log(document.querySelector('.l-page-group .l-page'))
       utils.addClass(document.querySelector('.l-page-group .l-page'), '_active')
     }
-  }, 50)
-  next()
+  }, 100)
+  setTimeout(next, 30)
 })
 
-// 控制页面转场动画
+// 控制页面间转场动画
 router.beforeEach((to, from, next) => {
   // 服务端渲染进入页面
   if(from.path === '/'){ 
@@ -213,14 +158,14 @@ router.beforeEach((to, from, next) => {
   if(to.meta.lazy && !toHistory){
     // $.showIndicator()
   }
-  next()
+
+  setTimeout(next, 40)
 })
 
 router.afterEach((route) => {
   utils.setTitle(route.meta.title)
   _history.direction = ''
   storage.session.set('_history', _history)
-  // $.hideIndicator()
 })
 
 router.onReady(()=>{
@@ -232,7 +177,7 @@ router.onReady(()=>{
     mui(document).on('click', '._nav-reload', function(e){
       window.location.reload()
     })
-  }, 50) 
+  }, 60) 
 })
 
 Vue._router = router
@@ -253,3 +198,54 @@ const vm = new Vue({
   render: h => h(App)
 }).$mount('#app')
 
+// 进入内页
+function _pageTo(toPageId, title){
+  let fromPage = document.querySelector('.l-page._active')
+  let toPage = document.querySelector(toPageId)
+  if(toPage){
+    utils.addClass(fromPage, 'page-in-leave-active')
+    utils.addClass(toPage, 'page-in-enter-active')
+    if(title){
+      router.currentRoute.meta[toPageId + '_title'] = router.currentRoute.meta.title
+      router.currentRoute.meta.title = title
+    }
+    router.currentRoute.meta.type = 'to'
+    router.push(toPageId)
+    
+    setTimeout(()=>{
+      router.currentRoute.meta.type = ''
+      utils.removeClass(fromPage, 'page-in-leave-active')
+      utils.removeClass(toPage, 'page-in-enter-active')
+    }, 600)
+  }
+}
+// 内页返回
+function _pageBack(toPageId, title){
+  let fromPage = document.querySelector('.l-page._active')
+  let toPage = toPageId ? document.querySelector(toPageId) : document.querySelector('.l-page')
+  if(toPage){
+    utils.addClass(fromPage, 'page-out-leave-active').removeClass(fromPage, '_active')
+    utils.addClass(toPage, 'page-out-enter-active').addClass(toPage, '_active')
+    if(title){
+      router.currentRoute.meta.title = title
+    }
+    setTimeout(()=>{
+      utils.removeClass(fromPage, 'page-out-leave-active')
+      utils.removeClass(toPage, 'page-out-enter-active')
+    }, 600)
+  }
+}
+// 跳转
+function _link(url, direction, type = 'push'){
+  if(!url) return
+
+  if(/^http(s?)/i.test(url)){
+    window.location[type === 'push' ? 'assign' : type](url)
+  }else{
+    if(_history && direction){
+      _history.direction = direction
+      storage.session.set('_history', _history)
+    }
+    router[type] && router[type](url)
+  }
+}

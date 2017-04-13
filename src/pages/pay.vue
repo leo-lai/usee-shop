@@ -42,15 +42,19 @@ export default {
     pay() {
       this.submiting = true
       this.$server.chooseWXPay2(this.formData).then(()=>{
-        this.$mui.confirm('支付成功', '', ['返回', '查看订单'], (e)=>{
-          this.isPay = true
-          if(e.index == 1){
-            this.$router.replace('/order/list?tab=2')
-          }else{
-            this.$router.replace(this.$route.query.to || '/index')
-            // this.$router.back()
-          }
-        })
+        this.$storage.session.set('temp_pay_result', 1)
+        // this.$mui.confirm('支付成功', '', ['返回', '查看订单'], (e)=>{
+        //   this.isPay = true
+        //   if(e.index == 1){
+        //     this.$router.replace('/order/list?tab=2')
+        //   }else{
+        //     this.$router.replace(this.$route.query.to || '/index')
+        //   }
+        // })
+        this.$router.replace('/pay/result')
+      }).catch(()=>{
+        this.$storage.session.set('temp_pay_result', 0)
+        this.$router.replace('/pay/result')
       }).finally(()=>{
         this.submiting = false
       })
@@ -70,16 +74,17 @@ export default {
     setTimeout(()=>{
       this.pay()
     }, 100)
-  },
-  beforeRouteLeave(to, from, next) {
-    if(!this.isPay){
-      this.$mui.alert('可在【我的->我的订单】完成支付', '未支付成功', (e)=>{
-        next()
-      })
-    }else{
-      next()
-    }
   }
+  // ,
+  // beforeRouteLeave(to, from, next) {
+  //   if(!this.isPay){
+  //     this.$mui.alert('可在【我的->我的订单】完成支付', '未支付成功', (e)=>{
+  //       next()
+  //     })
+  //   }else{
+  //     next()
+  //   }
+  // }
 }
 </script>
 <style scoped lang="less">

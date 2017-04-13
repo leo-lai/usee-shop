@@ -88,6 +88,10 @@ export default {
         return item
       })
 
+      if(this.addressList.length === 0){
+        this.sltedAddress = null
+      }
+      
       this.$storage.local.set('buy_slted_address', this.sltedAddress)
       this.$eventHub.$emit('APP-SLTED-ADDRESS', this.sltedAddress, this.addressList.length)
     })

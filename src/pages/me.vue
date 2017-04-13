@@ -9,7 +9,7 @@
         <div class="_bg" :style="{'background-image': 'url('+ userInfo.avatar +')'}"></div>
         <div class="_inner l-flex-hc">
           <div class="l-rest">
-            <template v-if="userInfo">
+            <template v-if="userInfo.phoneNumber">
               <h3>{{userInfo.userName}}</h3>
               <p>{{userInfo.phoneNumber}}</p>
             </template>
@@ -19,21 +19,28 @@
         </div>
       </div>
       <div class="mui-row l-text-center l-bg-white l-border-t">
-        <div class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link" @click="$link('/shop/car', 'page-in')">
+        <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/shop/car">
           <p>
             <span class="l-rel">
-              <img style="height: 2rem;" src="~assets/images/icon-004.png" alt="">
               <i class="mui-badge mui-badge-danger l-abs" style="left: 1.4rem;">{{shopcarNumber > 99 ? '99+' : shopcarNumber}}</i>
             </span>
+            <img style="height: 2rem;" src="~assets/images/icon-004.png" alt="">
           </p>
           <p class="l-margin-t-xs l-fs-m">购物车</p>
-        </div>
-        <router-link class="l-text-default mui-col-sm-6 mui-col-xs-6 l-padding l-link" to="/me/rebate">
-          <p><img style="height: 2rem;" src="~assets/images/icon-005.png" alt=""></p>
+        </router-link>
+        <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/me/rebate">
+          <p>
+            <img style="height: 2rem;" src="~assets/images/icon-005.png" alt="">
+          </p>
           <p class="l-margin-t-xs l-fs-m">我的返利</p>
         </router-link>
+        <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/me/customer">
+          <p>
+            <img style="height: 2rem;" src="~assets/images/icon-013.png" alt="">
+          </p>
+          <p class="l-margin-t-xs l-fs-m">我的客户</p>
+        </router-link>
       </div>
-
       <div class="l-margin-tb">
         <ul class="mui-table-view mui-table-view-chevron">
           <li class="mui-table-view-cell">
@@ -56,14 +63,13 @@
           </li>
         </ul>
       </div>
-
-      <div class="l-margin-tb l-text-center l-padding-tb-m l-bg-white l-text-gray l-link" @click="logout" v-if="userInfo">退出登录</div>
+      <div class="l-margin-tb l-text-center l-padding-btn l-bg-white l-text-gray l-link" @click="logout" v-if="userInfo.phoneNumber">退出登录</div>
     </div>
   </div>
 </template>
 <script>
 import navTab from 'components/nav-tab'
-let avatar = require('assets/images/avatar.jpg')
+const avatar = require('assets/images/avatar.jpg')
 
 export default {
   components: {
@@ -73,7 +79,7 @@ export default {
     return {
       defaultAvatar: avatar,
       shopcarNumber: 0,
-      userInfo: null
+      userInfo: {}
     }
   },
   methods: {
@@ -86,7 +92,9 @@ export default {
     }
   },
   created() {
-    this.userInfo = this.$storage.local.get('userInfo')
+    this.$server.user.getInfo().then((data)=>{
+      this.userInfo = data
+    })
 
     this.$server.shopcar.getNum().then(({data})=>{
       this.shopcarNumber = data
@@ -100,7 +108,7 @@ export default {
   ._bg {
     background: no-repeat 50% 50%; background-size: cover;
     position: absolute; left:0; top:0; width:100%; height: 100%;
-    z-index: -1; filter: blur(1px);
+    z-index: -1; /* filter: blur(1px); */
   }
   ._inner{
     position: relative; padding: 1.2rem 1rem;
