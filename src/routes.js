@@ -13,10 +13,12 @@ import pwd            from './pages/pwd'
 import addressInfo    from './pages/address-info'
 import pay            from './pages/pay'
 import rebate         from './pages/rebate'
+import account        from './pages/account'
 import customer       from './pages/customer'
 import qrcode         from './pages/qrcode'
-import withdrawal     from './pages/withdrawal'
+import withdrawals    from './pages/withdrawals'
 import payResult      from './pages/pay-result'
+import antifake       from './pages/antifake'
 
 const routes = [
   { 
@@ -60,6 +62,11 @@ const routes = [
   {
     path: '/shop/car',
     meta: { title: '购物车', auth: true},
+    component: shopCar
+  },
+  {
+    path: '/shopcar',
+    meta: { title: '购物车', mainPage: true, auth: true},
     component: shopCar
   },
   {
@@ -108,13 +115,23 @@ const routes = [
     component: payResult
   },
   {
+    path: '/me/account',
+    meta: { title: '我的账户', auth: true},
+    component: account
+  },
+  {
+    path: '/me/account/withdrawals',
+    meta: { title: '提现申请', auth: true},
+    component: withdrawals
+  },
+  {
     path: '/me/rebate',
     meta: { title: '我的返利', auth: true},
     component: rebate
   },
   {
     path: '/me/customer',
-    meta: { title: '我的人脉', auth: true},
+    meta: { title: '我的客户', auth: true},
     component: customer
   },
   {
@@ -123,9 +140,9 @@ const routes = [
     component: qrcode
   },
   {
-    path: '/me/rebate/withdrawal',
-    meta: { title: '提现申请', auth: true},
-    component: withdrawal
+    path: '/antifake',
+    meta: { title: '防伪查询'},
+    component: antifake
   }
 ]
 

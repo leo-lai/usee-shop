@@ -44,7 +44,9 @@
         <div class="l-goods-details l-padding-btn l-bg-white l-fs-m l-margin-b l-zoom">
           <!-- {{goodsInfo.goodsIntroduce}} -->
           <div class="l-text-center">
-            <img :src="img.imagePath" alt="" v-for="(img, index) in goodsImages" @click="previewImage(index)">
+            <lazy-component>
+              <img :src="img.imagePath" v-for="(img, index) in goodsImages" @click="previewImage(index)">    
+            </lazy-component>
           </div>
         </div>
         <!-- details end-->
@@ -118,7 +120,7 @@
 </template>
 <script>
 import navTab from 'components/nav-tab'
-// import previewImage from 'libs/mui/js/mui.preview-image'
+import previewImage from 'libs/mui/js/mui.preview-image'
 
 export default {
   components: {
@@ -231,15 +233,17 @@ export default {
             interval: 3000
           })
 
-          // let detailsImages = Array.from(document.querySelectorAll('.l-goods-details img'))
-          // detailsImages.forEach(img=>{
-          //   img.setAttribute('data-preview-src', '')
-          //   img.setAttribute('data-preview-group', '1')
-          // })
+          // if(!this.$device.isWechat){
+          //   let detailsImages = Array.from(document.querySelectorAll('.l-goods-details img'))
+          //   detailsImages.forEach(img=>{
+          //     img.setAttribute('data-preview-src', '')
+          //     img.setAttribute('data-preview-group', '1')
+          //   })
 
-          // if(detailsImages.length > 0){
-          //   this.$mui.use(previewImage)  
-          //   this.$mui.previewImage()
+          //   if(detailsImages.length > 0){
+          //     this.$mui.use(previewImage)  
+          //     this._previewImage = this.$mui.previewImage()
+          //   }
           // }
         })
       }, 600)
@@ -250,6 +254,17 @@ export default {
     this.$server.shopcar.getNum().then(({data})=>{
       this.shopcarNumber = data
     })
+  },
+  beforeDestroy() {
+    // if(this._previewImage){
+    //   let previewImage = document.querySelector('#__MUI_PREVIEWIMAGE')
+    //   if(previewImage){
+    //     previewImage.parentElement.removeChild(previewImage)
+    //   }
+    //   this._previewImage.empty()
+    //   this._previewImage.close()
+    //   this._previewImage = null
+    // } 
   }
 }
 </script>

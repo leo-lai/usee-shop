@@ -2,9 +2,10 @@
   <div class="l-page">
     <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
-      <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
+      <a v-show="!$route.meta.mainPage" class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       <!-- <a class="mui-icon mui-icon-bars mui-pull-right"></a> -->
     </header>
+    <nav-tab v-if="$route.path === '/shopcar'"></nav-tab>
     <footer class="mui-bar mui-bar-footer l-flex-hc l-shop-bar" v-show="goodsList && goodsList.length > 0">
       <div class="mui-checkbox"><label>全选</label><input type="checkbox" @click="sltAll" :checked="checkAll"></div>
       <div class="l-rest l-text-center">
@@ -53,8 +54,12 @@
   </div>
 </template>
 <script>
+import navTab from 'components/nav-tab'
 
 export default {
+  components: {
+    navTab
+  },
   data () {
     return {
       checkAll: false,

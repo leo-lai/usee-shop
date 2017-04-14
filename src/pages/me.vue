@@ -6,20 +6,22 @@
     <nav-tab></nav-tab>
     <div class="mui-content">
       <div class="l-card-me">
-        <div class="_bg" :style="{'background-image': 'url('+ userInfo.avatar +')'}"></div>
-        <div class="_inner l-flex-hc">
-          <div class="l-rest">
-            <template v-if="userInfo.phoneNumber">
-              <h3>{{userInfo.userName}}</h3>
-              <p>{{userInfo.phoneNumber}}</p>
-            </template>
-            <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">你还未未登录</span>
+        <template v-if="userInfo">
+          <div class="_bg" :style="{'background-image': 'url('+ userInfo.avatar +')'}"></div>
+          <div class="_inner l-flex-hc">
+            <div class="l-rest">
+              <template v-if="userInfo.phoneNumber">
+                <h3>{{userInfo.userName}}</h3>
+                <p>{{userInfo.phoneNumber}}</p>
+              </template>
+              <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">你还未未登录</span>
+            </div>
+            <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
           </div>
-          <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
-        </div>
+        </template>
       </div>
       <div class="mui-row l-text-center l-bg-white l-border-t">
-        <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/shop/car">
+        <!-- <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/shop/car">
           <p>
             <span class="l-rel">
               <i class="mui-badge mui-badge-danger l-abs" style="left: 1.4rem;">{{shopcarNumber > 99 ? '99+' : shopcarNumber}}</i>
@@ -27,10 +29,22 @@
             <img style="height: 2rem;" src="~assets/images/icon-004.png" alt="">
           </p>
           <p class="l-margin-t-xs l-fs-m">购物车</p>
+        </router-link> -->
+        <!-- <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/order/list">
+          <p>
+            <img style="height: 2rem;" src="~assets/images/icon-005.png" alt="">
+          </p>
+          <p class="l-margin-t-xs l-fs-m">我的订单</p>
+        </router-link> -->
+        <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/me/account">
+          <p>
+            <img style="height: 2rem;" src="~assets/images/icon-015.png" alt="">
+          </p>
+          <p class="l-margin-t-xs l-fs-m">我的账户</p>
         </router-link>
         <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/me/rebate">
           <p>
-            <img style="height: 2rem;" src="~assets/images/icon-005.png" alt="">
+            <img style="height: 2rem;" src="~assets/images/icon-014.png" alt="">
           </p>
           <p class="l-margin-t-xs l-fs-m">我的返利</p>
         </router-link>
@@ -49,6 +63,9 @@
           <li class="mui-table-view-cell">
             <router-link class="mui-navigate-right" to="/me/qrcode">我的二维码</router-link>
           </li>
+          <li class="mui-table-view-cell">
+            <router-link class="mui-navigate-right" to="/antifake">防伪查询</router-link>
+          </li>
           <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的预约</a>
           </li>
@@ -63,13 +80,12 @@
           </li>
         </ul>
       </div>
-      <div class="l-margin-tb l-text-center l-padding-btn l-bg-white l-text-gray l-link" @click="logout" v-if="userInfo.phoneNumber">退出登录</div>
+      <div class="l-margin-tb l-text-center l-padding-btn l-bg-white l-text-gray l-link" @click="logout" v-if="userInfo && userInfo.phoneNumber">退出登录</div>
     </div>
   </div>
 </template>
 <script>
 import navTab from 'components/nav-tab'
-const avatar = require('assets/images/avatar.jpg')
 
 export default {
   components: {
@@ -77,9 +93,9 @@ export default {
   },
   data () {
     return {
-      defaultAvatar: avatar,
+      defaultAvatar: require('assets/images/avatar.jpg'),
       shopcarNumber: 0,
-      userInfo: {}
+      userInfo: null
     }
   },
   methods: {
@@ -92,7 +108,7 @@ export default {
     }
   },
   created() {
-    this.$server.user.getInfo().then((data)=>{
+    this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
     })
 
@@ -104,7 +120,7 @@ export default {
 </script>
 <style scoped lang="less">
 .l-card-me{
-  position:relative; z-index:0; padding-top: 0.75rem;margin-top: -0.75rem; overflow: hidden;
+  position:relative; z-index:0; padding-top: 0.75rem;margin-top: -0.75rem; overflow: hidden; min-height: 6.15rem;
   ._bg {
     background: no-repeat 50% 50%; background-size: cover;
     position: absolute; left:0; top:0; width:100%; height: 100%;

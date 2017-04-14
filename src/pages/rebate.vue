@@ -5,18 +5,12 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <div class="mui-content l-bg-white">
-      <template v-if="userInfo.saler">
-        <div class="l-text-center">
-          <img src="~assets/images/img-003.jpg" alt="">  
+      <template v-if="userInfo.agentId == 1">
+        <div class="l-card-count l-text-center">
+          <p class="l-fs-s">&nbsp;累计返利</p>  
+          <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>86565.22</p>
         </div>
-        <div class="l-text-center l-margin-b">
-          <p class="l-text-gray l-fs-s">累计返利</p>
-          <p class="l-text-warn">
-            <span class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>95270.22</span>
-          </p>
-          <p><router-link class="mui-btn l-btn-main _m" to="/me/rebate/withdrawal" style="width:4.5rem;">提现</router-link></p>
-        </div>
-        <div class="l-text-center l-rebate-time l-margin-lr">
+        <div class="l-text-center l-rebate-time l-border-b l-sticky l-bg-white">
           <div class="l-flex-hc _time">
             <div class="l-rest">
               <p>起始时间</p>
@@ -58,15 +52,19 @@ export default {
     }
   },
   created() {
-    this.$server.user.getInfo().then((data)=>{
+    this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
     })
   }
 }
 </script>
 <style scoped lang="less">
+.l-card-count{
+  padding: 0.75rem; color: #fff;
+  background: linear-gradient(105deg, #ff784e, #f4524e);
+}
 .l-rebate-time{
-  color:#999; font-size: 0.75rem;
+  color:#999; font-size: 0.75rem; padding: 0 0.75rem;
   .l-rest{overflow: hidden;}
   ._tit{padding: 0.75rem;}
   ._time{padding: 0.75rem 0;}
@@ -78,4 +76,5 @@ export default {
   }
 }
 .l-rebate-item{margin:0 0.75rem; padding: 0.75rem 0; font-size: 0.7rem; color: #999;}
+
 </style>

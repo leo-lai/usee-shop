@@ -606,6 +606,44 @@ const _server = {
       return response
     })
   },
+  user: {
+    getInfo(remote) {
+      return new Promise((resolve)=>{
+        let userInfo = storage.local.get('userInfo')
+        if(!remote && userInfo){
+          resolve({data: userInfo})
+        }else{
+          _http.post('/shopUsers/refresh').then((response) => {
+            !response.data && (response.data = {})
+            response.data.avatar = utils.image.wxHead(response.data.image)
+            storage.local.set('userInfo', response.data, 1000*60*15)
+            resolve(response)
+          })
+        }
+      })
+    },
+    getBankInfo() {
+      return _http.post('/shopUsers/myBankInfo').then((response) => {
+        !response.data && (response.data = {})
+        return response
+      })
+    },
+    withdrawals(formData) {
+      return _http.post('/shopUsers/withdrawals', formData).then((response) => {
+        !response.data && (response.data = {})
+        return response
+      })
+    },
+    getWithdrawalsRecord(startDate = '', finishDate = '', page = 1, rows = 10) {
+      return _http.post('/shopUsers/withdrawalsRecord', {
+        startDate, finishDate, page, rows
+      }).then((response) => {
+        !response.data && (response.data = [])
+        response.data.rows = rows
+        return response
+      })
+    }
+  },
   // 修改密码、找回密码
   changePwd(formData) {
     return _http.post('/shopUsers/forgetPassword', formData).then((response) => {
@@ -619,13 +657,6 @@ const _server = {
       !response.data && (response.data = [])
       return response
     })
-  },
-  user: {
-    getInfo() {
-      return new Promise((resolve)=>{
-        resolve(storage.local.get('userInfo') || {})
-      })
-    }
   },
   // 地址
   address: {

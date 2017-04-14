@@ -5,17 +5,16 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <div class="mui-content l-bg-white">
-      <template v-if="userInfo.saler">
-        <div class="l-text-center">
-          <img src="~assets/images/img-002.jpg" alt="">  
+      <template v-if="userInfo.agentId == 1">
+        <div class="l-card-count l-text-center">
+          <p class="l-fs-s">&nbsp;累计有效客户</p>  
+          <p class="l-fs-xl">86565.22</p>
         </div>
-        <div class="l-text-center l-margin-b">
-          <p class="l-text-gray l-fs-s">累计有效客户</p>
-          <p class="l-text-warn l-fs-xl">665</p>
-          <p class="l-fs-s" style="margin:0 1.6rem;">客户扫码登录后需要购买指定商品才能与您成功绑定关系，已经被绑定的客户无法再次被绑定</p>
+        <div class="l-padding l-fs-s" style="background:#efeff4;">
+          说明：客户扫码登录后需要购买指定商品才能与您成功绑定关系，已经被绑定的客户无法再次被绑定。
         </div>
         <div class="l-tab-customer">
-          <div class="_tit l-border-b l-flex-hvc">
+          <div class="_tit l-border-b l-flex-hvc l-sticky">
             <div class="_item" :class="{'_active': tabIndex == 1}" @click="tabClick(1)">
               <i class="l-icon l-text-ok">&#xe626; </i>成功绑定
             </div>
@@ -62,16 +61,20 @@ export default {
     }
   },
   created() {
-    this.$server.user.getInfo().then((data)=>{
+    this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
     })
   }
 }
 </script>
 <style scoped lang="less">
+.l-card-count{
+  padding: 0.75rem; color: #fff;
+  background: linear-gradient(105deg, #ff784e, #f4524e);
+}
 .l-tab-customer{
   ._tit{
-    text-align: center;
+    text-align: center; background: #fff;
     .l-icon{font-size: 1rem;}
     ._item{
       padding: 0.5rem 1.4rem 0.5rem 1rem; 

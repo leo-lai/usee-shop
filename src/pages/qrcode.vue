@@ -5,7 +5,7 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <div class="mui-content">
-      <template v-if="userInfo.saler">
+      <template v-if="userInfo.agentId == 1">
         <div class="l-bg-white l-qrcode-desc l-zoom">
           <h3 class="l-margin l-text-center">二维码说明</h3>
           <ul class="l-fs-s">
@@ -18,7 +18,7 @@
           <div class="l-qrcode-img">
             <qrcanvas :options="qrcode"></qrcanvas>
           </div>
-          <p class="l-text-center l-margin">U视一号<i class="l-text-warn">™</i></p><br>
+          <p class="l-text-center l-margin">U视一号<i class="l-text-warn">™</i></p>
         </div>
         <p class="l-text-gray l-fs-s l-text-center l-margin">长按保存或点击右上角分享</p>
       </template>
@@ -56,7 +56,7 @@ export default {
     }
   },
   created() {
-    this.$server.user.getInfo().then((data)=>{
+    this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
     })
 
@@ -86,7 +86,7 @@ export default {
   ul{padding: 0 0.75rem 0 1.75rem;list-style-type: decimal;}
 }
 .l-qrcode-img{
-  width: 8.0rem; height: 8.0rem; margin: 2.5rem auto 0; text-align: center;
+  width: 12rem; height: 12rem; margin: 1.5rem auto 0; text-align: center;
    img,canvas{width: 100%; height: 100%;} 
 }
 </style>

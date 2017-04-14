@@ -4,10 +4,15 @@ import mui from 'libs/mui/js/mui'
 import FastClick from 'fastclick'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import VueLazyload from 'vue-lazyload'
 import { storage, utils } from 'assets/js/utils'
 import server from './server'
 import routes from './routes'
 import App from './App'
+
+Vue.use(VueLazyload, {
+  lazyComponent: true
+})
 
 FastClick.attach(document.body)
 
@@ -75,7 +80,6 @@ router.beforeEach((to, from, next) => {
       }
     }else{
       // 默认第一个展示
-      console.log(document.querySelector('.l-page-group .l-page'))
       utils.addClass(document.querySelector('.l-page-group .l-page'), '_active')
     }
   }, 100)
