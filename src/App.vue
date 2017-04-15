@@ -16,7 +16,11 @@ export default {
     this.$eventHub.$on('APP-DIRECTION', (data)=>{
       this.direction = data
     })
-	}
+    this.$server.user.bind()
+	},
+  updated() {
+    // console.log('updated')
+  }
 }
 </script>
 <style lang="less">

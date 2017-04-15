@@ -218,8 +218,18 @@ class List {
 }
 
 const _server = {
+  getHost() {
+    return window.location.origin
+  }, 
   getWxQrcode() {
     return qrcode
+  },
+  getImageBase64(imagePath) {
+    return _http.post('/shopUsers/imageBase64', {path: imagePath}).then((response) => {
+      !response.data && (response.data = '')
+      response.data = 'data:image/jpg;base64,' + response.data
+      return response
+    })
   },
   // 获取微信授权路径 url为绝对路径
   getGrantUrl(url, params) {
@@ -300,6 +310,7 @@ const _server = {
         formData.openId = storage.session.get('openId')
       }
       _http.post('/shopOrderPay/pay/prepare', formData).then(({ data }) => {
+        storage.session.set('buy_become_agent', data.isAgent || 0)
         storage.session.set('openId', data.openId)
         resolve(data.payInfo)
       }).catch(reject)
@@ -588,8 +599,9 @@ const _server = {
     return storage.local.get('sessionId')
   },
   // 登录
-  login(type, formData) {
+  login(type, formData = {}) {
     var url = type == 1 ? '/shopUsers/loginPassword' : '/shopUsers/loginCode'
+    formData.qrUserCode = storage.session.get('bind_qrcode')
     return _http.post(url, formData).then((response) => {
       !response.data && (response.data = {})
       response.data.avatar = utils.image.wxHead(response.data.image)
@@ -598,11 +610,26 @@ const _server = {
     })
   },
   // 注册
-  register(formData) {
+  register(formData = {}) {
+    formData.qrUserCode = storage.session.get('bind_qrcode')
     return _http.post('/shopUsers/register', formData).then((response) => {
       !response.data && (response.data = {})
       response.data.avatar = utils.image.wxHead(response.data.image)
       storage.local.set('userInfo', response.data)
+      return response
+    })
+  },
+  // 修改密码、找回密码
+  changePwd(formData) {
+    return _http.post('/shopUsers/forgetPassword', formData).then((response) => {
+      !response.data && (response.data = {})
+      return response
+    })
+  },
+  // 首页幻灯片
+  getBanner() {
+    return _http.post('/carouselFigure/getImages').then((response) => {
+      !response.data && (response.data = [])
       return response
     })
   },
@@ -638,25 +665,46 @@ const _server = {
       return _http.post('/shopUsers/withdrawalsRecord', {
         startDate, finishDate, page, rows
       }).then((response) => {
-        !response.data && (response.data = [])
+        !response.data && (response.data = {})
         response.data.rows = rows
         return response
       })
+    },
+    getRebateRecord(startDate = '', finishDate = '', page = 1, rows = 10) {
+      return _http.post('/shopUsers/rebateRecord', {
+        startDate, finishDate, page, rows
+      }).then((response) => {
+        !response.data && (response.data = {})
+        response.data.rows = rows
+        return response
+      })
+    },
+    getCustomer(isSuccess = 1, page = 1, rows = 10) {
+      return _http.post('/shopUsers/myCustomer', {
+        isSuccess, page, rows
+      }).then((response) => {
+        !response.data && (response.data = {})
+        response.data.rows = rows
+        return response
+      })
+    },
+
+    bind(qrUserCode) {
+      qrUserCode = qrUserCode || storage.session.get('bind_qrcode')
+      if(!qrUserCode) {
+        return errorPromise('没有检测到二维码')
+      }
+
+      if(!_server.checkLogin()){
+        return errorPromise('用户未登录') 
+      }
+
+      storage.local.set('bind_qrcode', qrUserCode)
+      return _http.post('/shopUsers/bindingCheck', { qrUserCode }).then((response) => {
+        !response.data && (response.data = {})
+        return response
+      })
     }
-  },
-  // 修改密码、找回密码
-  changePwd(formData) {
-    return _http.post('/shopUsers/forgetPassword', formData).then((response) => {
-      !response.data && (response.data = {})
-      return response
-    })
-  },
-  // 首页幻灯片
-  getBanner() {
-    return _http.post('/carouselFigure/getImages').then((response) => {
-      !response.data && (response.data = [])
-      return response
-    })
   },
   // 地址
   address: {
@@ -717,18 +765,22 @@ const _server = {
       })
     },
     getNum() {
-      let promise
-      if (_server.checkLogin()) {
-        promise = _http.post('/shopGoods/shoppingCartNumber').then((response) => {
-          !response.data && (response.data = 0)
-          return response
-        })
-      } else {
-        promise = new Promise((resolve) => {
+      return new Promise((resolve)=>{
+        if(_server.checkLogin()){
+          let shopcarNumber = storage.session.get('shopcarNumber')
+          if(shopcarNumber){
+            resolve({ data: shopcarNumber })
+          }else{
+            _http.post('/shopGoods/shoppingCartNumber').then((response) => {
+              !response.data && (response.data = 0)
+              storage.session.set('shopcarNumber', response.data)
+              resolve(response)
+            })  
+          }
+        }else{
           resolve({ data: 0 })
-        })
-      }
-      return promise
+        }
+      })
     }
   },
   // 订单

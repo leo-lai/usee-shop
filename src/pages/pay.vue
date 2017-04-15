@@ -42,7 +42,7 @@ export default {
     pay() {
       this.submiting = true
       this.$server.chooseWXPay2(this.formData).then(()=>{
-        this.$storage.session.set('temp_pay_result', 1)
+        
         // this.$mui.confirm('支付成功', '', ['返回', '查看订单'], (e)=>{
         //   this.isPay = true
         //   if(e.index == 1){
@@ -51,6 +51,7 @@ export default {
         //     this.$router.replace(this.$route.query.to || '/index')
         //   }
         // })
+        this.$storage.session.set('temp_pay_result', 1)
         this.$router.replace('/pay/result')
       }).catch(()=>{
         this.$storage.session.set('temp_pay_result', 0)

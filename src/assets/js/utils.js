@@ -389,6 +389,7 @@ export let utils = {
       if(src.indexOf('wx.qlogo.cn') === -1){
         return src
       }
+      // 有0、46、64、96、132数值可选，0代表640*640正方形头像
       return src.replace(/\/0$/, '/64')
     }
   },
@@ -424,6 +425,21 @@ export let utils = {
   hideWaiting() {
     let waiting = document.querySelector('#l-waiting')
     waiting && waiting.classList.add('_hide')
+  },
+  convertImgToBase64(url, callback, outputFormat){
+    var canvas = document.createElement('canvas'),
+      ctx = canvas.getContext('2d'),
+      img = new Image
+    img.crossOrigin = ''
+    img.onload = function(){
+      canvas.height = img.height
+      canvas.width = img.width
+      ctx.drawImage(img,0,0)
+      var dataURL = canvas.toDataURL(outputFormat || 'image/png')
+      callback.call(this, dataURL)
+      canvas = null;
+    }
+    img.src = url
   }
 }
 

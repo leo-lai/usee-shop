@@ -16,7 +16,10 @@
         </div>
         <div class="l-bg-white l-margin-tb l-padding">
           <div class="l-qrcode-img">
-            <qrcanvas :options="qrcode"></qrcanvas>
+            <div class="canvas" ref="qrcode">
+              <qrcanvas :options="qrcodeObj"></qrcanvas>
+            </div>
+            <img :src="qrcodeImg" alt="">  
           </div>
           <p class="l-text-center l-margin">U视一号<i class="l-text-warn">™</i></p>
         </div>
@@ -28,56 +31,91 @@
 </template>
 <script>
 import notU from 'components/not-u'
-import qrcanvas from 'qrcanvas-vue'
-function convertImgToBase64(url, callback, outputFormat){
-  var canvas = document.createElement('canvas'),
-    ctx = canvas.getContext('2d'),
-    img = new Image
-  img.crossOrigin = 'anonymous'
-  img.onload = function(){
-    canvas.height = img.height
-    canvas.width = img.width
-    ctx.drawImage(img,0,0)
-    var dataURL = canvas.toDataURL(outputFormat || 'image/png')
-    callback.call(this, dataURL)
-    canvas = null;
-  }
-  img.src = url
-}
+import Qrcanvas from 'qrcanvas-vue'
 
+let qrLogo = require('assets/images/logo.jpg')
 export default {
   components: {
-    qrcanvas, notU
+    notU, Qrcanvas
+  },
+  methods: {
+    convertToImage(){
+      const qrcodeCanvas = this.$refs.qrcode.children[0]
+      if(!qrcodeCanvas) return ''
+
+      const type = 'image/png'
+      let imageData = qrcodeCanvas.toDataURL(type).replace(type, 'image/octet-stream') || ''
+      this.$storage.local.set('qrcode_img', imageData, 1000*60*30)
+      return imageData
+    },
+    createQrcode(imageData) {
+      const self = this
+      let bgImg = new Image()
+      bgImg.onload = function(){
+        self.qrcodeObj = Object.assign({}, self.qrcodeObj, {
+          data: self.$server.getHost() + '/shop?_qruc=' + self.userInfo.userCode,
+          cellSize: 4,
+          correctLevel: 'H',
+          typeNumber: 2,
+          foreground: [
+            {style: '#ff7809'},
+            // outer squares of the positioner
+            {row: 0, rows: 7, col: 0, cols: 7, style: '#f35b54'},
+            {row: -7, rows: 7, col: 0, cols: 7, style: '#f35b54'},
+            {row: 0, rows: 7, col: -7, cols: 7, style: '#f35b54'},
+            // inner squares of the positioner
+            {row: 2, rows: 3, col: 2, cols: 3, style: '#0080ff'},
+            {row: -5, rows: 3, col: 2, cols: 3, style: '#0080ff'},
+            {row: 2, rows: 3, col: -5, cols: 3, style: '#0080ff'},
+          ],
+          background: '#ffffff',
+          logo: {
+            image: bgImg,
+            size: 0.1,
+            fontStyle: 'bold',
+            color: '#f35b54',
+            text: 'U视一号',
+            margin: 4
+          },
+          effect: {
+            key: 'round', // image liquid round
+            value: 0.2  
+          }
+        })
+
+        self.$nextTick(()=>{
+          self.qrcodeImg = self.convertToImage()
+        })
+      }
+      bgImg.src = imageData
+    }
   },
   data () {
     return {
       userInfo: {},
-      qrcode: { }
+      qrcodeObj: {},
+      qrcodeImg: ''
     }
   },
   created() {
     this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
+      if(data.agentId == 1){
+        if(this.$storage.local.get('qrcode_img')){
+          this.$nextTick(()=>{
+            this.qrcodeImg = this.$storage.local.get('qrcode_img')
+          })
+        }else{
+          this.$server.getImageBase64(data.avatar).then(({data})=>{
+            qrLogo = data
+          }).finally(()=>{
+            setTimeout(()=>{
+              this.createQrcode(qrLogo)  
+            }, 600)
+          })
+        }
+      }
     })
-
-    // const self = this
-    // self.userInfo = self.$storage.local.get('userInfo')
-    // let image = document.createElement('img')
-    // image.src = self.userInfo.avatar
-    // convertImgToBase64(self.userInfo.avatar, (base64)=>{
-      
-    // })
-    // image.onload = function(){
-    //   self.qrcode = Object.assign({}, this.qrcode, {
-    //     data: 'http://www.baidu.com',
-    //     cellSize: 6,
-    //     // size: 160,
-    //     logo: {
-    //       image,
-    //       // text: 'U视一号'
-    //     }
-    //   })
-    // }
   }
 }
 </script>
@@ -86,7 +124,8 @@ export default {
   ul{padding: 0 0.75rem 0 1.75rem;list-style-type: decimal;}
 }
 .l-qrcode-img{
-  width: 12rem; height: 12rem; margin: 1.5rem auto 0; text-align: center;
-   img,canvas{width: 100%; height: 100%;} 
+  width: 10rem; height: 10rem; margin: 1.5rem auto 0; text-align: center;
+  .canvas{display: none;}   
 }
+.l-qrcode-img img{width: 100%; height: 100%;}
 </style>

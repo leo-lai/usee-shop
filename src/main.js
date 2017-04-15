@@ -43,6 +43,9 @@ const router = new VueRouter({
 
 // 验证登陆
 router.beforeEach((to, from, next) => {
+  if(utils.url.getArgs()['_qruc']){
+    storage.session.set('bind_qrcode', utils.url.getArgs()['_qruc'])
+  }
   if(to.meta.auth && !storage.local.get('sessionId')){
     server.logout()  
     next(false)

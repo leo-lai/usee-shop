@@ -4,7 +4,7 @@
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
-    <div class="mui-content l-bg-white">
+    <div class="mui-content">
       <template v-if="userInfo.agentId == 1">
         <div class="l-card-count l-flex-hc">
           <div class="l-rest">
@@ -12,23 +12,23 @@
             <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>{{userInfo.account.toFixed(2)}}</p>
           </div>
           <div>
-            <router-link class="mui-btn l-btn-white _s" style="width:4.5rem;" to="/me/account/withdrawals">提现</router-link>
+            <router-link class="mui-btn l-btn-white _s" style="width:4.5rem;" tag="button" :disabled="userInfo.account <= 0" to="/me/account/withdrawals">提现</router-link>
           </div>
         </div>
         <div class="l-text-center l-rebate-time l-border-b l-sticky l-bg-white">
           <div class="l-flex-hc _time">
             <div class="l-rest">
               <p>起始时间</p>
-              <p class="_date"><input type="date" v-model="startDate"></p>
+              <p class="_date"><input type="date" v-model="startDate" @change="changeDate"></p>
             </div>
             <img class="l-block" style="width: 1rem; margin: 0 0.75rem;" src="~assets/images/icon-012.png" alt="">
             <div class="l-rest">
               <p>结束时间</p>
-              <p class="_date"><input type="date" v-model="endDate"></p>
+              <p class="_date"><input type="date" v-model="endDate" @change="changeDate"></p>
             </div>
           </div>
         </div>
-        <div class="l-rebate-list">
+        <div class="l-rebate-list l-bg-white">
           <div class="l-rebate-item l-border-b" v-for="item in list">
             <p><span class="l-text-warn mui-pull-right">处理中</span>提现单号：26155454545555</p>
             <p>申请时间：2016-02-02 10：53</p>
@@ -62,20 +62,27 @@ export default {
       endDate: new Date().format('yyyy-MM-dd'),
       page: 1,
       list: [],
-      userInfo: {}
+      userInfo: {
+        account: 0
+      }
     }
   },
   methods: {
+    changeDate() {
+      this.$refs.infinite.$emit('$InfiniteLoading:reset')
+    },
     onInfinite() {
       this.$server.user.getWithdrawalsRecord(this.startDate, this.endDate, this.page)
       .then(({data})=>{
-        this.list = this.list.concat(data)
-        if(data.length > 0){
+        let returnList = data.withdrawalRecords
+        // this.userInfo.account = data.account
+        this.list = this.list.concat(returnList)
+        if(returnList.length > 0){
           this.$nextTick(()=>{
             this.$refs.infinite.$emit('$InfiniteLoading:loaded')    
           })
           
-          if(data.length >= data.rows){
+          if(returnList.length >= data.rows){
             this.page++
           }else{
             this.$refs.infinite.$emit('$InfiniteLoading:complete')

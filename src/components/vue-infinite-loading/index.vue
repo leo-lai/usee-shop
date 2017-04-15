@@ -147,9 +147,9 @@
     clear: both;
     text-align: center;
     *[class^=loading-]{
-      @size: 28px;
+      @size: 1.4rem;
       display: inline-block;
-      margin: 15px 0;
+      margin: 0.75rem 0;
       width: @size;
       height: @size;
       font-size: @size;
@@ -160,7 +160,7 @@
 
   .infinite-status-prompt{
     color: #666;
-    font-size: 14px;
+    font-size: 0.7rem;
     text-align: center;
     margin: 0.5rem 0;
   }

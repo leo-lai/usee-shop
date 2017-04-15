@@ -111,7 +111,7 @@ const routes = [
   },
   {
     path: '/pay/result',
-    meta: { title: '支付结果', auth: true},
+    meta: { title: '支付结果'},
     component: payResult
   },
   {

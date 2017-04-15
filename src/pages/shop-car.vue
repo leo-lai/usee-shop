@@ -20,7 +20,7 @@
       <div class="l-shopcar-list l-margin-b">
         <div class="l-padding-btn l-text-gray l-border-b l-bg-white l-fs-s l-sticky" v-show="goodsList && goodsList.length > 0">
           <span class="mui-pull-right" @click="del">删除</span>
-          <span>共 {{shopcarNum}} 件商品</span>
+          <span>共 {{shopcarNumber}} 件商品</span>
         </div>
         <div class="l-shopcar-item l-flex-hc l-border-t" v-for="item in goodsList">
           <div class="mui-checkbox"><label></label><input type="checkbox" @click="slt(item)" :checked="item.checked"></div>
@@ -64,7 +64,7 @@ export default {
     return {
       checkAll: false,
       loading: false,
-      shopcarNum: 0,
+      shopcarNumber: 0,
       payTotalNum: 0,
       payTotalMoney: 0,
       submiting: false,
@@ -150,7 +150,7 @@ export default {
       }
     },
     calu() {
-      let shopcarNum = 0
+      let shopcarNumber = 0
       let payTotalNum = 0
       let payTotalMoney = 0
       let shoppingCartIds = []
@@ -164,7 +164,7 @@ export default {
           num = item.oldNumber
         }
 
-        shopcarNum += num
+        shopcarNumber += num
         if(item.checked){
           sltedGoods.push(item)
           shoppingCartIds.push(item.shoppingCartId)
@@ -177,9 +177,11 @@ export default {
 
       this.sltedGoods = sltedGoods
       this.shoppingCartIds = shoppingCartIds
-      this.shopcarNum = shopcarNum
+      this.shopcarNumber = shopcarNumber
       this.payTotalNum = payTotalNum
       this.payTotalMoney = payTotalMoney
+
+      this.$storage.session.set('shopcarNumber', shopcarNumber)
     },
     submit() {
       if(this.sltedGoods && this.sltedGoods.length > 0){

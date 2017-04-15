@@ -108,7 +108,7 @@ export default {
     }
   },
   created() {
-    this.$server.user.getInfo().then(({data})=>{
+    this.$server.user.getInfo(true).then(({data})=>{
       this.userInfo = data
     })
 

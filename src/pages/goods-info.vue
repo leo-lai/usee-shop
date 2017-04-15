@@ -201,6 +201,7 @@ export default {
           this.$mui.toast('已加入购物车')
           this.isShowSpec = false
           this.shopcarNumber += Number(this.buyNumber)
+          this.$storage.session.set('shopcarNumber', this.shopcarNumber)
         }).finally(()=>{
           this.$mui.hideWaiting()
         })
