@@ -264,9 +264,9 @@ const _server = {
         }
 
         _http.post('/shopOrderPay/getConfig', { url }).then(({ data }) => {
-          config.appId = data.appid
+          config.appId = data.appId
           config.timestamp = data.timestamp
-          config.nonceStr = data.noncestr
+          config.nonceStr = data.nonceStr
           config.signature = data.signature
 
           window.wx.config(config)
@@ -410,6 +410,36 @@ const _server = {
       }
     }).finally(() => {
       mui.hideWaiting()
+    })
+  },
+  wxShare(shareInfo) {
+    return new Promise((resolve, reject) => {
+      if(!shareInfo) {
+        reject('分享信息为空')
+        return
+      }
+      mui.showWaiting()
+      this.getWxConfig().then((wx) => {
+        if (wx._ready) {
+          let _info = {
+            title: shareInfo.title,             // 分享标题
+            desc: shareInfo.desc,
+            link: shareInfo.link,               // 分享链接
+            imgUrl: shareInfo.imgUrl,           // 分享图标
+            success: resolve,
+            cancel: reject
+          }
+          wx.onMenuShareTimeline(_info)
+          wx.onMenuShareAppMessage(_info)
+          wx.onMenuShareQQ(_info)
+          wx.onMenuShareWeibo(_info)
+          wx.onMenuShareQZone(_info)
+        }else{
+          reject('分享失败')
+        }
+      }).finally(() => {
+        mui.hideWaiting()
+      })
     })
   },
   // 获取当前经纬度 成功失败都返回一个对象

@@ -100,6 +100,13 @@ export default {
   created() {
     this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
+      this.$server.wxShare({
+        title: '我为U视喷喷代言',
+        desc: '喷3次，停3秒，眨3下，U视喷喷9秒靓眼。',
+        link: this.$server.getHost() + '/shop?_qruc=' + this.userInfo.userCode,
+        imgUrl: this.userInfo.avatar
+      })
+
       if(data.agentId == 1){
         if(this.$storage.local.get('qrcode_img')){
           this.$nextTick(()=>{

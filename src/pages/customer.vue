@@ -33,7 +33,7 @@
             <div class="_item l-border-b" v-for="item in list0">
               <p>微信昵称：{{item.userName}}</p>
               <p>绑定时间：{{item.startDate}}</p>
-              <p>失败原因：{{item.describe}}</p>
+              <p>失败原因：<!-- 该用户已经是其他小U店员的客户 -->{{item.describe}}</p>
             </div>
           </div>
         </div>
