@@ -11,12 +11,16 @@
           <div class="_inner l-flex-hc">
             <div class="l-rest">
               <template v-if="userInfo.phoneNumber">
-                <h3>{{userInfo.userName}}</h3>
+                <h3>{{userInfo.userName}}<i class="l-icon l-text-warn" v-show="userInfo.agentId == 1">&#xe604;</i></h3>
                 <p>{{userInfo.phoneNumber}}</p>
               </template>
               <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">你还未未登录</span>
             </div>
             <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
+            <div class="_ft l-flex-hc">
+              <router-link class="l-rest l-border-r" to="/me/account">账户余额：{{(userInfo.account || 0).toFixed(2)}}</router-link>
+              <router-link class="l-rest" to="/me/customer">累计客户：{{userInfo.customerNum || 0}}</router-link>
+            </div>
           </div>
         </template>
       </div>
@@ -127,7 +131,13 @@ export default {
     z-index: -1; /* filter: blur(1px); */
   }
   ._inner{
-    position: relative; padding: 1.2rem 1rem;
+    position: relative; padding: 0.75rem 1rem 2.35rem;
+    .l-icon{ vertical-align: super;  font-size: 0.7rem; margin-left: 5px;}
+  }
+  ._ft{
+    position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, rgba(255, 120, 78, 0.8), rgba(244, 82, 78, 0.8));
+    font-size: 0.7rem; color:#fff; text-align: center; padding: 0.25rem 0;
+    a{color: #fff;}
   }
 }
 .l-card-me:before{

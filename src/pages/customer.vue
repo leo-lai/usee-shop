@@ -110,7 +110,7 @@ export default {
           this.$refs.infinite.$emit('$InfiniteLoading:complete')
         }
 
-        this.customerNum = data.customerNum
+        this.customerNum = data.customerNum || 0
         this['list' + this.tabIndex] = list
 
       }).catch(()=>{

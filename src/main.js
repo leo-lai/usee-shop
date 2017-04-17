@@ -49,6 +49,7 @@ router.beforeEach((to, from, next) => {
   if(to.meta.auth && !storage.local.get('sessionId')){
     server.logout()  
     next(false)
+    return
   }
   next()
 })

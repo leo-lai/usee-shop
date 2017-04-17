@@ -14,14 +14,14 @@
             <li>越多人购买您获得的返利越多</li>
           </ul>
         </div>
-        <div class="l-bg-white l-margin-tb l-padding">
+        <div class="l-bg-white l-margin-tb" style="padding:2rem 0;">
           <div class="l-qrcode-img">
             <div class="canvas" ref="qrcode">
               <qrcanvas :options="qrcodeObj"></qrcanvas>
             </div>
             <img :src="qrcodeImg" alt="">  
           </div>
-          <p class="l-text-center l-margin">U视一号<i class="l-text-warn">™</i></p>
+          <!-- <p class="l-text-center l-margin-t">U视一号<i class="l-text-warn">™</i></p> -->
         </div>
         <p class="l-text-gray l-fs-s l-text-center l-margin">长按保存或点击右上角分享</p>
       </template>
@@ -124,7 +124,7 @@ export default {
   ul{padding: 0 0.75rem 0 1.75rem;list-style-type: decimal;}
 }
 .l-qrcode-img{
-  width: 10rem; height: 10rem; margin: 1.5rem auto 0; text-align: center;
+  width: 10rem; height: 10rem; margin:0 auto; text-align: center;
   .canvas{display: none;}   
 }
 .l-qrcode-img img{width: 100%; height: 100%;}

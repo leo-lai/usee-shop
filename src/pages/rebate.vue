@@ -14,12 +14,12 @@
           <div class="l-flex-hc _time">
             <div class="l-rest">
               <p>起始时间</p>
-              <p class="_date"><input type="date" v-model="startDate" @change="changeDate"></p>
+              <p class="_date"><input type="date" min="2017-01-01" max="2020-01-01" v-model="startDate" @change="changeDate"></p>
             </div>
             <img class="l-block" style="width: 1rem; margin: 0 0.75rem;" src="~assets/images/icon-012.png" alt="">
             <div class="l-rest">
               <p>结束时间</p>
-              <p class="_date"><input type="date" v-model="endDate" @change="changeDate"></p>
+              <p class="_date"><input type="date" min="2017-01-01" max="2020-01-01" v-model="endDate" @change="changeDate"></p>
             </div>
           </div>
         </div>
@@ -66,13 +66,14 @@ export default {
   },
   methods: {
     changeDate() {
+      this.list = []
       this.$refs.infinite.$emit('$InfiniteLoading:reset')
     },
     onInfinite() {
       this.$server.user.getRebateRecord(this.startDate, this.endDate, this.page)
       .then(({data})=>{
         let returnList = data.rebateRecords
-        this.totalAmount = data.totalAmount
+        this.totalAmount = data.totalAmount || 0
         this.list = this.list.concat(returnList)
         if(returnList.length > 0){
           this.$nextTick(()=>{

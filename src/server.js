@@ -582,9 +582,13 @@ const _server = {
     let sessionId = storage.local.get('sessionId')
     if (sessionId) {
       _http.post('/shopUsers/loginOut', { sessionId })
-      storage.local.remove('sessionId')
     }
+
+    // 清除缓存
+    storage.local.remove('sessionId')
     storage.local.remove('userInfo')
+    storage.local.remove('buy_slted_address')
+
     tipText && mui.toast(tipText)
     if (utils.device.isWechat) {
       // 避免登录后跳转到登录页面
@@ -601,7 +605,7 @@ const _server = {
   // 登录
   login(type, formData = {}) {
     var url = type == 1 ? '/shopUsers/loginPassword' : '/shopUsers/loginCode'
-    formData.qrUserCode = storage.session.get('bind_qrcode')
+    formData.qrUserCode = storage.session.get('bind_qrcode') || ''
     return _http.post(url, formData).then((response) => {
       !response.data && (response.data = {})
       response.data.avatar = utils.image.wxHead(response.data.image)
@@ -611,7 +615,7 @@ const _server = {
   },
   // 注册
   register(formData = {}) {
-    formData.qrUserCode = storage.session.get('bind_qrcode')
+    formData.qrUserCode = storage.session.get('bind_qrcode') || ''
     return _http.post('/shopUsers/register', formData).then((response) => {
       !response.data && (response.data = {})
       response.data.avatar = utils.image.wxHead(response.data.image)
@@ -636,6 +640,11 @@ const _server = {
   user: {
     getInfo(remote) {
       return new Promise((resolve)=>{
+        if(!_server.checkLogin()){
+          resolve({data: {}})
+          return
+        }
+
         let userInfo = storage.local.get('userInfo')
         if(!remote && userInfo){
           resolve({data: userInfo})
@@ -690,7 +699,7 @@ const _server = {
     },
 
     bind(qrUserCode) {
-      qrUserCode = qrUserCode || storage.session.get('bind_qrcode')
+      qrUserCode = qrUserCode || storage.session.get('bind_qrcode') || ''
       if(!qrUserCode) {
         return errorPromise('没有检测到二维码')
       }

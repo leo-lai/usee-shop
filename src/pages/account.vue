@@ -19,22 +19,22 @@
           <div class="l-flex-hc _time">
             <div class="l-rest">
               <p>起始时间</p>
-              <p class="_date"><input type="date" v-model="startDate" @change="changeDate"></p>
+              <p class="_date"><input type="date" min="2017-01-01" max="2020-01-01" v-model="startDate" @change="changeDate"></p>
             </div>
             <img class="l-block" style="width: 1rem; margin: 0 0.75rem;" src="~assets/images/icon-012.png" alt="">
             <div class="l-rest">
               <p>结束时间</p>
-              <p class="_date"><input type="date" v-model="endDate" @change="changeDate"></p>
+              <p class="_date"><input type="date" min="2017-01-01" max="2020-01-01" v-model="endDate" @change="changeDate"></p>
             </div>
           </div>
         </div>
         <div class="l-rebate-list l-bg-white">
           <div class="l-rebate-item l-border-b" v-for="item in list">
-            <p><span class="l-text-warn mui-pull-right">处理中</span>提现单号：26155454545555</p>
-            <p>申请时间：2016-02-02 10：53</p>
-            <p>打款时间：2016-02-02 10：53</p>
-            <p>银行流水：胡杨树</p>
-            <p>提现金额：<span class="l-text-warn l-margin-r"><b class="l-icon">&#xe6cb;</b>95270.22</span></p>
+            <p><span class="mui-pull-right" :class="{'l-text-warn': item.withdrawalsState == 0, 'l-text-ok': item.withdrawalsState == 1}">{{withdrawalsState[item.withdrawalsState]}}</span>提现单号：{{item.withdrawalCode}}</p>
+            <p>申请时间：{{item.startDate}}</p>
+            <p>打款时间：{{item.finishDate}}</p>
+            <p>银行流水：{{item.brankCode}}</p>
+            <p>提现金额：<span class="l-text-warn l-margin-r"><b class="l-icon">&#xe6cb;</b>{{(item.amount || 0).toFixed(2)}}</span></p>
           </div>
         </div> 
         <infinite-loading :on-infinite="onInfinite" ref="infinite">
@@ -58,6 +58,7 @@ export default {
   },
   data () {
     return {
+      withdrawalsState: ['处理中', '已打款'],
       startDate: new Date(now.setMonth(now.getMonth()-3)).format('yyyy-MM-dd'),
       endDate: new Date().format('yyyy-MM-dd'),
       page: 1,
@@ -69,14 +70,17 @@ export default {
   },
   methods: {
     changeDate() {
+      this.list = []
       this.$refs.infinite.$emit('$InfiniteLoading:reset')
     },
     onInfinite() {
       this.$server.user.getWithdrawalsRecord(this.startDate, this.endDate, this.page)
       .then(({data})=>{
         let returnList = data.withdrawalRecords
-        // this.userInfo.account = data.account
+
+        this.userInfo.account = data.account || 0
         this.list = this.list.concat(returnList)
+        
         if(returnList.length > 0){
           this.$nextTick(()=>{
             this.$refs.infinite.$emit('$InfiniteLoading:loaded')    
