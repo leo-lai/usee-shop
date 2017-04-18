@@ -100,14 +100,21 @@ export default {
   created() {
     this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
-      this.$server.wxShare({
-        title: '我为U视喷喷代言',
-        desc: '喷3次，停3秒，眨3下，U视喷喷9秒靓眼。',
-        link: this.$server.getHost() + '/shop?_qruc=' + this.userInfo.userCode,
-        imgUrl: this.userInfo.avatar
-      })
-
       if(data.agentId == 1){
+        // 分享授权
+        this.$server.wxShare({
+          title: '我为U视喷喷代言',
+          desc: '喷3次，停3秒，眨3下，U视喷喷9秒靓眼。',
+          link: this.$server.getHost() + '/shop?_qruc=' + this.userInfo.userCode,
+          imgUrl: this.userInfo.avatar
+        }).catch((wx)=>{
+          this.$mui.confirm('微信分享授权失败，请刷新重试', '', ['返回', '刷新'], (e)=>{
+            if(e.index == 1){
+              window.location.reload()
+            }
+          })
+        })
+
         if(this.$storage.local.get('qrcode_img')){
           this.$nextTick(()=>{
             this.qrcodeImg = this.$storage.local.get('qrcode_img')

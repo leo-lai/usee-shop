@@ -4,13 +4,15 @@ import { storage, utils } from 'assets/js/utils'
 
 // 测试
 let appid = 'wxb022237ad49ef61f'
-let baseUrl = 'http://119.23.30.245:8080/useeproject/interface'
+// let baseUrl = 'http://119.23.30.245:8080/useeproject/interface'
+let baseUrl = 'http://apitest.deyila.cn/useeproject/interface'
 let qrcode = require('assets/images/usee-test.jpg')
 
 // 正式
 if (['h5.usee1.com.cn', 'h5.ushiyihao.com'].indexOf(window.location.host) > -1) {
   // appid = 'wxc81b31922070b7ae'
-  baseUrl = 'https://bird.ioliu.cn/v1?url=http://119.23.30.245:8080/useeproject/interface'
+  // baseUrl = 'https://api.usee1.com.cn/useeproject/interface'
+  baseUrl = 'https://bird.ioliu.cn/v1?url=' + baseUrl
   // qrcode = require('assets/images/usee-online.jpg')
 }
 
@@ -239,6 +241,9 @@ const _server = {
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) {
+    // if(!url){
+    //   url = utils.isWeb ? window.location.href : storage.session.get('wx_url')
+    // }
     url = url || storage.session.get('wx_url') || window.location.href
     const self = this
     let config = {
@@ -271,28 +276,26 @@ const _server = {
 
           window.wx.config(config)
 
-          window.wx.error((error) => {
-            console.log('jssdk权限验证出错', error)
-            if (!window.wx._tried) { // 第一次权限验证失败再利用当前地址尝试一下
+          window.wx.error((res) => {
+            console.log('微信JS-SDK权限验证失败', res)
+            
+            // 第一次权限验证失败再利用当前地址尝试一下
+            if (!window.wx._tried && res.errMsg === 'config:invalid signature' && url !== window.location.href) { 
               window.wx._tried = true // 标识已经尝试验证过，不再尝试
-              if (url === window.location.href) {
-                resolve(window.wx)
-              } else {
-                window.wx._ready = false
-                resolve(self.getWxConfig(window.location.href))
-              }
+              window.wx._ready = false
+              resolve(self.getWxConfig(window.location.href))
             } else {
               resolve(window.wx)
             }
           })
 
-          window.wx.ready(() => {
-            console.log('微信jsdk授权成功')
+          window.wx.ready((res) => {
+            console.log('微信JS-SDK权限验证成功', res)
             window.wx._ready = true
             resolve(window.wx)
           })
         }).catch(() => {
-          console.log('微信jsdk授权失败')
+          console.log('微信JS-SDK权限验证配置获取失败')
           resolve(window.wx)
         })
       }
@@ -395,27 +398,30 @@ const _server = {
     return promise
   },
   previewImage(imgs = [], index = 0) {
-    mui.showWaiting()
-    this.getWxConfig().then((wx) => {
-      if (wx._ready) {
-        wx.previewImage({
-          current: imgs[index], // 当前显示图片的http链接
-          urls: imgs, // 需要预览的图片http链接列表
-          fail(err) {
-            mui.alert('预览图片失败：' + err.errMsg)
-          }
-        })
-      } else {
-        // mui.alert('请在微信浏览器内预览图片')
-      }
-    }).finally(() => {
-      mui.hideWaiting()
+    return new Promise((resolve, reject) => {
+      mui.showWaiting()
+      this.getWxConfig().then((wx) => {
+        if (wx._ready) {
+          wx.previewImage({
+            current: imgs[index], // 当前显示图片的http链接
+            urls: imgs, // 需要预览的图片http链接列表
+            fail(err) {
+              mui.alert('预览图片失败：' + err.errMsg)
+            }
+          })
+          resolve(wx)
+        } else {
+          reject('请在微信浏览器内预览图片')
+        }
+      }).finally(() => {
+        mui.hideWaiting()
+      })
     })
   },
   wxShare(shareInfo) {
     return new Promise((resolve, reject) => {
       if(!shareInfo) {
-        reject('分享信息为空')
+        reject(window.wx, '分享信息为空')
         return
       }
       mui.showWaiting()
@@ -434,8 +440,10 @@ const _server = {
           wx.onMenuShareQQ(_info)
           wx.onMenuShareWeibo(_info)
           wx.onMenuShareQZone(_info)
+
+          resolve(wx, '微信分享授权成功')
         }else{
-          reject('分享失败')
+          reject(wx, '微信分享授权失败')
         }
       }).finally(() => {
         mui.hideWaiting()

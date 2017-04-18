@@ -67,6 +67,7 @@ const isIpad = /(iPad).*OS\s([\d_]+)/.test(ua)
 const isIpod = /(iPod)(.*OS\s([\d_]+))?/.test(ua)
 const isIphone = !isIpad && /(iPhone\sOS)\s([\d_]+)/.test(ua)
 const isWechat = /micromessenger/i.test(ua)
+const isWeb = !(isAndroid || isIpad || isIpod || isIphone)
 
 function _hasClass(elem, cls) {
   if(!elem || !cls) return false
@@ -199,7 +200,8 @@ export let utils = {
     isIpad,
     isIpod,
     isIphone,
-    isWechat 
+    isWechat,
+    isWeb
   },
   regexp: {
     mobile: /^\s*1\d{10}\s*$/
