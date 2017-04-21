@@ -94,7 +94,7 @@ function _removeClass(elem, cls) {
 }
 
 /*========本地存储===========*/
-const STORE_PREFIX = '_dcsx_client_'
+const STORE_PREFIX = '_usee_client_'
 export let storage = {
   getPrefix: () => STORE_PREFIX,
   cookies: {

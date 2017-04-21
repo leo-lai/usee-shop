@@ -5,7 +5,8 @@ import { storage, utils } from 'assets/js/utils'
 // 测试
 let appid = 'wxb022237ad49ef61f'
 // let baseUrl = 'http://119.23.30.245:8080/useeproject/interface'
-let baseUrl = 'http://apitest.deyila.cn/useeproject/interface'
+// let baseUrl = 'http://apitest.deyila.cn/useeproject/interface'
+let baseUrl = 'http://api.deyila.cn/useeproject/interface'
 let qrcode = require('assets/images/usee-test.jpg')
 
 // 正式
@@ -850,7 +851,7 @@ const _server = {
           ordersState = -1
           break
         case 'RECEIVE':
-          ordersState = 4
+          ordersState = 5
           break
       }
       return _http.post('/shopUsers/changeOrderState', {

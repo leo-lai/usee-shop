@@ -9,7 +9,7 @@
       <div v-if="orderInfo">
         <a class="mui-btn l-margin-l-s l-btn-white _m" v-if="orderInfo.ordersState == 1" @click="cancel(orderInfo.orderId)">取消订单</a>
         <a class="mui-btn l-margin-l-s l-btn-main _m" v-if="orderInfo.ordersState == 1" @click="pay()">去付款</a>
-        <a class="mui-btn l-margin-l-s l-btn-main _m" v-if="orderInfo.ordersState == 3" @click="receive(orderInfo.orderId)">确认收货</a>
+        <a class="mui-btn l-margin-l-s l-btn-main _m" v-if="orderInfo.ordersState == 4" @click="receive(orderInfo.orderId)">确认收货</a>
       </div>
     </footer>
     <div class="mui-content l-fs-s" v-if="orderInfo">

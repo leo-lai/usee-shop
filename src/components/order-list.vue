@@ -27,7 +27,7 @@
         <div class="l-rest l-text-right">
           <a class="mui-btn l-btn-white _s" v-if="item.ordersState == 1" @click="cancel(item.orderId)">取消订单</a>
           <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 1" @click="pay(item)">去付款</a>
-          <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 3" @click="receive(item.orderId)">确认收货</a>
+          <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 4" @click="receive(item.orderId)">确认收货</a>
           <!-- <router-link class="mui-btn l-btn-main _s" :to="'/order/evaluate' + item.orderId" v-if="item.ordersState == 4">去评价</router-link> -->
         </div>
       </div>
