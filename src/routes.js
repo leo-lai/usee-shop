@@ -1,4 +1,5 @@
 import index          from './pages/index'
+import indexGuid      from './pages/index-guid'
 import shop           from './pages/shop'
 import shopCar        from './pages/shop-car'
 import goodsInfo      from './pages/goods-info'
@@ -23,11 +24,20 @@ import antifake       from './pages/antifake'
 const routes = [
   { 
     path: '/', 
-    redirect: '/index'
+    redirect: '/index/guid'
   },
   { 
     path: '/index.html', 
-    redirect: '/index'
+    redirect: '/index/guid'
+  },
+  { 
+    path: '/index', 
+    redirect: '/index/guid'
+  },
+  {
+    path: '/index/guid',
+    meta: { title: 'U视一号明目舒眼水', mainPage: true },
+    component: indexGuid
   },
   {
     path: '/index',

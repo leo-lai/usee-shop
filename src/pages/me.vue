@@ -67,8 +67,11 @@
           <li class="mui-table-view-cell">
             <router-link class="mui-navigate-right" to="/me/qrcode">我的二维码</router-link>
           </li>
-          <li class="mui-table-view-cell">
+          <!-- <li class="mui-table-view-cell">
             <router-link class="mui-navigate-right" to="/antifake">防伪查询</router-link>
+          </li> -->
+          <li class="mui-table-view-cell">
+            <div class="mui-navigate-right" @click="$link('http://wx.ty-2009.com/CX/FW17')">防伪查询</div>
           </li>
           <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的预约</a>

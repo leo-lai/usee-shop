@@ -127,7 +127,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // 首页进入内页
-  if(from.path === '/index'){
+  if(from.path.indexOf('/index') !== -1){
     direction = 'page-in'
   }
 
