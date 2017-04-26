@@ -3,18 +3,19 @@ import Vue from 'vue'
 import { storage, utils } from 'assets/js/utils'
 
 // 测试
-let appid = 'wxb022237ad49ef61f'
 // let baseUrl = 'http://119.23.30.245:8080/useeproject/interface'
-// let baseUrl = 'http://apitest.deyila.cn/useeproject/interface'
+// let baseUrl = 'http://api.deyila.cn/useeproject/interface'
+let appid = 'wxb022237ad49ef61f'
 let baseUrl = 'http://api.deyila.cn/useeproject/interface'
 let qrcode = require('assets/images/usee-test.jpg')
 
 // 正式
-if (['h5.usee1.com.cn', 'h5.ushiyihao.com'].indexOf(window.location.host) > -1) {
-  // appid = 'wxc81b31922070b7ae'
+if (['h5.usee1.com.cn', 'h5.ushiyihao.com', 'shoptest.deyila.cn'].indexOf(window.location.host) > -1) {
   // baseUrl = 'https://api.usee1.com.cn/useeproject/interface'
-  baseUrl = 'https://bird.ioliu.cn/v1?url=' + baseUrl
-  // qrcode = require('assets/images/usee-online.jpg')
+  // baseUrl = 'https://bird.ioliu.cn/v1?url=' + baseUrl
+  appid = 'wxc81b31922070b7ae'
+  baseUrl = 'http://apitest.deyila.cn/useeproject/interface'
+  qrcode = require('assets/images/usee-online.jpg')
 }
 
 const errorPromise = function(message = '') {
@@ -84,139 +85,6 @@ const _http = {
   },
   put(url, data, contentType = 'json') {
     return this.ajax(url, data, 'PUT', contentType)
-  }
-}
-
-// 分页数据类
-class List {
-  constructor(type, params = [], method = 'GET') {
-    this.type = type
-    this.method = method
-    this.params = params // 异步发送数据
-
-    this.isLoading = false // 正在请求数据
-    this.isNull = false // 表示后台已无数据返回，无需再发送请求
-    this.isAjax = false // 是否已请求过数据
-    this.alldata = [] // 累计分页已返回数据
-    this.data = [] // 当前分页数据
-    this.page = 1 // 当前页数
-    this.row = 10 // 条数
-
-    this.beforeAjax = utils.noop
-    this.callback = utils.noop
-  }
-  init() {
-    this.isAjax = false
-    this.isNull = false
-    this.data = []
-    this.alldata = []
-    this.goto(1)
-  }
-  next() {
-    if (!this.isLoading && !this.isNull) {
-      ++this.page
-      this.ajax()
-    }
-    return this
-  }
-  prev() {
-    if (!this.isLoading && this.page > 1) {
-      this.page = Math.min(--this.page, 1)
-      this.ajax()
-    }
-    return this
-  }
-  goto(index = 1) {
-    if (!this.isLoading && !this.isNull) {
-      this.page = index
-      this.ajax()
-    }
-    return this
-  }
-  ajax() {
-    if (this.isLoading || this.isNull) {
-      return this }
-
-    let url = ''
-    switch (this.type) {
-      case 'Order': // 订单列表
-        url = '/Member/order/list'
-        break
-      case 'UserCombos': // 用户套餐
-        url = '/Member/combo/my'
-        break
-      case 'UserCoupons': // 用户优惠券
-        url = '/Member/coupon/my'
-        break
-      case 'Coupons': // 优惠券中心
-        url = '/Member/coupon/list'
-        break
-      case 'Combos': // 套餐年卡
-        url = '/Member/combo/list'
-        break
-      case 'OrderHistory': // 消费记录
-        url = '/Member/order/his_order'
-        break
-      case 'AgentRecord': // 分销记录
-        url = '/Member/user/rebate_info'
-        break
-      case 'HolderDrawal': // 提现记录
-        url = '/Member/holder/drawal_list'
-        break
-      case 'HolderMember': // 我的人脉
-        url = '/Member/holder/member_list'
-        break
-      case 'HolderRebate': // 分红记录
-        url = '/Member/holder/rebate_list'
-        break
-      case 'Goods': // 商品列表
-        url = '/Member/shopping/goods_list'
-        break
-      case 'Store': // 门店列表
-        url = '/Member/store/lbs_list'
-        break
-    }
-
-    this.isLoading = true
-    this.beforeAjax()
-
-    let promise = null
-    switch (this.method) {
-      case 'GET':
-        url += `/${this.page}/${this.row}`
-        if (utils.isArray(this.params) && this.params.length > 0) {
-          url += '/' + this.params.join('/')
-        }
-        promise = _http.get(url)
-        break
-      case 'POST':
-        if (!utils.isPlainObject(this.params)) this.params = {}
-        this.params.page = this.page
-        this.params.row = this.row
-        promise = _http.post(url, this.params)
-        break
-    }
-
-    promise.then(({ list, obj }) => {
-      this.isAjax = true
-      this.isLoading = false
-
-      this.data = list
-
-      if (list.length === 0 || list.length < this.row) {
-        this.isNull = true
-      }
-
-      this.alldata = this.alldata.concat(list)
-      this.callback(this.alldata, obj)
-    }).catch((error) => {
-      this.isAjax = true
-      this.isNull = false
-      this.isLoading = false
-      this.callback(this.alldata)
-    })
-
-    return promise
   }
 }
 
@@ -884,6 +752,11 @@ const _server = {
       return _http.post('/shopUsers/myInvoiceInfo').then((response) => {
         !response.data && (response.data = {})
         return response
+      })
+    },
+    getExpressInfo(orderId = '17') {
+      return _http.post('/shopGoods/expressInfo', {
+        orderId
       })
     }
   }

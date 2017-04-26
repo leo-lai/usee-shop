@@ -136,6 +136,22 @@ export default {
       this.orderList3.unshift(data)
     })
 
+    // 监听取消事件
+    this.$eventHub.$on('APP-CANCEL', (orderId)=>{
+      this.orderList0.forEach((item, index)=>{
+        if(item.orderId === orderId){
+          this.orderList0.splice(index, 1)
+          return true
+        }
+      })
+      this.orderList1.forEach((item, index)=>{
+        if(item.orderId === orderId){
+          this.orderList1.splice(index, 1)
+          return true
+        }
+      })
+    })
+
     this.pages = [1, 1, 1, 1]
     this.$nextTick(()=>{
       this.tabClick(Number(this.$route.query.tab || 0))  

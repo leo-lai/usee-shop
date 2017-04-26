@@ -11,7 +11,7 @@
           <p class="l-fs-xl">{{customerNum}}</p>
         </div>
         <div class="l-padding l-fs-s">
-          说明：客户扫码登录后需要购买指定商品才能与您成功绑定关系，已经被绑定的客户无法再次被绑定。
+          说明：客户扫码登录后即可绑定关系，有绑定关系的客户无法再次被绑定。
         </div>
         <div class="l-tab-customer l-bg-white">
           <div class="_tit l-border-b l-flex-hvc l-sticky">
@@ -93,7 +93,7 @@ export default {
             this.$refs.infinite.$emit('$InfiniteLoading:loaded')    
           })
           
-          if(returnList.length >= returnList.rows){
+          if(returnList.length >= data.rows){
             this.pages[this.tabIndex]++
             list.complete = false
           }else{

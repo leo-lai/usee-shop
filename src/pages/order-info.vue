@@ -4,31 +4,34 @@
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
-    <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr">
+    <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr" v-if="orderInfo && orderInfo.ordersState > 0">
       <div class="l-rest"></div>
-      <div v-if="orderInfo">
-        <a class="mui-btn l-margin-l-s l-btn-white _m" v-if="orderInfo.ordersState == 1" @click="cancel(orderInfo.orderId)">取消订单</a>
-        <a class="mui-btn l-margin-l-s l-btn-main _m" v-if="orderInfo.ordersState == 1" @click="pay()">去付款</a>
-        <a class="mui-btn l-margin-l-s l-btn-main _m" v-if="orderInfo.ordersState == 4" @click="receive(orderInfo.orderId)">确认收货</a>
-      </div>
+      <template v-if="orderInfo.ordersState == 1">
+        <a class="mui-btn l-margin-l-s l-btn-white _s"  @click="cancel">取消订单</a>
+        <a class="mui-btn l-margin-l-s l-btn-main _s" @click="pay">去付款</a>  
+      </template>
+      <template v-if="orderInfo.ordersState == 4">
+        <a class="mui-btn l-margin-l-s l-btn-white _s" @click="express">查看物流</a>
+        <a class="mui-btn l-margin-l-s l-btn-main _s" @click="receiv">确认收货</a>  
+      </template>
     </footer>
     <div class="mui-content l-fs-s" v-if="orderInfo">
       <!-- 收货地址 -->
       <div class="l-bg-white">
         <div class="l-order-state l-flex-hc">
-          <span class="l-rest">{{ordersState[orderInfo.ordersState]}}</span>
+          <span class="l-rest">{{ordersState[orderInfo.ordersState].name}}</span>
           <span><i class="l-icon">&#xe634;</i></span>
         </div>
-        <div class="l-flex-hc l-padding-btn l-border-b">
+        <div v-if="orderInfo.expressCode" class="l-flex-hc l-padding l-link-arrow" @click="express">
           <div class="l-text-warn l-fs-l l-margin-r">
             <i class="l-icon">&#xe647;</i>
           </div>
           <div class="l-rest">
-            <p>物流公司：{{orderInfo.expressName || '无'}}</p>
-            <p>物流单号：{{orderInfo.expressCode || '无'}}</p>
+            <p>物流公司：{{orderInfo.expressName}}</p>
+            <p>物流单号：{{orderInfo.expressCode}}</p>
           </div>
         </div>
-        <div class="l-flex-hc l-padding-btn">
+        <div class="l-flex-hc l-padding l-border-t">
           <div class="l-text-warn l-fs-l l-margin-r">
             <i class="l-icon">&#xe60a;</i>
           </div>
@@ -57,7 +60,7 @@
                   <span><b class="l-icon">&#xe6cb;</b>{{goods.amount}}</span>
                   <span class="l-text-gray">x{{goods.goodsNumber}}</span>
                 </p>
-                <span class="l-text-gray" v-show="goods.colorId">颜色：{{goods.colorName}}</span>
+                <span class="l-text-gray" v-show="goods.colorId">款式：{{goods.colorName}}</span>
               </div>
             </div>
           </div>
@@ -85,7 +88,36 @@ export default {
   },
   data () {
     return {
-      ordersState: ['', '未付款', '已付款', '已发货', '已收货'],
+      ordersState: {
+        '-1': {
+          cls: 'l-text-gray',
+          name: '已取消'
+        },
+        '0': {
+          cls: '',
+          name: '全部'
+        },
+        '1': {
+          cls: 'l-text-warn',
+          name: '未付款'
+        },
+        '2': {
+          cls: 'l-text-ok',
+          name: '已付款'
+        },
+        '3': {
+          cls: 'l-text-warn',
+          name: '待发货'
+        },
+        '4': {
+          cls: 'l-text-warn',
+          name: '已发货'
+        },
+        '5': {
+          cls: 'l-text-ok',
+          name: '已收货'
+        },
+      },
       orderInfo: null
     }
   },
@@ -99,7 +131,7 @@ export default {
       this.$mui.confirm('确定取消订单？', (e)=>{
         if(e.index == 1){
           this.$mui.showWaiting()
-          this.$server.order.changeStatus(orderId, 'CANCEL').then(()=>{
+          this.$server.order.changeStatus(this.orderInfo.orderId, 'CANCEL').then(()=>{
             this.$mui.toast('取消成功')
             this.timeid = setTimeout(()=>{
               this.$router.back()  
@@ -114,7 +146,7 @@ export default {
       this.$mui.confirm('确定已收到商品？', (e)=>{
         if(e.index == 1){
           this.$mui.showWaiting()
-          this.$server.order.changeStatus(orderId, 'RECEIVE').then(()=>{
+          this.$server.order.changeStatus(this.orderInfo.orderId, 'RECEIVE').then(()=>{
             this.$mui.toast('收货成功')
             this.getInfo()
           }).finally(()=>{
@@ -122,6 +154,9 @@ export default {
           })
         }
       })
+    },
+    express(orderId) {
+      this.$link('/order/express/' + this.orderInfo.orderId, 'page-in')
     },
     pay() {
       this.$storage.session.set('temp_pay_info', {

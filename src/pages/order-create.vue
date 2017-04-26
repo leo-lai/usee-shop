@@ -47,7 +47,7 @@
                   <span><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</span>
                   <span class="l-text-gray">x{{item.number}}</span>
                 </p>
-                <span v-show="item.colorName" class="l-text-gray">颜色：{{item.colorName}}</span>
+                <span v-show="item.colorName" class="l-text-gray">款式：{{item.colorName}}</span>
               </div>
             </div>
           </div>
@@ -414,6 +414,7 @@ export default {
         if(data){
           // this.$mui.toast('提交订单成功')
           this.$storage.session.set('temp_pay_info', data)
+          this.$storage.session.remove('shopcarNumber')
           // this.$storage.local.remove('buy_slted_address')
           window.location.replace(this.$server.getGrantUrl('/pay/'))
         }else{

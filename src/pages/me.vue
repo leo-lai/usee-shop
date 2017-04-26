@@ -14,7 +14,7 @@
                 <h3>{{userInfo.userName}}<i class="l-icon l-text-warn" v-show="userInfo.agentId == 1">&#xe604;</i></h3>
                 <p>{{userInfo.phoneNumber}}</p>
               </template>
-              <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">你还未未登录</span>
+              <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">您还没登录</span>
             </div>
             <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
             <div class="_ft l-flex-hc">

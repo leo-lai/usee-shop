@@ -6,6 +6,7 @@ import goodsInfo      from './pages/goods-info'
 import orderCreate    from './pages/order-create'
 import orderList      from './pages/order-list'
 import orderInfo      from './pages/order-info'
+import orderExpress   from './pages/order-express'
 import orderEvaluate  from './pages/order-evaluate'
 import me             from './pages/me'
 import login          from './pages/login'
@@ -50,6 +51,11 @@ const routes = [
     component: shop
   },
   {
+    path: '/shopcar',
+    meta: { title: '购物车', mainPage: true},
+    component: shopCar
+  },
+  {
     path: '/me',
     meta: { title: '个人中心', mainPage: true },
     component: me
@@ -71,12 +77,7 @@ const routes = [
   },
   {
     path: '/shop/car',
-    meta: { title: '购物车', auth: true},
-    component: shopCar
-  },
-  {
-    path: '/shopcar',
-    meta: { title: '购物车', mainPage: true, auth: true},
+    meta: { title: '购物车'},
     component: shopCar
   },
   {
@@ -96,8 +97,13 @@ const routes = [
   },
   {
     path: '/order/info/:id',
-    meta: { title: '订单详情', auth: true},
+    meta: { title: '订单详情'},
     component: orderInfo
+  },
+  {
+    path: '/order/express/:id',
+    meta: { title: '物流详情' },
+    component: orderExpress
   },
   {
     path: '/order/evaluate',

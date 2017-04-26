@@ -3,7 +3,7 @@
     <div class="l-order-item l-margin-t" v-for="item in list">
       <router-link :to="'/order/info/' + item.orderId" tag="div">
         <div class="_hd l-link-arrow">
-          <span class="l-text-warn mui-pull-right">{{ordersState[item.ordersState]}}</span>
+          <span class="mui-pull-right" :class="ordersState[item.ordersState].cls">{{ordersState[item.ordersState].name}}</span>
           <span>订单号：{{item.orderCode}}</span>
         </div>
         <div class="_bd l-panel-group l-border-t">
@@ -16,7 +16,7 @@
                   <span><b class="l-icon">&#xe6cb;</b>{{goods.amount.toFixed(2)}}</span>
                   <span class="l-text-gray">x{{goods.goodsNumber}}</span>
                 </p>
-                <span v-show="goods.colorName" class="l-text-gray">颜色：{{goods.colorName}}</span>
+                <span v-show="goods.colorName" class="l-text-gray">款式：{{goods.colorName}}</span>
               </div>
             </div>
           </div>
@@ -27,8 +27,12 @@
         <div class="l-rest l-text-right">
           <a class="mui-btn l-btn-white _s" v-if="item.ordersState == 1" @click="cancel(item.orderId)">取消订单</a>
           <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 1" @click="pay(item)">去付款</a>
-          <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 4" @click="receive(item.orderId)">确认收货</a>
-          <!-- <router-link class="mui-btn l-btn-main _s" :to="'/order/evaluate' + item.orderId" v-if="item.ordersState == 4">去评价</router-link> -->
+          <template v-if="item.ordersState == 4">
+            <a class="mui-btn l-btn-white _s" @click="express(item.orderId)">查看物流</a>  
+            <a class="mui-btn l-btn-main _s" @click="receive(item.orderId)">确认收货</a>  
+          </template>
+          
+          <!-- <router-link class="mui-btn l-btn-main _s" :to="'/order/evaluate' + item.orderId" v-if="item.ordersState == 5">去评价</router-link> -->
         </div>
       </div>
     </div>
@@ -44,7 +48,36 @@ export default {
   },
   data() {
     return {
-      ordersState: ['', '未付款', '已付款', '已发货', '已收货']
+      ordersState: {
+        '-1': {
+          cls: 'l-text-gray',
+          name: '已取消'
+        },
+        '0': {
+          cls: '',
+          name: '全部'
+        },
+        '1': {
+          cls: 'l-text-warn',
+          name: '未付款'
+        },
+        '2': {
+          cls: 'l-text-ok',
+          name: '已付款'
+        },
+        '3': {
+          cls: 'l-text-warn',
+          name: '待发货'
+        },
+        '4': {
+          cls: 'l-text-warn',
+          name: '已发货'
+        },
+        '5': {
+          cls: 'l-text-ok',
+          name: '已收货'
+        },
+      }
     }
   },
   methods: {
@@ -54,13 +87,7 @@ export default {
           this.$mui.showWaiting()
           this.$server.order.changeStatus(orderId, 'CANCEL').then(()=>{
             this.$mui.toast('取消成功')
-
-            this.list.forEach((item, index)=>{
-              if(item.orderId === orderId){
-                this.list.splice(index, 1)
-                return true
-              }
-            })
+            this.$eventHub.$emit('APP-CANCEL', orderId)
           }).finally(()=>{
             this.$mui.hideWaiting()
           })
@@ -87,7 +114,9 @@ export default {
         }
       })
     },
-
+    express(orderId) {
+      this.$link('/order/express/' + orderId, 'page-in')
+    },
     pay(item) {
       this.$storage.session.set('temp_pay_info', {
         orderId: item.orderId,

@@ -19,7 +19,7 @@
     <div class="mui-content">
       <template v-if="goodsInfo">
         <div class="l-text-center">
-          <img style="height: 10rem; width: 100%;" :src="goodsInfo.image" alt="">
+          <img style="width: 100%;" :src="goodsInfo.image" alt="">
         </div>
         <!-- info -->
         <div class="l-goods-item l-border-tb">
@@ -75,7 +75,7 @@
               </template>
             </div>
             <div class="l-padding-tb l-fs-s l-border-b" v-if="goodsColour">
-              <p>颜色分类</p>
+              <p>款式</p>
               <ul class="l-slt-list">
                 <li class="_item" v-for="item in goodsColour" :class="{'_active': sltedGoodsColor.colorId  === item.colorId }" @click="sltGoodsColor(item)">{{item.colorName}}</li>
               </ul>
@@ -174,7 +174,7 @@ export default {
     sltSpecOk() {
       // this.$router.push('/shop/order/create')
       if(this.goodsColour && this.goodsColour.length > 0 && !this.sltedGoodsColor.colorId){
-        this.$mui.toast('请选择颜色')
+        this.$mui.toast('请选择款式')
         return
       }
 
@@ -228,6 +228,8 @@ export default {
         this.goodsInfo = data.goodsInfo || {}
         this.goodsInfo.priceStr = (this.goodsInfo.price || 0).toFixed(2)
         this.loading = false
+
+        this.sltGoodsColor(this.goodsColour[0])
 
         this.$nextTick(()=>{
           this.$mui('.mui-slider').slider({

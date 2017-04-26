@@ -27,7 +27,7 @@
           <div class="_thumb l-bg-contain" :style="{'background-image': 'url('+ item.image +')'}" @click="slt(item)"></div>
           <div class="_main l-rest">
             <p class="_tit l-text-wrap1">{{item.goodsName}}</p>
-            <p class="l-text-gray l-fs-xs" v-show="item.colorId">颜色：{{item.colorName}}</p>
+            <p class="l-text-gray l-fs-xs" v-show="item.colorId">款式：{{item.colorName}}</p>
             <div class="_price l-flex-hc">
               <p class="l-text-warn l-rest"><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</p>
               <span class="l-numbox mui-pull-right">
@@ -50,6 +50,16 @@
         </div>
       </div>
       <!-- 空数据 end-->
+      
+      <!-- 未登录 -->
+      <div class="l-data-null" v-if="!isLogin">
+        <div class="_icon"><i class="l-icon">&#xe620;</i></div>
+        <p class="_text">您还没登录</p>
+        <div class="_btn">
+          <button class="mui-btn l-btn-main _m" :disabled="submiting" @click="$server.logout(false)">马上去登录</button>
+        </div>
+      </div>
+      <!-- 未登录 end-->
     </div>
   </div>
 </template>
@@ -74,6 +84,9 @@ export default {
   computed: {
     isNull() {
       return this.goodsList && this.goodsList.length === 0
+    },
+    isLogin() {
+      return this.$server.checkLogin()
     }
   },
   methods: {
@@ -202,21 +215,23 @@ export default {
     }
   },
   created() {
-    this.loading = true
-    this.$server.shopcar.getList().then(({data})=>{
-      setTimeout(()=>{
-        this.goodsList = data.map((item)=>{
-          item.oldNumber = item.number
-          item.checked = false
-          return item
-        })
+    if(this.isLogin){
+      this.loading = true
+      this.$server.shopcar.getList().then(({data})=>{
+        setTimeout(()=>{
+          this.goodsList = data.map((item)=>{
+            item.oldNumber = item.number
+            item.checked = false
+            return item
+          })
 
-        this.calu()
+          this.calu()
+          this.loading = false
+        }, 600)
+      }).catch(()=>{
         this.loading = false
-      }, 600)
-    }).catch(()=>{
-      this.loading = false
-    })
+      })  
+    }
   }
 }
 </script>

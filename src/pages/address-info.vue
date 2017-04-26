@@ -137,7 +137,10 @@ export default {
     }
   },
   beforeDestroy() {
-    this.cityPicker && this.cityPicker.hide()
+    if(this.cityPicker){
+      // this.cityPicker.hide()
+      this.cityPicker.dispose()
+    } 
   }
 }
 </script>

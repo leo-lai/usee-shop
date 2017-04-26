@@ -6,14 +6,13 @@
     <nav-tab></nav-tab>
     <div class="mui-content">
       <router-link to="/shop/goods/info/1">
-        <img height="100%" width="100%" src="~assets/images/index.hot.jpg" alt="">
+        <img height="100%" width="100%" src="~assets/images/index.hot2.jpg" alt="">
       </router-link>
     </div>
   </div>
 </template>
 <script>
 import navTab from 'components/nav-tab'
-
 export default {
   components: {
     navTab
@@ -23,7 +22,7 @@ export default {
       
     }
   },
-  created() {
+  methods: {
     
   }
 }

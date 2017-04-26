@@ -19,7 +19,7 @@
                 <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span>
                 <span>x3</span>
               </p>
-              <span class="l-text-gray">颜色：苹果红</span>
+              <span class="l-text-gray">款式：苹果红</span>
             </div>
           </div>
         </div>
