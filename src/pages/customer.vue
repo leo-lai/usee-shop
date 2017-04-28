@@ -24,14 +24,14 @@
           </div>
           <div class="l-customer-list" v-show="tabIndex == 1">
             <div class="_item l-border-b" v-for="item in list1">
-              <p>微信昵称：{{item.userName}}</p>
+              <p>扫码用户：{{item.userName || item.phoneNumber}}</p>
               <p>绑定时间：{{item.startDate}}</p>
               <p>客户来源：{{item.describe}}</p>
             </div>
           </div>
           <div class="l-customer-list" v-show="tabIndex == 0">
             <div class="_item l-border-b" v-for="item in list0">
-              <p>微信昵称：{{item.userName}}</p>
+              <p>扫码用户：{{item.userName || item.phoneNumber}}</p>
               <p>绑定时间：{{item.startDate}}</p>
               <p>失败原因：<!-- 该用户已经是其他小U店员的客户 -->{{item.describe}}</p>
             </div>
@@ -81,7 +81,7 @@ export default {
       }
     },
     onInfinite() {
-      this.$server.user.getCustomer(this.tabIndex, this.page)
+      this.$server.user.getCustomer(this.tabIndex, this.pages[this.tabIndex])
       .then(({data})=>{
         let returnList = data.relationshi
         let list = this['list' + this.tabIndex]

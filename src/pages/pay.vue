@@ -12,7 +12,7 @@
         </div>
         <div class="_item l-flex-hc">
           <div class="l-rest">订单金额</div>
-          <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{(payInfo.amount || 0).toFixed(2)}}</span>
+          <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{payInfo.amount | currency}}</span>
         </div>
         <div class="_item l-flex-hc">
           <div class="l-rest">付款方式</div>

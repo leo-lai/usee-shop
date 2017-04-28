@@ -103,10 +103,10 @@ const _server = {
     })
   },
   // 获取微信授权路径 url为绝对路径
-  getGrantUrl(url, params) {
+  getGrantUrl(url, params, type = 'snsapi_base') {
     if (!url) return ''
     url = window.location.origin + utils.url.setArgs(url, params)
-    return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`
+    return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=${type}&state=STATE#wechat_redirect`
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) {
@@ -486,24 +486,35 @@ const _server = {
   },
   // 注销
   logout(tipText = '请先登录', toUrl = window.location.pathname) {
-    let sessionId = storage.local.get('sessionId')
-    if (sessionId) {
-      _http.post('/shopUsers/loginOut', { sessionId })
-    }
+    return new Promise((resolve)=>{
+      let sessionId = storage.local.get('sessionId')
+      if (sessionId) {
+        mui.showWaiting()
+        _http.post('/shopUsers/loginOut', { sessionId }).finally(()=>{
+          mui.hideWaiting()
+          resolve()
+        })
+      }else{
+        resolve()
+      }
+    }).finally(()=>{
+      // 清除缓存
+      storage.local.remove('sessionId')
+      storage.local.remove('userInfo')
+      storage.local.remove('buy_slted_address')
 
-    // 清除缓存
-    storage.local.remove('sessionId')
-    storage.local.remove('userInfo')
-    storage.local.remove('buy_slted_address')
+      tipText && mui.toast(tipText)
 
-    tipText && mui.toast(tipText)
-    if (utils.device.isWechat) {
-      // 避免登录后跳转到登录页面
-      toUrl = toUrl === '/login' ? '/index' : toUrl
-      window.location.replace(_server.getGrantUrl('/login', { to: toUrl }))
-    } else {
-      Vue._link(`/login?to=${toUrl}`, 'page-in')
-    }
+      if (utils.device.isWechat) {
+        // 避免登录后跳转到登录页面
+        toUrl = toUrl === '/login' ? '/index' : toUrl
+        window.location.replace(_server.getGrantUrl('/login', { to: toUrl }))
+      } else {
+        Vue._link(`/login?to=${toUrl}`, 'page-in')
+      }
+
+      return true
+    })
   },
   // 检测登录
   checkLogin() {
@@ -565,6 +576,15 @@ const _server = {
         }
       })
     },
+    resetWxInfo(code = '') {
+      return _http.post('/shopUsers/refreshCode', { code }).then((response) => {
+        !response.data && (response.data = {})
+        response.data.avatar = utils.image.wxHead(response.data.image)
+        let userInfo = Object.assign({}, storage.local.get('userInfo'), response.data)
+        storage.local.set('userInfo',  userInfo, 1000*60*15)
+        return response
+      })
+    },
     getBankInfo() {
       return _http.post('/shopUsers/myBankInfo').then((response) => {
         !response.data && (response.data = {})
@@ -604,7 +624,6 @@ const _server = {
         return response
       })
     },
-
     bind(qrUserCode) {
       qrUserCode = qrUserCode || storage.session.get('bind_qrcode') || ''
       if(!qrUserCode) {
@@ -618,6 +637,14 @@ const _server = {
       storage.local.set('bind_qrcode', qrUserCode)
       return _http.post('/shopUsers/bindingCheck', { qrUserCode }).then((response) => {
         !response.data && (response.data = {})
+        return response
+      })
+    },
+    notify(notify = 1) {
+      return _http.post('/shopUsers/notify', { notify }).then((response)=>{
+        if(response.data == 1){
+          storage.local.set('userInfo', Object.assign({}, storage.local.get('userInfo'), {notify: response.data}))
+        }
         return response
       })
     }

@@ -13,7 +13,7 @@
               <p class="l-text-wrap2">{{goods.goodsName}}</p>
               <div class="l-margin-m1">
                 <p class="l-fr">
-                  <span><b class="l-icon">&#xe6cb;</b>{{goods.amount.toFixed(2)}}</span>
+                  <span><b class="l-icon">&#xe6cb;</b>{{goods.amount | currency}}</span>
                   <span class="l-text-gray">x{{goods.goodsNumber}}</span>
                 </p>
                 <span v-show="goods.colorName" class="l-text-gray">款式：{{goods.colorName}}</span>
@@ -23,7 +23,7 @@
         </div>
       </router-link>
       <div class="_ft l-border-t l-flex-hc">
-        <span>共{{item.ordersInfo.length}}件 合计：<b class="l-icon">&#xe6cb;</b>{{item.amount.toFixed(2)}}</span>
+        <span>共{{item.ordersInfo.length}}件 合计：<b class="l-icon">&#xe6cb;</b>{{item.amount | currency}}</span>
         <div class="l-rest l-text-right">
           <a class="mui-btn l-btn-white _s" v-if="item.ordersState == 1" @click="cancel(item.orderId)">取消订单</a>
           <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 1" @click="pay(item)">去付款</a>

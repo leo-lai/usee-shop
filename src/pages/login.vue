@@ -113,7 +113,19 @@ export default {
       this.$server.login(this.loginType, this.formData).then(({data})=>{
         this.$mui.toast('登录成功')
         this.$storage.local.set('sessionId', data.sessionId)
-        this.$router.replace('/index' || this.$route.query.to)
+        let toUrl = this.$route.query.to || ''
+        switch(toUrl){
+          case '/me/setting':
+            toUrl = '/me'
+            break
+          case '/login':
+          case '/register':
+          case '/forgot':
+          case '':
+            toUrl = '/index'
+            break
+        }
+        this.$router.replace(toUrl)
       }).finally(()=>{
         this.submiting = false
         this.$mui.hideWaiting()
@@ -121,11 +133,11 @@ export default {
     }
   },
   created() {
-    this.$storage.local.remove('sessionId')
-    if(this.$device.isWechat && !this.$route.query.code){
-      this.$mui.toast('微信授权失败')
-      // this.$server.getGrantUrl('/login', this.$route.query)
-    }
+    // this.$storage.local.remove('sessionId')
+    // if(this.$device.isWechat && !this.$route.query.code){
+    //   this.$mui.toast('微信授权失败')
+    //   this.$server.getGrantUrl('/login', this.$route.query)
+    // }
   },
   mounted() {
     this.loginType = this.$storage.local.get('loginType') || 2

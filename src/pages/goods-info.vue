@@ -109,8 +109,8 @@
               </div>
             </div>
           </div>
-          <div class="l-padding-t l-border-t">
-            <button type="button" class="mui-btn l-btn-main" @click="showSupport">我知道了</button>
+          <div class="l-padding-t l-border-t l-flex-hc">
+            <button type="button" class="mui-btn l-btn-main _m l-rest" @click="showSupport">我知道了</button>
           </div>
         </div>
       </div>

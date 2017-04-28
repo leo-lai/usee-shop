@@ -9,7 +9,7 @@
     <footer class="mui-bar mui-bar-footer l-flex-hc l-shop-bar" v-show="goodsList && goodsList.length > 0">
       <div class="mui-checkbox"><label>全选</label><input type="checkbox" @click="sltAll" :checked="checkAll"></div>
       <div class="l-rest l-text-center">
-        合计：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{payTotalMoney.toFixed(2)}}</span>
+        合计：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{payTotalMoney | currency}}</span>
       </div>
       <div class="_btn">
         <button type="button" class="mui-btn l-btn-main _m" @click="submit">结算({{payTotalNum}})</button>
@@ -29,7 +29,7 @@
             <p class="_tit l-text-wrap1">{{item.goodsName}}</p>
             <p class="l-text-gray l-fs-xs" v-show="item.colorId">款式：{{item.colorName}}</p>
             <div class="_price l-flex-hc">
-              <p class="l-text-warn l-rest"><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</p>
+              <p class="l-text-warn l-rest"><b class="l-icon">&#xe6cb;</b>{{item.price | currency}}</p>
               <span class="l-numbox mui-pull-right">
                 <i class="l-icon _minus" @click="numberMinus(item)">&#xe631;</i>
                 <input class="_num" type="tel" pattern="[0-9]*" value="1" step="1" min="1" maxlength="6" @change="editNum(item, $event)" :value="item.number" >

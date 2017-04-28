@@ -7,7 +7,7 @@
       </header>
       <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr">
         <div class="l-rest">
-          需付款：<span class="l-text-warn" v-if="buyMoney"><b class="l-icon">&#xe6cb;</b>{{buyMoney.toFixed(2)}}</span>
+          需付款：<span class="l-text-warn" v-if="buyMoney"><b class="l-icon">&#xe6cb;</b>{{buyMoney | currency}}</span>
         </div>
         <div class="_btn">
           <button type="button" style="width: 6rem;" class="mui-btn l-btn-main _m l-margin-l-m"  @click="orderSubmit">提交订单</button>
@@ -44,7 +44,7 @@
               <p class="l-text-wrap2">{{item.goodsName}}</p>
               <div class="l-margin-m1">
                 <p class="mui-pull-right">
-                  <span><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</span>
+                  <span><b class="l-icon">&#xe6cb;</b>{{item.price | currency}}</span>
                   <span class="l-text-gray">x{{item.number}}</span>
                 </p>
                 <span v-show="item.colorName" class="l-text-gray">款式：{{item.colorName}}</span>

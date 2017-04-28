@@ -19,7 +19,7 @@
         <div class="l-bg-white l-margin-tb">
           <ul class="l-step-list">
             <li class="_item" :class="{'_active': index === 0}" v-for="(item,index) in expressInfo.expressList">
-              <p>{{item.areaName}}/{{item.context}}</p>
+              <p>[{{item.areaName}}]{{item.context}}</p>
               <p class="l-fs-s l-margin-t-xs">{{item.ftime}}</p>
             </li>
           </ul>

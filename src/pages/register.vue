@@ -221,10 +221,10 @@ export default {
     }
   },
   created() {
-    if(this.$device.isWechat && !this.$route.query.code){
-      this.$mui.alert('微信授权失败')
-      window.location.replace(this.$server.getGrantUrl('/register', this.$route.query))
-    }
+    // if(this.$device.isWechat && !this.$route.query.code){
+    //   this.$mui.alert('微信授权失败')
+    //   window.location.replace(this.$server.getGrantUrl('/register', this.$route.query))
+    // }
   },
   mounted() {
     this.$mui('.l-login-form input').input();

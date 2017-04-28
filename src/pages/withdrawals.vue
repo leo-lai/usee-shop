@@ -12,7 +12,7 @@
         <div class="_item l-flex-hc">
           <label class="_tit">账户余额</label>
           <div class="_ipt l-rest">
-            <input type="number" maxlength="5" :value="userInfo.account.toFixed(2)" readonly>
+            <input type="number" maxlength="5" :value="userInfo.account | currency" readonly>
           </div>
         </div>
         <div class="_item l-flex-hc">

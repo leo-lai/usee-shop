@@ -16,7 +16,7 @@
           <div class="_text l-border-t">
             <h3>{{item.goodsName}}</h3>
             <p class="l-fs-m">{{item.goodsBrief}}</p>
-            <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>{{item.price.toFixed(2)}}</p>
+            <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>{{item.price | currency}}</p>
           </div>
         </router-link>
         <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>

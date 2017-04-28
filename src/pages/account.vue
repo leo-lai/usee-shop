@@ -9,7 +9,7 @@
         <div class="l-card-count l-flex-hc">
           <div class="l-rest">
             <p class="l-fs-s">&nbsp;账户余额</p>  
-            <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>{{userInfo.account.toFixed(2)}}</p>
+            <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>{{userInfo.account | currency}}</p>
           </div>
           <div>
             <router-link class="mui-btn l-btn-white _s" style="width:4.5rem;" tag="button" :disabled="userInfo.account <= 0" to="/me/account/withdrawals">提现</router-link>
@@ -34,7 +34,7 @@
             <p>申请时间：{{item.startDate}}</p>
             <p>打款时间：{{item.finishDate}}</p>
             <p>银行流水：{{item.brankCode}}</p>
-            <p>提现金额：<span class="l-text-warn l-margin-r"><b class="l-icon">&#xe6cb;</b>{{(item.amount || 0).toFixed(2)}}</span></p>
+            <p>提现金额：<span class="l-text-warn l-margin-r"><b class="l-icon">&#xe6cb;</b>{{item.amount | currency}}</span></p>
           </div>
         </div> 
         <infinite-loading :on-infinite="onInfinite" ref="infinite">

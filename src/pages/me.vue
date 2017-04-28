@@ -11,18 +11,19 @@
           <div class="_inner l-flex-hc">
             <div class="l-rest">
               <template v-if="userInfo.phoneNumber">
-                <h3>{{userInfo.userName}}<i class="l-icon l-text-warn" v-show="userInfo.agentId == 1">&#xe604;</i></h3>
+                <h3>{{userInfo.userName || '小U用户'}}<i class="l-icon l-text-warn" v-show="userInfo.agentId == 1">&#xe604;</i></h3>
                 <p>{{userInfo.phoneNumber}}</p>
               </template>
               <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">您还没登录</span>
             </div>
             <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
             <div class="_ft l-flex-hc">
-              <router-link class="l-rest l-border-r" to="/me/account">账户余额：{{(userInfo.account || 0).toFixed(2)}}</router-link>
+              <router-link class="l-rest l-border-r" to="/me/account">账户余额：{{userInfo.account | currency}}</router-link>
               <router-link class="l-rest" to="/me/customer">累计客户：{{userInfo.customerNum || 0}}</router-link>
             </div>
           </div>
         </template>
+        <div class="l-loading-inline" v-show="loading" style="padding: 1.8rem 0;"><i class="mui-spinner"></i></div>
       </div>
       <div class="mui-row l-text-center l-bg-white l-border-t">
         <!-- <router-link class="l-text-default mui-col-sm-4 mui-col-xs-4 l-padding l-link" to="/shop/car">
@@ -73,7 +74,7 @@
           <li class="mui-table-view-cell">
             <div class="mui-navigate-right" @click="$link('http://wx.ty-2009.com/CX/FW17')">防伪查询</div>
           </li>
-          <li class="mui-table-view-cell l-disabled">
+          <!-- <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的预约</a>
           </li>
           <li class="mui-table-view-cell l-disabled">
@@ -84,10 +85,15 @@
           </li>
           <li class="mui-table-view-cell l-disabled">
             <a class="mui-navigate-right" @click="$mui.coding">我的验光单</a>
+          </li> -->
+        </ul>
+
+        <ul class="mui-table-view mui-table-view-chevron l-margin-t">
+          <li class="mui-table-view-cell">
+            <a class="mui-navigate-right" @click="$link('/me/setting', 'page-in')">系统设置</a>
           </li>
         </ul>
       </div>
-      <div class="l-margin-tb l-text-center l-padding-btn l-bg-white l-text-gray l-link" @click="logout" v-if="userInfo && userInfo.phoneNumber">退出登录</div>
     </div>
   </div>
 </template>
@@ -100,6 +106,7 @@ export default {
   },
   data () {
     return {
+      loading: false,
       defaultAvatar: require('assets/images/avatar.jpg'),
       shopcarNumber: 0,
       userInfo: null
@@ -115,8 +122,11 @@ export default {
     }
   },
   created() {
+    this.loading = true
     this.$server.user.getInfo(true).then(({data})=>{
       this.userInfo = data
+    }).finally(()=>{
+      this.loading = false
     })
 
     this.$server.shopcar.getNum().then(({data})=>{
@@ -127,7 +137,7 @@ export default {
 </script>
 <style scoped lang="less">
 .l-card-me{
-  position:relative; z-index:0; padding-top: 0.75rem;margin-top: -0.75rem; overflow: hidden; min-height: 6.15rem;
+  position:relative; z-index:0; padding-top: 0.75rem;margin-top: -0.75rem; overflow: hidden; min-height: 6.85rem; background: #fff;
   ._bg {
     background: no-repeat 50% 50%; background-size: cover;
     position: absolute; left:0; top:0; width:100%; height: 100%;

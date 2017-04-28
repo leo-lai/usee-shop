@@ -8,7 +8,7 @@
       <template v-if="userInfo.agentId == 1">
         <div class="l-card-count l-text-center">
           <p class="l-fs-s">&nbsp;累计返利</p>  
-          <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>{{totalAmount.toFixed(2)}}</p>
+          <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>{{totalAmount | currency}}</p>
         </div>
         <div class="l-text-center l-rebate-time l-border-b l-sticky l-bg-white">
           <div class="l-flex-hc _time">
@@ -27,9 +27,9 @@
           <div class="l-rebate-item l-border-b" v-for="item in list">
             <p><span class="mui-pull-right" :class="{'l-text-warn': item.rebateRecordState == 0, 'l-text-ok': item.rebateRecordState == 1}">{{rebateRecordState[item.rebateRecordState]}}</span>订单编号：{{item.orderCode}}</p>
             <p>购买时间：{{item.startDate}}</p>
-            <p>购买客户：{{item.userName}}</p>
+            <p>购买客户：{{item.userName || item.phoneNumber}}</p>
             <p>返利商品：{{item.goodsName}}</p>
-            <p>返利金额：<span class="l-text-warn l-margin-r"><b class="l-icon">&#xe6cb;</b>{{(item.amount||0).toFixed(2)}}</span></p>
+            <p>返利金额：<span class="l-text-warn l-margin-r"><b class="l-icon">&#xe6cb;</b>{{item.amount | currency}}</span></p>
           </div>
         </div>
         <infinite-loading :on-infinite="onInfinite" ref="infinite">
