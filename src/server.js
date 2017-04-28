@@ -43,7 +43,7 @@ const _http = {
         type,
         headers,
         dataType: 'json',
-        timeout: 60000,
+        timeout: 20000,
         success(response, status, xhr) {
           mui.closePopups()
           !response.message && (response.message = '系统繁忙')
