@@ -103,10 +103,10 @@ const _server = {
     })
   },
   // 获取微信授权路径 url为绝对路径
-  getGrantUrl(url, params, type = 'snsapi_base') {
+  getGrantUrl(url, params, scope = 'snsapi_base') {
     if (!url) return ''
     url = window.location.origin + utils.url.setArgs(url, params)
-    return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=${type}&state=STATE#wechat_redirect`
+    return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=${scope}&state=STATE#wechat_redirect`
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) {
