@@ -57,7 +57,7 @@
               <p class="l-text-wrap2">{{goods.goodsName}}</p>
               <div class="l-margin-m1">
                 <p class="mui-pull-right">
-                  <span><b class="l-icon">&#xe6cb;</b>{{goods.amount}}</span>
+                  <span><b class="l-icon">&#xe6cb;</b>{{goods.amount | currency}}</span>
                   <span class="l-text-gray">x{{goods.goodsNumber}}</span>
                 </p>
                 <span class="l-text-gray" v-show="goods.colorId">款式：{{goods.colorName}}</span>
@@ -66,8 +66,8 @@
           </div>
         </div>
         <div class="l-padding-btn l-bg-white l-border-t">
-          <p class="mui-pull-right">实付款：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{orderInfo.amount}}</span></p>
-          <span>订单总价：<b class="l-icon">&#xe6cb;</b>{{orderInfo.amount}}</span>
+          <p class="mui-pull-right">实付款：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{orderInfo.amount | currency}}</span></p>
+          <span>订单总价：<b class="l-icon">&#xe6cb;</b>{{orderInfo.amount | currency}}</span>
         </div>
       </div>
       <!-- 订单时间 -->
