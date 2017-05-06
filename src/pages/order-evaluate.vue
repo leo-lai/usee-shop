@@ -6,25 +6,31 @@
       <!-- <a class="mui-icon mui-icon-bars mui-pull-right"></a> -->
     </header>
     <footer class="mui-bar mui-bar-footer l-flex-hc l-transparent">
-      <button type="button" class="mui-btn l-btn-main">提交</button>
+      <button type="button" class="mui-btn l-btn-main" :disabled="submiting" @click="submit">提交评价</button>
     </footer>
     <div class="mui-content">
-      <div class="l-bg-white l-margin-b" v-for="item in 2">
-        <div class="l-flex-hc l-padding-btn l-border-b">
-          <div class="l-thumb l-bg-contain l-margin-r" style="background-image: url('http://placeholdit.imgix.net/~text?txtsize=33&bg=ff784e&txtclr=fff&txt=thumb&w=120&h=120')"></div>
+      <div class="l-bg-white l-margin-b" v-for="item in orderInfo.ordersInfo" >
+        <div class="l-flex-hc l-padding l-border-b">
+          <div class="l-thumb l-bg-contain l-margin-r" :style="{'background-image': 'url('+ item.image +')'}"></div>
           <div class="l-rest l-fs-s">
-            <p class="l-text-wrap2">Lamp C091Lamp C091LampLamp C091Lamp C091LampLamp C091Lamp C091LampLamp C091Lamp C091Lamp </p>
-            <div class="l-margin-m1">
-              <p class="l-fr">
-                <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>268.00</span>
-                <span>x3</span>
-              </p>
-              <span class="l-text-gray">款式：苹果红</span>
-            </div>
+            <p class="l-text-wrap2">{{item.goodsName}}</p>
           </div>
         </div>
         <div class="l-padding-btn">
-          <textarea class="l-textarea" rows="3" placeholder="亲~写点什么吧！"></textarea>
+          <textarea class="l-textarea l-fs-m" rows="3" v-model="item._content" placeholder="说说您的使用心得，分享给想买的他们吧~"></textarea>
+          <div class="l-upload-images l-clearfix">
+            <ul class="_list">
+              <li class="_item" v-for="(image, index) in item._images">
+                <img :src="image.image || image.localId" alt="" @click="previewImage(item._images_src, index)">
+                <i @click="delImage(item, image)"></i>
+              </li>
+            </ul>
+            <div class="_btn" @click="addImages(item)" v-if="item._images.length < 6">
+              <i class="l-icon">&#xe632;</i>
+              <p v-show="item._images.length === 0">添加图片</p>
+              <p v-show="item._images.length > 0">{{item._images.length}}/{{imageCount}}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -37,17 +43,95 @@ export default {
   },
   data () {
     return {
-      
+      submiting: false,
+      imageCount: 6,
+      orderInfo: {}
     }
   },
-  computed: {
-   
+  methods: {
+    addImages(item) {
+      this.$server.chooseImage(this.imageCount - item._images.length)
+      .then((localIds)=>{
+        // localIds.forEach((localId)=>{
+        //   item._images.push({
+        //     localId
+        //   })
+        // })
+        this.$server.uploadImage(localIds).then(({ serverIds, images, localIds })=>{
+          console.log(serverIds, images, localIds)
+          item._images_src = images
+          serverIds.forEach((serverId, index)=>{
+            item._images.push({
+              serverId,
+              localId: localIds[index],
+              image: images[index]
+            })
+          })
+        })
+      }).catch((errMsg)=>{
+        this.$mui.alert('添加图片失败，请刷新重试！', ()=>{
+          this.$url.reload()
+        })
+      })
+    },
+    delImage(item, image){
+      item._images = item._images.filter((_image)=>{
+        return _image.serverId !== image.serverId
+      })
+    },
+    previewImage(images, index) {
+      this.$server.previewImage(images, index)
+    },
+    submit() {
+      let evaluates = [], isPass = true
+      this.orderInfo.ordersInfo.forEach((item)=>{
+        if(!item._content){
+          this.$mui.toptip('请输入评价内容')
+          isPass = false
+          return true
+        }
+
+        evaluates.push({
+          goodsId: item.goodsId,
+          judgegContent: item._content,
+          imageMax: item._images_src
+        })
+      })
+
+      if(!isPass) return
+
+      this.$mui.showWaiting('提交中...')
+      this.submiting = true
+      this.$server.shop.evaluateGoods({
+        orderId: this.orderInfo.orderId,
+        evaluates: JSON.stringify(evaluates)
+      }).then(()=>{
+        this.$storage.session.remove('temp_evaluate_order')
+        this.$mui.toast('评价成功')
+        this.$router.back()
+      }).finally(()=>{
+        this.$mui.hideWaiting()
+        this.submiting = false
+      })
+    }
   },
   created() {
-    
+    let orderInfo = this.$storage.session.get('temp_evaluate_order') || {}
+    orderInfo.ordersInfo.map((item)=>{
+      item._content = ''
+      item._images = []
+      return item
+    })
+
+    this.orderInfo = orderInfo
+    // this.$mui.showWaiting()
+    // this.$server.getWxConfig().then(()=>{
+    //   this.$mui.hideWaiting()
+    // })
   }
 }
 </script>
-<style scoped>
+<style scoped lang="less">
+.l-thumb{width: 2rem; height: 2rem;}
 
 </style>

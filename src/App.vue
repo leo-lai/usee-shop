@@ -16,7 +16,18 @@ export default {
     this.$eventHub.$on('APP-DIRECTION', (data)=>{
       this.direction = data
     })
-    this.$server.user.bind()
+
+    let appLoader = document.getElementById('app-loader')
+    setTimeout(()=> {
+      appLoader.classList.add('app-loaded')
+    }, 3000)
+    setTimeout(() => {
+      let appLoaderCss = document.getElementById('app-loader-css')
+      appLoader.parentNode.removeChild(appLoader)
+      appLoaderCss.parentNode.removeChild(appLoaderCss)
+      appLoader = null
+      appLoaderCss = null
+    }, 5000)
 	},
   updated() {
     // console.log('updated')

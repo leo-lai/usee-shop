@@ -48,7 +48,7 @@ export default {
         //   if(e.index == 1){
         //     this.$router.replace('/order/list?tab=2')
         //   }else{
-        //     this.$router.replace(this.$route.query.to || '/index')
+        //     this.$router.replace(this.$route.query.to || '/home')
         //   }
         // })
         this.$storage.session.set('temp_pay_result', 1)

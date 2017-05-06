@@ -5,6 +5,7 @@
     </header>
     <nav-tab></nav-tab>
     <div class="mui-content">
+      <!-- <input type="file" accept="image/*" >  -->
       <router-link to="/shop/goods/info/1">
         <img height="100%" width="100%" src="~assets/images/index.hot2.jpg" alt="">
       </router-link>

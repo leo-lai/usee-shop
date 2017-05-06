@@ -26,9 +26,9 @@
         </div>
       </template>
       <!-- 空数据 -->
-      <div class="l-data-null" v-if="expressInfo && !expressInfo.code">
-        <div class="_icon"><i class="l-icon">&#xe647;</i></div>
-        <p class="_text">暂无物流信息</p>
+      <div class="l-data-null" v-if="!expressInfo">
+        <div class="_icon"><i class="l-icon l-text-warn">&#xe64c;</i></div>
+        <p class="_text">商品正等待快递小哥揽收呢~</p>
       </div>
       <!-- 空数据 end-->
       <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
@@ -47,7 +47,7 @@ export default {
   mounted() {
     this.loading = true
     this.$server.order.getExpressInfo(this.$route.params.id).then(({data})=>{
-      this.expressInfo = data || {}
+      this.expressInfo = data
     }).finally(()=>{
       this.loading = false
     })

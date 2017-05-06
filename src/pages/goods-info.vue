@@ -5,13 +5,14 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr">
-      <div class="l-rest">
-        <a class="l-shopcar-icon" @click="$link('/shop/car', 'page-in')">
-          <i class="l-icon">&#xe63f;</i>
-          <span class="mui-badge mui-badge-danger">{{shopcarNumber > 99 ? '99+' : shopcarNumber}}</span>
-        </a>
-      </div>
-      <div class="_btn">
+      <a class="l-shopcar-icon" @click="$link('/shop/car', 'page-in')">
+        <i class="l-icon">&#xe63f;</i>
+        <span class="mui-badge mui-badge-danger">{{shopcarNumber > 99 ? '99+' : shopcarNumber}}</span>
+      </a>
+      <a href="http://p.qiao.baidu.com/cps/chat?siteId=10424067&userId=23235048" class="l-icon">
+        <span class="l-text-gray l-fs-xl" style="margin-left:1rem;">&#xe70d;</span>
+      </a>
+      <div class="_btn l-rest l-text-right">
         <button type="button" style="width: 6rem;" class="mui-btn l-btn-warn _m" @click="addToCar">加入购物车</button>
         <button type="button" style="width: 6rem;" class="mui-btn l-btn-main _m l-margin-l-s" @click="buyNow">立即购买</button>
       </div>
@@ -26,7 +27,10 @@
           <div class="_text">
             <h3>{{goodsInfo.goodsName}}</h3>
             <p class="l-fs-m">{{goodsInfo.goodsBrief}}</p>
-            <p class="l-text-warn l-fs-l"><b class="l-icon">&#xe6cb;</b>{{goodsInfo.priceStr}}</p>
+            <p class="l-text-warn l-fs-l">
+              <span><b class="l-icon">&#xe6cb;</b>{{goodsInfo.price | currency}}</span>&nbsp;
+              <del class="l-text-gray l-fs-s" v-if="goodsInfo.isBindingAgent == 1">原价：<b class="l-icon">&#xe6cb;</b>{{goodsInfo.originalPrice | currency}}</del>
+            </p>
           </div>
         </div>
         <div class="l-padding-btn l-bg-white l-fs-m l-text-gray l-link-arrow" @click="showSupport" v-if="goodsService">
@@ -36,22 +40,48 @@
           </template>
         </div>
         <!-- info end-->
-        <!-- details -->
-        <div class="l-padding-btn l-margin-t l-bg-white l-border-b">
-          <span>商品详情</span>
-          <span class="l-text-gray"> / Details</span>
+        
+        <div class="l-margin-t"></div>
+        <div class="l-tabs l-flex-hc l-sticky l-border-b">
+          <a class="l-rest _item l-margin-lr" :class="{'_active': tabIndex == 0}" @click="tabClick(0)">商品详情</a>
+          <a class="l-rest _item l-margin-lr" :class="{'_active': tabIndex == 1}" @click="tabClick(1)">商品评价</a>
         </div>
-        <div class="l-goods-details l-padding-btn l-bg-white l-fs-m l-margin-b l-zoom">
+        <!-- details -->
+        <div class="l-goods-details l-fs-m" v-show="tabIndex == 0">
           <!-- {{goodsInfo.goodsIntroduce}} -->
           <div class="l-text-center">
             <lazy-component>
-              <img :src="img.imagePath" v-for="(img, index) in goodsImages" @click="previewImage(index)">    
+              <img :src="img.imagePath" v-for="(img, index) in goodsImages" @click="previewGoodsImages(index)">    
             </lazy-component>
           </div>
+          <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
         </div>
         <!-- details end-->
+        <div v-show="tabIndex == 1">
+          <div class="l-evaluate-list">
+            <div class="_item l-fs-s l-padding l-border-b" v-for="item in evaluateList">
+              <div class="l-flex-hc">
+                <div class="l-avatar" :style="{'background-image': 'url('+ (item.userImage || avatar) +')'}"></div>
+                <h4 class="l-text-wrap1 l-rest">{{item.userName}}</h4>
+                <span class="l-fs-xs l-text-gray">{{item.judgegDate}}</span>
+              </div>
+              <div class="_cont">{{item.judgegContent}}</div>
+              <div class="l-upload-images l-clearfix">
+                <ul class="_list">
+                  <li class="_item" v-for="(image,index) in item.images">
+                    <img :src="image" alt="" @click="previewImage(item.images, index)">
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <infinite-loading :on-infinite="onInfinite" ref="infinite">
+            <div class="l-loading-inline" slot="spinner"><i class="mui-spinner"></i><span class="_txt">正在加载...</span></div>
+            <div class="l-text-gray l-fs-m" slot="no-results">该商品还没有评论</div>
+            <div class="l-text-gray l-fs-m" slot="no-more">全部评论加载完毕</div>
+          </infinite-loading>
+        </div>
       </template>
-      <div class="l-loading-inline" v-show="loading"><i class="mui-spinner"></i><span class="_txt">加载中...</span></div>
     </div>
     <!-- 选择商品规格 -->
     <div class="l-popup-bottom" :class="{'_show': isShowSpec}"  @click="showSpec">
@@ -63,7 +93,10 @@
             <div class="l-rest l-fs-s">
               <p class="l-text-wrap2">{{goodsInfo.goodsName}}</p>
               <div class="l-margin-m1">
-                <span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{goodsInfo.priceStr}}</span>
+                <p class="l-text-warn l-fs-l">
+                  <span><b class="l-icon">&#xe6cb;</b>{{goodsInfo.price | currency}}</span>&nbsp;
+                  <del class="l-text-gray l-fs-s" v-if="goodsInfo.isBindingAgent == 1">原价：<b class="l-icon">&#xe6cb;</b>{{goodsInfo.originalPrice | currency}}</del>
+                </p>
               </div>
             </div>
           </div>
@@ -121,13 +154,17 @@
 <script>
 import navTab from 'components/nav-tab'
 import previewImage from 'libs/mui/js/mui.preview-image'
+import infiniteLoading from 'components/vue-infinite-loading'
 
+let avatar = require('assets/images/avatar.jpg')
 export default {
   components: {
-    navTab
+    navTab, infiniteLoading
   },
   data () {
     return {
+      avatar,
+      tabIndex: 0,
       isShowSupport: false,
       isShowSpec: false,
       loading: false,
@@ -137,10 +174,58 @@ export default {
       goodsService: null,
       goodsInfo: null,
       shopcarNumber: 0,
-      buyNumber: 1
+      buyNumber: 1,
+
+      page: 1,
+      evaluateList: []
     }
   },
   methods: {
+    onInfinite() {
+      if(this.tabIndex != 1){
+        this.$refs.infinite.$emit('$InfiniteLoading:complete')
+        return
+      }
+
+      this.$server.shop.getEvaluate(this.goodsInfo.goodTypeId, this.page)
+      .then(({data})=>{
+
+        let returnList = data.map((item)=>{
+          item.images = item.imageMax ? item.imageMax.split(',') : []
+          return item
+        })
+
+        this.evaluateList = this.evaluateList.concat(returnList)
+        
+        if(returnList.length > 0){
+          this.$nextTick(()=>{
+            this.$refs.infinite.$emit('$InfiniteLoading:loaded')    
+          })
+          
+          if(returnList.length >= data.rows){
+            this.page++
+          }else{
+            this.$refs.infinite.$emit('$InfiniteLoading:complete')
+          }
+        }else{
+          this.$refs.infinite.$emit('$InfiniteLoading:complete')
+        }
+      }).catch(()=>{
+        this.$refs.infinite.$emit('$InfiniteLoading:complete')
+      })
+    },
+    previewImage(images, index) {
+      this.$server.previewImage(images, index)
+    },
+    tabClick(index = 0) {
+      this.tabIndex = index
+
+      if(this.evaluateList.length > 0){
+        this.$refs.infinite.$emit('$InfiniteLoading:reset', false)  
+      }else{
+        this.$refs.infinite.$emit('$InfiniteLoading:reset', true)
+      }
+    },
     numberMinus() {
       this.buyNumber = Math.max(this.buyNumber - 1, 1)
     },
@@ -214,7 +299,7 @@ export default {
         this.$link('/shop/order/create', 'page-in')
       }
     },
-    previewImage(index) {
+    previewGoodsImages(index) {
       this.$server.previewImage(this.goodsImages.map((item)=>item.imagePath), index)
     }
   },
@@ -277,4 +362,22 @@ export default {
   ._item{padding: 0.5rem 0;}
   ._item:first-child{padding-top: 0;}
 }
+.l-goods-details{
+  background: #fff; padding: 0.5rem 0.75rem; overflow-x: hidden; margin-bottom: 0.75rem;
+}
+
+.l-evaluate-list{
+  .l-avatar{width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;}
+  ._item{
+    background: #fff;
+  }
+  ._cont{margin: 0.5rem 0; color: #999;}
+}
+.l-upload-images ._list{
+  margin-top: 0.5rem;
+}
+.l-upload-images ._item{
+  margin: 0 0.5rem 0.5rem 0;
+}
+
 </style>

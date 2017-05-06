@@ -47,11 +47,23 @@ const router = new VueRouter({
   }
 })
 
+// 是否微信网页授权
+router.beforeEach((to, from, next) => {
+  let code = utils.url.getArgs()['code']
+  let qrUserCode = utils.url.getArgs()['_qruc'] || ''
+
+  storage.session.set('bind_qrcode', qrUserCode)
+  if(!code && to.meta.wxScope && qrUserCode && utils.device.isWechat){
+    window.location.replace(server.getGrantUrl(to.fullPath, '', to.meta.wxScope))
+    next(false)
+    return
+  }
+  storage.session.set('wx_code', code)
+  next()
+})
+
 // 验证登陆
 router.beforeEach((to, from, next) => {
-  if(utils.url.getArgs()['_qruc']){
-    storage.session.set('bind_qrcode', utils.url.getArgs()['_qruc'])
-  }
   let auth = to.meta.auth
   if(auth === undefined){
     auth = true 
@@ -63,9 +75,6 @@ router.beforeEach((to, from, next) => {
   }
   next()
 })
-
-// 记录微信的Landing Page，用于当前目录地址授权验证
-storage.session.set('wx_url', window.location.href)
 
 // 记录页面浏览顺序及滚动条位置，用来判断动画方向
 const initHistory = [{
@@ -138,7 +147,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // 首页进入内页
-  if(from.path.indexOf('/index') !== -1){
+  if(from.path.indexOf('/home') !== -1){
     direction = 'page-in'
   }
 
@@ -178,7 +187,7 @@ router.beforeEach((to, from, next) => {
     // $.showIndicator()
   }
 
-  setTimeout(next, 50)
+  setTimeout(next, 60)
 })
 
 router.afterEach((to) => {
@@ -196,17 +205,20 @@ router.afterEach((to) => {
       // 默认第一个展示
       utils.addClass(document.querySelector('.l-page-group .l-page'), '_active')
     }
-  }, 50)
+  }, 60)
 })
 
 router.onReady(()=>{
   setTimeout(()=>{
+    // 记录微信的Landing Page，用于当前目录地址授权验证
+    storage.session.set('wx_url', window.location.href)
+
     mui.init()
     mui(document).on('click', '._nav-back', function(e){
       router.back()
     })
     mui(document).on('click', '._nav-reload', function(e){
-      window.location.reload()
+      utils.url.reload()
     })
   }, 120) 
 })

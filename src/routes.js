@@ -1,5 +1,5 @@
-import index          from './pages/index'
-import indexGuid      from './pages/index-guid'
+import home           from './pages/home'
+import homeGuid       from './pages/home-guid'
 import shop           from './pages/shop'
 import shopCar        from './pages/shop-car'
 import goodsInfo      from './pages/goods-info'
@@ -22,74 +22,93 @@ import qrcode         from './pages/qrcode'
 import withdrawals    from './pages/withdrawals'
 import payResult      from './pages/pay-result'
 import antifake       from './pages/antifake'
+import about          from './pages/about'
 
 const routes = [
   { 
-    path: '/', 
-    redirect: '/index/guid'
+    path: '/',
+    redirect: '/home/guid'
+  },
+  { 
+    path: '/index',
+    redirect: '/home/guid'
+  },
+  { 
+    path: '/index/guid',
+    redirect: '/home/guid'
   },
   { 
     path: '/index.html', 
-    redirect: '/index/guid'
+    redirect: '/home/guid'
   },
   { 
-    path: '/index', 
-    redirect: '/index/guid'
+    path: '/home', 
+    redirect: '/home/guid'
   },
   {
-    path: '/index/guid',
-    meta: { title: 'U视一号明目舒眼水', mainPage: true },
-    component: indexGuid
+    path: '/home/guid',
+    meta: { title: '明目舒眼水', mainPage: true, auth: false },
+    component: homeGuid
   },
   {
-    path: '/index',
-    meta: { title: '首页', mainPage: true },
-    component: index
+    path: '/home',
+    meta: { title: '首页', mainPage: true, auth: false },
+    component: home
   },
   {
     path: '/shop',
-    meta: { title: '商城', mainPage: true },
+    meta: { title: '商城', mainPage: true, auth: false, wxScope: 'snsapi_base' },
     component: shop
   },
   {
     path: '/shopcar',
-    meta: { title: '购物车', mainPage: true},
+    meta: { title: '购物车', mainPage: true, auth: false },
     component: shopCar
   },
   {
     path: '/me',
-    meta: { title: '个人中心', mainPage: true },
+    meta: { title: '个人中心', mainPage: true, auth: false },
     component: me
+  },
+  {
+    path: '/login',
+    meta: { title: '登录', auth: false },
+    component: login
+  },
+  {
+    path: '/register',
+    meta: { title: '注册', auth: false },
+    component: register
+  },
+  {
+    path: '/forgot',
+    meta: { title: '找回密码', auth: false },
+    component: pwd
+  },
+  {
+    path: '/shop/car',
+    meta: { title: '购物车', auth: false },
+    component: shopCar
+  },
+  {
+    path: '/shop/goods/info/:id',
+    meta: { title: '商品详情', auth: false },
+    component: goodsInfo
+  },
+  {
+    path: '/antifake',
+    meta: { title: '防伪查询', auth: false },
+    component: antifake
+  },
+  {
+    path: '/about',
+    meta: { title: '关于U视一号', auth: false },
+    component: about
   },
   {
     path: '/me/setting',
     meta: { title: '系统设置'},
     component: meSetting
-  },
-  {
-    path: '/login',
-    meta: { title: '登录', auth: false},
-    component: login
-  },
-  {
-    path: '/register',
-    meta: { title: '注册', auth: false},
-    component: register
-  },
-  {
-    path: '/forgot',
-    meta: { title: '找回密码', auth: false},
-    component: pwd
-  },
-  {
-    path: '/shop/car',
-    meta: { title: '购物车'},
-    component: shopCar
-  },
-  {
-    path: '/shop/goods/info/:id',
-    meta: { title: '商品详情'},
-    component: goodsInfo
   },
   {
     path: '/shop/order/create',
@@ -112,8 +131,8 @@ const routes = [
     component: orderExpress
   },
   {
-    path: '/order/evaluate',
-    meta: { title: '订单评价'},
+    path: '/order/evaluate/:id',
+    meta: { title: '商品评价'},
     component: orderEvaluate
   },
   {
@@ -160,11 +179,6 @@ const routes = [
     path: '/me/qrcode',
     meta: { title: '我的二维码'},
     component: qrcode
-  },
-  {
-    path: '/antifake',
-    meta: { title: '防伪查询'},
-    component: antifake
   }
 ]
 

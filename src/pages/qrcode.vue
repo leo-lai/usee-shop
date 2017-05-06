@@ -45,7 +45,7 @@ export default {
 
       const type = 'image/png'
       let imageData = qrcodeCanvas.toDataURL(type).replace(type, 'image/octet-stream') || ''
-      this.$storage.local.set('qrcode_img', imageData, 1000*60*30)
+      this.$storage.local.set('qrcode_img', imageData, 1000*60*1)
       return imageData
     },
     createQrcode(imageData) {
@@ -105,12 +105,12 @@ export default {
         this.$server.wxShare({
           title: '我为U视喷喷代言',
           desc: '喷3次，停3秒，眨3下，U视喷喷9秒靓眼。',
-          link: this.$server.getHost() + '/shop?_qruc=' + this.userInfo.userCode,
+          link: this.$server.getHost() + '/shop?_from=scan&_qruc=' + this.userInfo.userCode,
           imgUrl: this.userInfo.avatar
         }).catch((wx)=>{
           this.$mui.confirm('微信分享授权失败，请刷新重试', '', ['返回', '刷新'], (e)=>{
             if(e.index == 1){
-              window.location.reload()
+              this.$url.reload()
             }
           })
         })

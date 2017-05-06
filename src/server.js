@@ -35,7 +35,8 @@ const _http = {
       // headers['Content-Type'] = 'text/plain'
       data = JSON.stringify(data)
     }
-    data.sessionId = storage.local.get('sessionId')
+    data.sessionId = storage.local.get('sessionId') || ''
+    data.openId = storage.session.get('openId') || ''
 
     return new Promise((resolve, reject) => {
       mui.ajax(url, {
@@ -45,29 +46,40 @@ const _http = {
         dataType: 'json',
         timeout: 20000,
         success(response, status, xhr) {
+          if(response.resultCode === 200){
+            return resolve(response)
+          }
+
           mui.closePopups()
-          !response.message && (response.message = '系统繁忙')
-          if (response.resultCode === 4002) { // 登录失效
-            mui.hideWaiting()
-            storage.local.remove('sessionId')
-            mui.alert(response.message, ()=>{
-              _server.logout(false)
-            })
-            setTimeout(()=>{
-              mui.closePopups()
-            }, 3000)
-            reject(response.message)
-          } else if (response.resultCode !== 200) {
-            mui.hideWaiting()
-            mui.alert(response.message)
-            reject(response.message)
-          } else {
-            resolve(response)
+          mui.hideWaiting()
+          switch(response.resultCode){
+            case 4002: // 登录失效
+              mui.alert(response.message, ()=>{
+                _server.logout(false)
+              })
+              setTimeout(()=>{
+                mui.closePopups()
+              }, 3000)
+              reject(response.message)
+              break
+            case 4008: // 微信授权异常
+              mui.confirm('微信网页授权异常', '系统提示', ['返回', '重新授权'], (e)=>{
+                if(e.index == 1){
+                  window.location.replace(_server.getGrantUrl(utils.url.setArgs(window.location.pathname, 'code', ''), '' , 'snsapi_userinfo'))
+                }else{
+                  reject(response.message)    
+                }
+              })
+              break
+            default:
+              mui.toast(response.message)
+              reject(response.message)
+              break
           }
         },
         error(xhr, errorType, error) {
-          mui.hideWaiting()
           mui.closePopups()
+          mui.hideWaiting()
           mui.toast('服务器连接失败')
           reject(error)
         }
@@ -96,10 +108,21 @@ const _server = {
     return qrcode
   },
   getImageBase64(imagePath) {
-    return _http.post('/shopUsers/imageBase64', {path: imagePath}).then((response) => {
-      !response.data && (response.data = '')
-      response.data = 'data:image/jpg;base64,' + response.data
-      return response
+    return new Promise((resolve, reject)=>{
+      if(!imagePath) {
+        reject()
+        return 
+      }
+      if(/^data:image/i.test(imagePath)){
+        // resolve({data: imagePath})
+        reject()
+      }else{
+        _http.post('/shopUsers/imageBase64', {path: imagePath}).then((response) => {
+          !response.data && (response.data = '')
+          response.data = 'data:image/jpg;base64,' + response.data
+          resolve(response)
+        }).catch(reject)
+      } 
     })
   },
   // 获取微信授权路径 url为绝对路径
@@ -110,10 +133,10 @@ const _server = {
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) {
-    // if(!url){
-    //   url = utils.isWeb ? window.location.href : storage.session.get('wx_url')
-    // }
-    url = url || storage.session.get('wx_url') || window.location.href
+    url = url || (utils.device.isIos ? storage.session.get('wx_url') : window.location.href)
+
+    // mui.alert(url)
+    
     const self = this
     let config = {
       debug: false,
@@ -126,13 +149,12 @@ const _server = {
 
     let promise = new Promise((resolve, reject) => {
       if (!window.wx) {
-        // reject('找不到wx对象')
         window.wx = {
           _ready: false
         }
         resolve(window.wx)
       } else {
-        if (!utils.device.isWechat || window.wx._ready) {
+        if (!utils.device.isWechat || (utils.device.isIos && window.wx._ready)) {
           resolve(window.wx)
           return
         }
@@ -149,22 +171,48 @@ const _server = {
             console.log('微信JS-SDK权限验证失败', res)
             
             // 第一次权限验证失败再利用当前地址尝试一下
-            if (!window.wx._tried && res.errMsg === 'config:invalid signature' && url !== window.location.href) { 
-              window.wx._tried = true // 标识已经尝试验证过，不再尝试
+            if (res.errMsg === 'config:invalid signature' && !window.wx._try) {
               window.wx._ready = false
-              resolve(self.getWxConfig(window.location.href))
+              window.wx._try = true
+              resolve(self.getWxConfig(utils.device.isIos ? window.location.href : storage.session.get('wx_url')))
             } else {
               resolve(window.wx)
             }
           })
 
-          window.wx.ready((res) => {
-            console.log('微信JS-SDK权限验证成功', res)
+          window.wx.ready(() => {
             window.wx._ready = true
             resolve(window.wx)
+
+            // wx.checkJsApi({
+            //   jsApiList: config.jsApiList,
+            //   success: function(res) {
+            //     // 以键值对的形式返回，可用的api值true，不可用为false
+            //     // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+            //     let _isReady = true
+            //     Object.keys(res.checkResult).forEach((jsApiName)=>{
+            //       if(!res.checkResult[jsApiName]){
+            //         _isReady = false
+            //         return true
+            //       }
+            //     })
+            //     _isReady && console.log('微信JS-SDK权限验证成功')
+
+            //     window.wx._ready = _isReady
+            //     if(!_isReady && !window.wx._try){
+            //       window.wx._try = true
+            //       resolve(self.getWxConfig(utils.device.isIos ? window.location.href : storage.session.get('wx_url')))
+            //     }else{
+            //       resolve(window.wx)
+            //     }
+            //   },
+            //   fail() {
+            //     resolve(window.wx)
+            //   }
+            // })
           })
         }).catch(() => {
-          console.log('微信JS-SDK权限验证配置获取失败')
+          console.log('服务器返回微信JS-SDK配置失败')
           resolve(window.wx)
         })
       }
@@ -280,11 +328,81 @@ const _server = {
           })
           resolve(wx)
         } else {
-          reject('请在微信浏览器内预览图片')
+          reject('微信JS-SDK授权异常')
         }
       }).finally(() => {
         mui.hideWaiting()
       })
+    })
+  },
+  chooseImage(count = 1) {
+    return new Promise((resolve, reject) => {
+      mui.showWaiting()
+      this.getWxConfig().then((wx) => {
+        if (wx._ready) {
+          wx.chooseImage({
+            count,
+            sizeType: ['original', 'compressed'], 
+            sourceType: ['album', 'camera'], 
+            success: function (res) {
+              resolve(res.localIds)
+            },
+            fail(err) {
+              reject(err.errMsg)
+            }
+          })
+        } else {
+          reject('微信JS-SDK授权异常')
+        }
+      }).finally(() => {
+        mui.hideWaiting()
+      })
+    })
+  },
+  uploadImage(localIds = [], remote = true) {
+    return new Promise((resolve, reject) => {
+      let _serverIds = []
+      let _localIds = []
+      mui.showWaiting('上传中...')
+      let _ = function syncUpload(localIds){
+        let localId = localIds.pop()
+        wx.uploadImage({
+          localId,
+          isShowProgressTips: 0,
+          success: function (res) {
+            _serverIds.push(res.serverId)
+            _localIds.push(localId)
+            if(localIds.length > 0){
+              syncUpload(localIds)
+            }else{
+              if(remote) {
+                _http.post('/shop/uploadImage', {media_ids: _serverIds.join(',')}).then(({data})=>{
+                  resolve({
+                    serverIds: _serverIds,
+                    localIds: _localIds,
+                    images: data
+                  })
+                }).finally(()=>{
+                  mui.hideWaiting()
+                }) 
+              }else{
+                resolve({
+                  serverIds: _serverIds,
+                  localIds: [],
+                  images: []
+                })
+                mui.hideWaiting()
+              }
+            }
+          },
+          fail(err) {
+            if(localIds.length === 0){
+              mui.hideWaiting()
+              reject(err.errMsg)
+            }
+          }
+        })
+      }(localIds)
     })
   },
   wxShare(shareInfo) {
@@ -312,7 +430,7 @@ const _server = {
 
           resolve(wx, '微信分享授权成功')
         }else{
-          reject(wx, '微信分享授权失败')
+          utils.device.isWechat && reject(wx, '微信JS-SDK授权异常')
         }
       }).finally(() => {
         mui.hideWaiting()
@@ -508,7 +626,7 @@ const _server = {
       if (utils.device.isWechat) {
         // 避免登录后跳转到登录页面
         toUrl = toUrl === '/login' ? '/index' : toUrl
-        window.location.replace(_server.getGrantUrl('/login', { to: toUrl }))
+        window.location.replace(_server.getGrantUrl('/login', { to: toUrl }, 'snsapi_userinfo'))
       } else {
         Vue._link(`/login?to=${toUrl}`, 'page-in')
       }
@@ -624,21 +742,34 @@ const _server = {
         return response
       })
     },
-    bind(qrUserCode) {
+    bind(qrUserCode = '', code = '') {
       qrUserCode = qrUserCode || storage.session.get('bind_qrcode') || ''
+      code = code || storage.session.get('wx_code') || ''
+      
       if(!qrUserCode) {
         return errorPromise('没有检测到二维码')
       }
-
-      if(!_server.checkLogin()){
-        return errorPromise('用户未登录') 
+      if(!code) {
+        return errorPromise('微信网页授权异常')
       }
 
-      storage.local.set('bind_qrcode', qrUserCode)
-      return _http.post('/shopUsers/bindingCheck', { qrUserCode }).then((response) => {
-        !response.data && (response.data = {})
+      storage.session.set('bind_qrcode', qrUserCode)
+      storage.session.set('wx_code', code)
+
+      return _http.post('/shopUsers/binding', { qrUserCode, code }).then((response) => {
+        storage.session.set('openId', response.data)
         return response
       })
+
+      // if(!_server.checkLogin()){
+      //   return errorPromise('用户未登录') 
+      // }
+
+      // return _http.post('/shopUsers/bindingCheck', { qrUserCode, code }).then((response) => {
+      //   !response.data && (response.data = {})
+      //   return response
+      // })
+      
     },
     notify(notify = 1) {
       return _http.post('/shopUsers/notify', { notify }).then((response)=>{
@@ -678,6 +809,20 @@ const _server = {
     getGoodsInfo(goodsId = '') {
       return _http.post('/shopGoods/goodsInfo', { goodsId }).then((response) => {
         !response.data && (response.data = {})
+        return response
+      })
+    },
+    evaluateGoods(formData) { // 评价商品
+      return _http.post('/shopJudge/beJudge', formData)
+    },
+    getEvaluate(goodsTypeId, page = 1, rows = 10) { // 商品评价列表
+      return _http.post('/shopJudge/getJudgeList', {
+        goodsTypeId,
+        page,
+        rows
+      }).then((response) => {
+        !response.data && (response.data = [])
+        response.data.rows = rows
         return response
       })
     }
@@ -766,13 +911,13 @@ const _server = {
     addFromShopcar(formData) { // 2从购物车下单
       return _http.post('/shopGoods/addOrdersOfshoppingCart', formData)
     },
-    cancel(orderId) {
+    cancel(orderId) { // 取消订单
       return _http.put(`/Member/order/cancel/${orderId}`)
     },
-    recive(orderId) {
+    recive(orderId) { // 收货
       return _http.put(`/Member/order/order_recive/${orderId}`)
     },
-    editInvoice(formData) {
+    editInvoice(formData) { // 修改发票
       return _http.post('/shopUsers/addOrEditInvoiceInfo', formData)
     },
     getInvoice() {
@@ -781,7 +926,7 @@ const _server = {
         return response
       })
     },
-    getExpressInfo(orderId = '17') {
+    getExpressInfo(orderId = '17') { // 查看物流
       return _http.post('/shopGoods/expressInfo', {
         orderId
       })
@@ -790,10 +935,18 @@ const _server = {
 }
 Vue.mixin({
   created() {
-    // 判断设备
-    this.$device = utils.device
     // 接口
     this.$server = _server
+
+    // 小工具
+    this.$utils = utils
+
+    // url操作
+    this.$url = utils.url
+
+    // 设备判断 
+    this.$device = utils.device
+    
     // 本地缓存
     this.$storage = storage
   }

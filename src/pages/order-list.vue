@@ -19,10 +19,10 @@
           <p><img class="_icon" src="~assets/images/icon-009.png" alt=""></p>
           <p class="_txt">待收货</p>
         </a>
-        <!-- <a class="_item l-rest" :class="{'_active': tabIndex == 3}" @click="tabClick(3)">
+        <a class="_item l-rest" :class="{'_active': tabIndex == 3}" @click="tabClick(3)">
           <p><img class="_icon" src="~assets/images/icon-010.png" alt=""></p>
           <p class="_txt">待评价</p>
-        </a> -->
+        </a>
       </div>
       <div class="l-tab-group l-rest l-rel">
         <div class="l-tab-cont" v-show="tabIndex == 0">
@@ -97,7 +97,7 @@ export default {
           status = 'ALL'
       }
 
-      this.$server.order.getList(status, this.pages[index], 5)
+      this.$server.order.getList(status, this.pages[index])
       .then(({data})=>{
         let list = this['orderList' + index]
         list = list.concat(data)
@@ -132,8 +132,17 @@ export default {
   },
   created() {
     // 监听收货事件
-    this.$eventHub.$on('APP-RECEIVE', (data)=>{
-      this.orderList3.unshift(data)
+    this.$eventHub.$on('APP-RECEIVE', (orderId)=>{
+      this['orderList' + this.tabIndex].forEach((item, index)=>{
+        if(item.orderId === orderId){
+          if(this.tabIndex == 0){
+            item.ordersState = 5
+          }else if(this.tabIndex == 2){
+            this.orderList3.unshift(this.orderList2.splice(index, 1))
+          }
+          return true
+        }
+      })
     })
 
     // 监听取消事件

@@ -101,12 +101,13 @@ export default {
           return
         }
       }else{
-        this.formData.code = this.$route.query.code || ''
         if(!this.formData.phoneCode){
           this.$mui.toptip('请输入手机验证码')
           return
         }
       }
+
+      this.formData.code = this.$route.query.code || ''
 
       this.submiting = true
       this.$mui.showWaiting()
@@ -122,7 +123,7 @@ export default {
           case '/register':
           case '/forgot':
           case '':
-            toUrl = '/index'
+            toUrl = '/home'
             break
         }
         this.$router.replace(toUrl)
@@ -133,7 +134,7 @@ export default {
     }
   },
   created() {
-    // this.$storage.local.remove('sessionId')
+    this.$storage.local.remove('sessionId')
     // if(this.$device.isWechat && !this.$route.query.code){
     //   this.$mui.toast('微信授权失败')
     //   this.$server.getGrantUrl('/login', this.$route.query)

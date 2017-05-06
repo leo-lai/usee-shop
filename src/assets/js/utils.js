@@ -76,6 +76,7 @@ const isIpod = /(iPod)(.*OS\s([\d_]+))?/.test(ua)
 const isIphone = !isIpad && /(iPhone\sOS)\s([\d_]+)/.test(ua)
 const isWechat = /micromessenger/i.test(ua)
 const isWeb = !(isAndroid || isIpad || isIpod || isIphone)
+const isIos = isIphone || isIpad || isIpod
 
 function _hasClass(elem, cls) {
   if(!elem || !cls) return false
@@ -208,6 +209,7 @@ export let utils = {
     isIpad,
     isIpod,
     isIphone,
+    isIos,
     isWechat,
     isWeb
   },
@@ -351,7 +353,7 @@ export let utils = {
       return url
     },
     reload(){
-      window.location.reload()
+      window.location.replace(this.setArgs(window.location.href, 't', Date.now()))
     },
     replace(url) {
       window.location.replace(url)

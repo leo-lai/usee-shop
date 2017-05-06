@@ -211,9 +211,21 @@ export default {
       this.submiting = true
       this.$mui.showWaiting()
       this.$server.register(this.formData).then(({data})=>{
-        this.$mui.toast('注册成功')
         this.$storage.local.set('sessionId', data.sessionId)
-        this.$router.replace(this.$route.query.to || '/index')
+        this.$mui.toast('注册成功')
+        let toUrl = this.$route.query.to || ''
+        switch(toUrl){
+          case '/me/setting':
+            toUrl = '/me'
+            break
+          case '/login':
+          case '/register':
+          case '/forgot':
+          case '':
+            toUrl = '/home'
+            break
+        }
+        this.$router.replace(toUrl)
       }).finally(()=>{
         this.submiting = false
         this.$mui.hideWaiting()

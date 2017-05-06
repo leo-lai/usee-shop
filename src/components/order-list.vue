@@ -25,14 +25,11 @@
       <div class="_ft l-border-t l-flex-hc">
         <span>共{{item.ordersInfo.length}}件 合计：<b class="l-icon">&#xe6cb;</b>{{item.amount | currency}}</span>
         <div class="l-rest l-text-right">
-          <a class="mui-btn l-btn-white _s" v-if="item.ordersState == 1" @click="cancel(item.orderId)">取消订单</a>
-          <a class="mui-btn l-btn-main _s" v-if="item.ordersState == 1" @click="pay(item)">去付款</a>
-          <template v-if="item.ordersState == 4">
-            <a class="mui-btn l-btn-white _s" @click="express(item.orderId)">查看物流</a>  
-            <a class="mui-btn l-btn-main _s" @click="receive(item.orderId)">确认收货</a>  
-          </template>
-          
-          <!-- <router-link class="mui-btn l-btn-main _s" :to="'/order/evaluate' + item.orderId" v-if="item.ordersState == 5">去评价</router-link> -->
+          <button class="mui-btn l-btn-white _s" v-if="item.ordersState == 1" @click="cancel(item.orderId)">取消订单</button>
+          <button class="mui-btn l-btn-main _s" v-if="item.ordersState == 1" @click="pay(item)">去付款</button>
+          <button class="mui-btn l-btn-white _s" v-if="item.ordersState > 3" @click="express(item.orderId)">查看物流</button>
+          <button class="mui-btn l-btn-main _s" v-if="item.ordersState == 4" @click="receive(item.orderId)">确认收货</button>
+          <button class="mui-btn l-btn-main _s" v-if="item.ordersState == 5" @click="evaluate(item)">去评价</button>
         </div>
       </div>
     </div>
@@ -77,6 +74,10 @@ export default {
           cls: 'l-text-ok',
           name: '已收货'
         },
+        '6': {
+          cls: '',
+          name: '交易完成'
+        }
       }
     }
   },
@@ -100,14 +101,7 @@ export default {
           this.$mui.showWaiting()
           this.$server.order.changeStatus(orderId, 'RECEIVE').then(()=>{
             this.$mui.toast('收货成功')
-
-            this.list.forEach((item, index)=>{
-              if(item.orderId === orderId){
-                let receiveItem = this.list.splice(index, 1)
-                this.$eventHub.$emit('APP-RECEIVE', receiveItem)
-                return true
-              }
-            })
+            this.$eventHub.$emit('APP-RECEIVE', orderId)
           }).finally(()=>{
             this.$mui.hideWaiting()
           })
@@ -116,6 +110,10 @@ export default {
     },
     express(orderId) {
       this.$link('/order/express/' + orderId, 'page-in')
+    },
+    evaluate(item) {
+      this.$storage.session.set('temp_evaluate_order', item)
+      this.$link('/order/evaluate/' + item.orderId, 'page-in')
     },
     pay(item) {
       this.$storage.session.set('temp_pay_info', {

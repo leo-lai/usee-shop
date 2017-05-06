@@ -93,6 +93,12 @@
             <a class="mui-navigate-right" @click="$link('/me/setting', 'page-in')">系统设置</a>
           </li>
         </ul>
+
+        <ul class="mui-table-view mui-table-view-chevron l-margin-t">
+          <li class="mui-table-view-cell">
+            <a class="mui-navigate-right" @click="$link('/about', 'page-in')">关于U视一号</a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

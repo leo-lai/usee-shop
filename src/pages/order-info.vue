@@ -4,16 +4,13 @@
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
-    <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr" v-if="orderInfo && orderInfo.ordersState > 0">
+    <footer class="mui-bar mui-bar-footer l-flex-hc l-padding-lr" v-if="showToolbar">
       <div class="l-rest"></div>
-      <template v-if="orderInfo.ordersState == 1">
-        <a class="mui-btn l-margin-l-s l-btn-white _s"  @click="cancel">取消订单</a>
-        <a class="mui-btn l-margin-l-s l-btn-main _s" @click="pay">去付款</a>  
-      </template>
-      <template v-if="orderInfo.ordersState == 4">
-        <a class="mui-btn l-margin-l-s l-btn-white _s" @click="express">查看物流</a>
-        <a class="mui-btn l-margin-l-s l-btn-main _s" @click="receiv">确认收货</a>  
-      </template>
+      <button class="mui-btn l-margin-l-m l-btn-white _s" v-if="orderInfo.ordersState == 1" @click="cancel(orderInfo.orderId)">取消订单</button>
+      <button class="mui-btn l-margin-l-m l-btn-main _s" v-if="orderInfo.ordersState == 1" @click="pay(orderInfo)">去付款</button>
+      <button class="mui-btn l-margin-l-m l-btn-white _s" v-if="orderInfo.ordersState > 3 && orderInfo.ordersState < 5" @click="express(orderInfo.orderId)">查看物流</button>
+      <button class="mui-btn l-margin-l-m l-btn-main _s" v-if="orderInfo.ordersState == 4" @click="receive(orderInfo.orderId)">确认收货</button>
+      <button class="mui-btn l-margin-l-m l-btn-main _s" v-if="orderInfo.ordersState == 5" @click="evaluate(orderInfo)">去评价</button>
     </footer>
     <div class="mui-content l-fs-s" v-if="orderInfo">
       <!-- 收货地址 -->
@@ -117,6 +114,10 @@ export default {
           cls: 'l-text-ok',
           name: '已收货'
         },
+        '6': {
+          cls: 'l-text-ok',
+          name: '交易完成'
+        },
       },
       orderInfo: null
     }
@@ -124,6 +125,9 @@ export default {
   computed: {
     address() {
       return this.orderInfo && this.orderInfo.address ? this.orderInfo.address.split('|') : ['','','']
+    },
+    showToolbar() {
+      return this.orderInfo && this.orderInfo.ordersState != 2 && this.orderInfo.ordersState > 0 && this.orderInfo.ordersState < 6
     }
   },
   methods: {
@@ -157,6 +161,10 @@ export default {
     },
     express(orderId) {
       this.$link('/order/express/' + this.orderInfo.orderId, 'page-in')
+    },
+    evaluate(item) {
+      this.$storage.session.set('temp_evaluate_order', this.orderInfo)
+      this.$link('/order/evaluate/' + this.orderInfo.orderId, 'page-in')
     },
     pay() {
       this.$storage.session.set('temp_pay_info', {
