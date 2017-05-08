@@ -75,7 +75,7 @@ export default {
   }
   ._cont{
     margin: 0.75rem; font-size: 0.75rem;
-    p{text-indent: 2rem;}
+    p{text-indent: 2em;}
     ul{ list-style-type: decimal; padding: 0 0 0 1rem; }
   }
 }

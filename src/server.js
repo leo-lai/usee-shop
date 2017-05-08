@@ -54,11 +54,9 @@ const _http = {
           mui.hideWaiting()
           switch(response.resultCode){
             case 4002: // 登录失效
-              mui.alert(response.message, ()=>{
-                _server.logout(false)
-              })
+              mui.toast(response.message)
               setTimeout(()=>{
-                mui.closePopups()
+                _server.logout(false)
               }, 3000)
               reject(response.message)
               break
@@ -363,7 +361,8 @@ const _server = {
     return new Promise((resolve, reject) => {
       let _serverIds = []
       let _localIds = []
-      mui.showWaiting('上传中...')
+      let len = localIds.length
+      mui.showWaiting('上传中(1/'+len+')')
       let _ = function syncUpload(localIds){
         let localId = localIds.pop()
         wx.uploadImage({
@@ -372,7 +371,9 @@ const _server = {
           success: function (res) {
             _serverIds.push(res.serverId)
             _localIds.push(localId)
+            
             if(localIds.length > 0){
+              mui.showWaiting('上传中('+_localIds.length+'/'+len+')')
               syncUpload(localIds)
             }else{
               if(remote) {

@@ -380,12 +380,17 @@ export let utils = {
     replace() {}
   },
   image: {
-    thumb(src, width, height) {
+    thumb(src = '', width, height) {
       width = width || 320
+
       if(!src){ 
-        return ''
-        return `http://placeholder.qiniudn.com/${width}/ebebeb/cccccc` 
+        return `https://placeholdit.imgix.net/~text?txtsize=20&bg=ffffff&txtclr=999&txt=image&w=${width}&h=${width}` 
       }
+
+      if(src.indexOf('clouddn.com') === -1){
+        return src
+      }
+
       // return src += '?imageMogr2/gravity/Center/crop/'+width+'x'+height;
       src += `?imageMogr2/format/jpg/interlace/1/quality/60/gravity/Center/thumbnail/${width}x`
       if(height){

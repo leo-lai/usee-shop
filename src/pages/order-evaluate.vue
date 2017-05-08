@@ -21,7 +21,7 @@
           <div class="l-upload-images l-clearfix">
             <ul class="_list">
               <li class="_item" v-for="(image, index) in item._images">
-                <img :src="image.image || image.localId" alt="" @click="previewImage(item._images_src, index)">
+                <img :src="$utils.image.thumb(image.image, 60, 60) || image.localId" alt="" @click="previewImage(item._images_src, index)">
                 <i @click="delImage(item, image)"></i>
               </li>
             </ul>

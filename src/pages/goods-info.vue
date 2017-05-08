@@ -69,7 +69,7 @@
               <div class="l-upload-images l-clearfix">
                 <ul class="_list">
                   <li class="_item" v-for="(image,index) in item.images">
-                    <img :src="image" alt="" @click="previewImage(item.images, index)">
+                    <img :src="$utils.image.thumb(image, 100, 100)" alt="" @click="previewImage(item.images, index)">
                   </li>
                 </ul>
               </div>
@@ -182,12 +182,12 @@ export default {
   },
   methods: {
     onInfinite() {
-      if(this.tabIndex != 1){
-        this.$refs.infinite.$emit('$InfiniteLoading:complete')
-        return
-      }
+      // if(this.tabIndex != 1){
+      //   this.$refs.infinite.$emit('$InfiniteLoading:complete')
+      //   return
+      // }
 
-      this.$server.shop.getEvaluate(this.goodsInfo.goodTypeId, this.page)
+      this.$server.shop.getEvaluate(this.goodsInfo.goodTypeId, this.page, 50)
       .then(({data})=>{
 
         let returnList = data.map((item)=>{
@@ -220,10 +220,8 @@ export default {
     tabClick(index = 0) {
       this.tabIndex = index
 
-      if(this.evaluateList.length > 0){
-        this.$refs.infinite.$emit('$InfiniteLoading:reset', false)  
-      }else{
-        this.$refs.infinite.$emit('$InfiniteLoading:reset', true)
+      if(this.tabIndex == 1){
+        // this.$refs.infinite.$emit('$InfiniteLoading:reset')
       }
     },
     numberMinus() {

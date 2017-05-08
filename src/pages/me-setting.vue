@@ -8,7 +8,7 @@
       <div class="l-margin-tb">
         <ul class="mui-table-view mui-table-view-chevron">
           <li class="mui-table-view-cell" @click="refreshUserInfo">
-            <span class="mui-navigate-right">刷新个人信息</span>
+            <p class="mui-navigate-right">同步微信信息<span class="l-text-gray l-fs-m">（头像和昵称）</span></p>
           </li>
           <li class="mui-table-view-cell" @click="notify">
             <span class="mui-navigate-right">接收消息通知</span>
@@ -69,7 +69,8 @@ export default {
     if(this.$route.query.code && this.$device.isWechat){
       this.$mui.showWaiting('刷新中...')
       this.$server.user.resetWxInfo(this.$route.query.code).then(({data})=>{
-        this.$mui.toast('刷新个人信息成功')
+        this.$mui.toast('同步成功')
+        this.$storage.local.remove('qrcode_img')
         this.$link('/me', 'page-out', 'replace')
       }).finally(()=>{
         this.$mui.hideWaiting()
