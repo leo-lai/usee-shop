@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
@@ -37,7 +37,7 @@ export default {
       this.$mui.showWaiting()
       this.$server.user.notify(Number(this.isNotice)).then(({data})=>{
         if(!data){
-          this.$mui.confirm('接收消息通知需要绑定微信，请刷新个人信息授权获取微信信息', '开启通知失败', ['取消', '绑定'], (e)=>{
+          this.$mui.confirm('接收消息通知需要绑定微信，请授权同步微信信息', '开启通知失败', ['取消', '绑定'], (e)=>{
             if(e.index == 1){
               this.refreshUserInfo()
             }
@@ -52,7 +52,7 @@ export default {
     },
     refreshUserInfo() {
       if(this.$device.isWechat){
-        window.location.replace(this.$server.getGrantUrl('/me/setting', '', 'snsapi_userinfo'))
+        window.location.replace(this.$server.getGrantUrl('/me/setting', undefined, 'snsapi_userinfo'))
       }else{
         this.$mui.toast('请使用微信浏览器打开')
       }

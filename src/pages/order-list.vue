@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       <!-- <a class="mui-icon mui-icon-refreshempty mui-pull-right _nav-reload"></a> -->
@@ -69,10 +69,10 @@ export default {
       this.tabIndex = index
 
       if(!list.complete){
-        if(list.length > 0){
-          this.$refs.infinite.$emit('$InfiniteLoading:reset', false)  
-        }else{
+        if(list.length === 0 || !list.loaded){
           this.$refs.infinite.$emit('$InfiniteLoading:reset', true)
+        }else{
+          this.$refs.infinite.$emit('$InfiniteLoading:reset', false) 
         }
       }else{
         this.$refs.infinite.$emit('$InfiniteLoading:complete')
@@ -102,6 +102,7 @@ export default {
         let list = this['orderList' + index]
         list = list.concat(data)
         if(data.length > 0){
+          list.loaded = true
           this.$nextTick(()=>{
             this.$refs.infinite.$emit('$InfiniteLoading:loaded')    
           })
@@ -135,10 +136,10 @@ export default {
     this.$eventHub.$on('APP-RECEIVE', (orderId)=>{
       this['orderList' + this.tabIndex].forEach((item, index)=>{
         if(item.orderId === orderId){
-          if(this.tabIndex == 0){
-            item.ordersState = 5
-          }else if(this.tabIndex == 2){
-            this.orderList3.unshift(this.orderList2.splice(index, 1))
+          item.ordersState = 5
+          if(this.tabIndex == 2){
+            this.orderList2.splice(index, 1)
+            this.orderList3.unshift(item)
           }
           return true
         }

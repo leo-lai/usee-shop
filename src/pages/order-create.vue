@@ -1,7 +1,7 @@
 <template>
   <div class="l-page-group">
     <div class="l-page">
-      <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+      <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
         <h1 class="mui-title">确认订单</h1>
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>
@@ -97,7 +97,7 @@
     </div>
     <!-- 收货地址 -->
     <div class="l-page" id="page-address-list">
-      <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+      <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
         <h1 class="mui-title">选择收货地址</h1>
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>
@@ -110,7 +110,7 @@
     </div>
     <!-- 发票 -->
     <div class="l-page" id="page-invoice">
-      <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+      <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
         <h1 class="mui-title">发票信息</h1>
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>

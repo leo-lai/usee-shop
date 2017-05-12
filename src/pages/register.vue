@@ -1,7 +1,7 @@
 <template>
   <div class="l-page-group">
     <div class="l-page">
-      <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+      <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
         <h1 class="mui-title">{{ $route.meta.title }}</h1>
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>
@@ -41,7 +41,7 @@
       </div>
     </div>
     <div class="l-page" id="page-agreement">
-      <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+      <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
         <h1 class="mui-title">注册协议</h1>
         <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       </header>

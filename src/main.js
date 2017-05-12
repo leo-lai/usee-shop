@@ -49,15 +49,19 @@ const router = new VueRouter({
 
 // 是否微信网页授权
 router.beforeEach((to, from, next) => {
-  let code = utils.url.getArgs()['code']
+  let code = utils.url.getArgs()['code'] || ''
   let qrUserCode = utils.url.getArgs()['_qruc'] || ''
-
   storage.session.set('bind_qrcode', qrUserCode)
-  if(!code && to.meta.wxScope && qrUserCode && utils.device.isWechat){
-    window.location.replace(server.getGrantUrl(to.fullPath, '', to.meta.wxScope))
-    next(false)
-    return
+  if(utils.device.isWechat && to.meta.wxScope && qrUserCode){
+    if(!code){
+      window.location.replace(server.getGrantUrl(to.fullPath, undefined, to.meta.wxScope))
+      next(false)
+      return
+    }else{
+      storage.session.set('wx_url', window.location.href)  
+    }
   }
+
   storage.session.set('wx_code', code)
   next()
 })
@@ -220,7 +224,7 @@ router.onReady(()=>{
     mui(document).on('click', '._nav-reload', function(e){
       utils.url.reload()
     })
-  }, 120) 
+  }, 60) 
 })
 
 Vue._router = router

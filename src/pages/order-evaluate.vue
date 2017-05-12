@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
       <!-- <a class="mui-icon mui-icon-bars mui-pull-right"></a> -->
@@ -25,7 +25,7 @@
                 <i @click="delImage(item, image)"></i>
               </li>
             </ul>
-            <div class="_btn" @click="addImages(item)" v-if="item._images.length < 6">
+            <div class="_btn" @click="addImages(item)" v-if="item._images.length < imageCount">
               <i class="l-icon">&#xe632;</i>
               <p v-show="item._images.length === 0">添加图片</p>
               <p v-show="item._images.length > 0">{{item._images.length}}/{{imageCount}}</p>

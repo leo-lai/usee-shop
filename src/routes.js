@@ -3,6 +3,7 @@ import homeGuid       from './pages/home-guid'
 import shop           from './pages/shop'
 import shopCar        from './pages/shop-car'
 import goodsInfo      from './pages/goods-info'
+import goodsService   from './pages/goods-service'
 import orderCreate    from './pages/order-create'
 import orderList      from './pages/order-list'
 import orderInfo      from './pages/order-info'
@@ -25,36 +26,51 @@ import antifake       from './pages/antifake'
 import about          from './pages/about'
 
 const routes = [
-  { 
+  // { 
+  //   path: '/',
+  //   redirect: '/home/guid'
+  // },
+  // { 
+  //   path: '/index',
+  //   redirect: '/home/guid'
+  // },
+  // { 
+  //   path: '/index/guid',
+  //   redirect: '/home/guid'
+  // },
+  // { 
+  //   path: '/index.html', 
+  //   redirect: '/home/guid'
+  // },
+  // { 
+  //   path: '/home', 
+  //   redirect: '/home/guid'
+  // },
+  {
     path: '/',
-    redirect: '/home/guid'
+    meta: { title: '明目舒眼水', mainPage: true, auth: false },
+    component: homeGuid
   },
-  { 
+  {
     path: '/index',
-    redirect: '/home/guid'
+    meta: { title: '明目舒眼水', mainPage: true, auth: false },
+    component: homeGuid
   },
-  { 
-    path: '/index/guid',
-    redirect: '/home/guid'
-  },
-  { 
-    path: '/index.html', 
-    redirect: '/home/guid'
-  },
-  { 
-    path: '/home', 
-    redirect: '/home/guid'
+  {
+    path: '/home',
+    meta: { title: '明目舒眼水', mainPage: true, auth: false },
+    component: homeGuid
   },
   {
     path: '/home/guid',
     meta: { title: '明目舒眼水', mainPage: true, auth: false },
     component: homeGuid
   },
-  {
-    path: '/home',
-    meta: { title: '首页', mainPage: true, auth: false },
-    component: home
-  },
+  // {
+  //   path: '/home',
+  //   meta: { title: '首页', mainPage: true, auth: false },
+  //   component: home
+  // },
   {
     path: '/shop',
     meta: { title: '商城', mainPage: true, auth: false, wxScope: 'snsapi_base' },
@@ -109,6 +125,11 @@ const routes = [
     path: '/me/setting',
     meta: { title: '系统设置'},
     component: meSetting
+  },
+  {
+    path: '/order/goods/service/:orderId/:orderInfoId/:goodsId',
+    meta: { title: '售后服务'},
+    component: goodsService
   },
   {
     path: '/shop/order/create',

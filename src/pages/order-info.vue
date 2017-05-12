@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
@@ -48,32 +48,37 @@
           <span>购买的商品</span>
         </div>
         <div class="l-panel-group">
-          <div class="_item l-flex-hc" v-for="goods in orderInfo.ordersInfo">
+          <div class="_item l-flex-h" v-for="goods in orderInfo.ordersInfo">
             <div class="l-thumb l-bg-contain l-margin-r" :style="{'background-image': 'url('+ goods.image +')'}"></div>
             <div class="l-rest">
               <p class="l-text-wrap2">{{goods.goodsName}}</p>
-              <div class="l-margin-m1">
-                <p class="mui-pull-right">
-                  <span><b class="l-icon">&#xe6cb;</b>{{goods.amount | currency}}</span>
-                  <span class="l-text-gray">x{{goods.goodsNumber}}</span>
-                </p>
-                <span class="l-text-gray" v-show="goods.colorId">款式：{{goods.colorName}}</span>
-              </div>
+              <p class="l-margin-m1"><span class="l-text-gray" v-show="goods.colorName">款式：{{goods.colorName}}</span></p>
+            </div>
+            <div class="l-text-right l-margin-l-m">
+              <p>
+                <span><b class="l-icon">&#xe6cb;</b>{{goods.amount | currency}}</span>
+                <span class="l-text-gray">x{{goods.goodsNumber}}</span>
+              </p>
+              <p class="l-margin-m1" v-if="orderInfo.ordersState > 4">
+                <button class="mui-btn l-margin-l-m l-btn-white _xs" @click="afterSales(goods.orderInfoId, goods.goodsId)">申请售后</button>  
+              </p>
             </div>
           </div>
         </div>
-        <div class="l-padding-btn l-bg-white l-border-t">
+      </div>
+      <!-- 订单时间 -->
+      <div class="l-margin-tb">
+        <div class="l-bg-white l-padding-btn l-border-b">
           <p class="mui-pull-right">实付款：<span class="l-text-warn"><b class="l-icon">&#xe6cb;</b>{{orderInfo.amount | currency}}</span></p>
           <span>订单总价：<b class="l-icon">&#xe6cb;</b>{{orderInfo.amount | currency}}</span>
         </div>
-      </div>
-      <!-- 订单时间 -->
-      <div class="l-margin-t l-bg-white l-padding-btn l-text-gray l-margin-b">
-        <p>订单编号：{{orderInfo.orderCode}}</p>
-        <p>创建时间：{{orderInfo.startDate}}</p>
-        <p>付款时间：{{orderInfo.payDate}}</p>
-        <p>发货时间：{{orderInfo.deliverGoodsDate}}</p>
-        <p>收货时间：{{orderInfo.goodsReceiptDate}}</p>
+        <div class="l-bg-white l-padding-btn l-text-gray">
+          <p>订单编号：{{orderInfo.orderCode}}</p>
+          <p>创建时间：{{orderInfo.startDate}}</p>
+          <p>付款时间：{{orderInfo.payDate}}</p>
+          <p>发货时间：{{orderInfo.deliverGoodsDate}}</p>
+          <p>收货时间：{{orderInfo.goodsReceiptDate}}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -183,6 +188,9 @@ export default {
       }).finally(()=>{
         this.$mui.hideWaiting()
       })
+    },
+    afterSales(orderInfoId, goodsId) {
+      this.$link(`/order/goods/service/${this.orderInfo.orderId}/${orderInfoId}/${goodsId}`, 'page-in')
     }
   },
   created() {

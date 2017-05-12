@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">关于U视一号</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
@@ -31,7 +31,7 @@
         <h3 class="_tit">联系我们</h3>
         <div class="_cont l-text-center">
           <div>广州市天河区陶庄路五号空间3F009</div>
-          <div>客服电话：020-85655842<br>服务时间：9:00-18:00</div>
+          <div>客服电话：400-180-6900<br>服务时间：9:00-18:00</div>
         </div>
       </div>
     </div>

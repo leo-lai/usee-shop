@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
@@ -27,7 +27,7 @@
       <transition name="fade">
         <div class="l-layer l-flex-vhc" v-if="isAgent && success" @click="hideAgentTip">
           <div class="l-agent-tip">
-            <p><i class="l-icon" style="color:#ffef16;">&#xe64c;</i></p>
+            <p><i class="l-icon" style="color:#ffef16;">&#xe617;</i></p>
             <p>恭喜您获得小U店员资格<br>系统将在24小时内生效</p>
           </div>
           <p class="l-text-center l-margin-t"><i class="l-icon l-agent-close" >&#xe61a;</i></p>

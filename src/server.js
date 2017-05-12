@@ -18,9 +18,9 @@ if (['h5.usee1.com.cn', 'h5.ushiyihao.com', 'shoptest.deyila.cn'].indexOf(window
   qrcode = require('assets/images/usee-online.jpg')
 }
 
-const errorPromise = function(message = '') {
+const errorPromise = function(message = {}) {
   return new Promise((resolve, reject) => {
-    reject({ message })
+    reject(message)
   })
 }
 const _http = {
@@ -54,6 +54,7 @@ const _http = {
           mui.hideWaiting()
           switch(response.resultCode){
             case 4002: // 登录失效
+              storage.local.remove('sessionId')
               mui.toast(response.message)
               setTimeout(()=>{
                 _server.logout(false)
@@ -63,7 +64,7 @@ const _http = {
             case 4008: // 微信授权异常
               mui.confirm('微信网页授权异常', '系统提示', ['返回', '重新授权'], (e)=>{
                 if(e.index == 1){
-                  window.location.replace(_server.getGrantUrl(utils.url.setArgs(window.location.pathname, 'code', ''), '' , 'snsapi_userinfo'))
+                  window.location.replace(_server.getGrantUrl(window.location.href, undefined , 'snsapi_userinfo'))
                 }else{
                   reject(response.message)    
                 }
@@ -124,16 +125,23 @@ const _server = {
     })
   },
   // 获取微信授权路径 url为绝对路径
-  getGrantUrl(url, params, scope = 'snsapi_base') {
-    if (!url) return ''
-    url = window.location.origin + utils.url.setArgs(url, params)
+  getGrantUrl(url = '', params = {}, scope = 'snsapi_base') {
+    url = utils.url.setArgs(url, Object.assign({}, params, {code: undefined}))
+
+    if(!/^http(s?)/i.test(url)){
+      url = window.location.origin + url
+    }
+
+    url = url.replace(/[\?&=#,]/ig, ($1)=>encodeURIComponent($1))
+
     return `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&redirect_uri=${url}&response_type=code&scope=${scope}&state=STATE#wechat_redirect`
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) {
-    url = url || (utils.device.isIos ? storage.session.get('wx_url') : window.location.href)
+    console.log(utils.device)
 
-    // mui.alert(url)
+    url = url || (utils.device.isIos && utils.device.isWechat ? storage.session.get('wx_url') : window.location.href)
+    url = url.split('#')[0]
     
     const self = this
     let config = {
@@ -152,7 +160,7 @@ const _server = {
         }
         resolve(window.wx)
       } else {
-        if (!utils.device.isWechat || (utils.device.isIos && window.wx._ready)) {
+        if (!utils.device.isWechat || (utils.device.isIos && window.wx._configOk)) {
           resolve(window.wx)
           return
         }
@@ -162,7 +170,7 @@ const _server = {
           config.timestamp = data.timestamp
           config.nonceStr = data.nonceStr
           config.signature = data.signature
-
+          
           window.wx.config(config)
 
           window.wx.error((res) => {
@@ -178,36 +186,40 @@ const _server = {
             }
           })
 
-          window.wx.ready(() => {
-            window.wx._ready = true
-            resolve(window.wx)
+          window.wx.ready((res) => {
+            // window.wx._ready = true
+            // resolve(window.wx)
 
-            // wx.checkJsApi({
-            //   jsApiList: config.jsApiList,
-            //   success: function(res) {
-            //     // 以键值对的形式返回，可用的api值true，不可用为false
-            //     // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
-            //     let _isReady = true
-            //     Object.keys(res.checkResult).forEach((jsApiName)=>{
-            //       if(!res.checkResult[jsApiName]){
-            //         _isReady = false
-            //         return true
-            //       }
-            //     })
-            //     _isReady && console.log('微信JS-SDK权限验证成功')
+            wx.checkJsApi({
+              jsApiList: config.jsApiList,
+              success: function(res) {
+                console.log('jsApiList:', res)
+                // 以键值对的形式返回，可用的api值true，不可用为false
+                // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+                let _configOk = Object.keys(res.checkResult).length >= config.jsApiList.length ? true : false
+                // Object.keys(res.checkResult).forEach((jsApiName)=>{
+                //   if(!res.checkResult[jsApiName]){
+                //     _configOk = false
+                //     return true
+                //   }
+                // })
 
-            //     window.wx._ready = _isReady
-            //     if(!_isReady && !window.wx._try){
-            //       window.wx._try = true
-            //       resolve(self.getWxConfig(utils.device.isIos ? window.location.href : storage.session.get('wx_url')))
-            //     }else{
-            //       resolve(window.wx)
-            //     }
-            //   },
-            //   fail() {
-            //     resolve(window.wx)
-            //   }
-            // })
+                window.wx._configOk = _configOk
+                _configOk && console.log('微信JS-SDK权限验证成功')
+
+                if(!_configOk && !window.wx._try){
+                  window.wx._ready = false
+                  window.wx._try = true
+                  resolve(self.getWxConfig(utils.device.isIos ? window.location.href : storage.session.get('wx_url')))
+                }else{
+                  window.wx._ready = true
+                  resolve(window.wx)
+                }
+              },
+              fail() {
+                resolve(window.wx)
+              }
+            })
           })
         }).catch(() => {
           console.log('服务器返回微信JS-SDK配置失败')
@@ -270,8 +282,7 @@ const _server = {
             mui.hideWaiting()
           })
         } else {
-          mui.toast('微信jssdk不可用')
-          reject('微信jssdk不可用')
+          reject('微信JS-SDK授权异常')
         }
       })
     })
@@ -407,11 +418,14 @@ const _server = {
     })
   },
   wxShare(shareInfo) {
+    let userInfo = _server.user.getInfo()
+    shareInfo = shareInfo || {
+      title: '我为U视喷喷代言',
+      desc: '喷3次，停3秒，眨3下，U视喷喷9秒靓眼。',
+      link: _server.getHost() + '/shop?_from=scan&_qruc=' + userInfo.userCode,
+      imgUrl: userInfo.avatar
+    }
     return new Promise((resolve, reject) => {
-      if(!shareInfo) {
-        reject(window.wx, '分享信息为空')
-        return
-      }
       mui.showWaiting()
       this.getWxConfig().then((wx) => {
         if (wx._ready) {
@@ -429,9 +443,9 @@ const _server = {
           wx.onMenuShareWeibo(_info)
           wx.onMenuShareQZone(_info)
 
-          resolve(wx, '微信分享授权成功')
+          resolve(wx)
         }else{
-          utils.device.isWechat && reject(wx, '微信JS-SDK授权异常')
+          utils.device.isWechat && reject('微信JS-SDK授权异常')
         }
       }).finally(() => {
         mui.hideWaiting()
@@ -461,7 +475,7 @@ const _server = {
                 resolve(position)
               },
               fail(err) {
-                console.log('调用位置接口出错', err)
+                console.log('地理定位失败', err)
                 resolve(_defualt)
               }
             })
@@ -620,20 +634,26 @@ const _server = {
       // 清除缓存
       storage.local.remove('sessionId')
       storage.local.remove('userInfo')
-      storage.local.remove('buy_slted_address')
-
+      _server.clearTempStore()
+      
       tipText && mui.toast(tipText)
 
       if (utils.device.isWechat) {
         // 避免登录后跳转到登录页面
         toUrl = toUrl === '/login' ? '/index' : toUrl
-        window.location.replace(_server.getGrantUrl('/login', { to: toUrl }, 'snsapi_userinfo'))
+
+        window.location.replace(_server.getGrantUrl(`/login?to=${toUrl}`, undefined , 'snsapi_userinfo'))
       } else {
         Vue._link(`/login?to=${toUrl}`, 'page-in')
       }
 
       return true
     })
+  },
+  clearTempStore() { // 清除临时缓存
+    storage.local.remove('_isFollow')
+    storage.local.remove('qrcode_img')
+    storage.local.remove('buy_slted_address')
   },
   // 检测登录
   checkLogin() {
@@ -646,6 +666,7 @@ const _server = {
     return _http.post(url, formData).then((response) => {
       !response.data && (response.data = {})
       response.data.avatar = utils.image.wxHead(response.data.image)
+      storage.local.set('_isFollow', response.data.isFollow)
       storage.local.set('userInfo', response.data)
       return response
     })
@@ -689,6 +710,7 @@ const _server = {
           _http.post('/shopUsers/refresh').then((response) => {
             !response.data && (response.data = {})
             response.data.avatar = utils.image.wxHead(response.data.image)
+            storage.local.set('_isFollow', response.data.isFollow)
             storage.local.set('userInfo', response.data, 1000*60*15)
             resolve(response)
           })
@@ -746,18 +768,27 @@ const _server = {
     bind(qrUserCode = '', code = '') {
       qrUserCode = qrUserCode || storage.session.get('bind_qrcode') || ''
       code = code || storage.session.get('wx_code') || ''
-      
-      if(!qrUserCode) {
-        return errorPromise('没有检测到二维码')
-      }
+
       if(!code) {
-        return errorPromise('微信网页授权异常')
+        return errorPromise({
+          status: 4008,
+          tips: false,
+          message: '扫码失败（微信网页授权失败）'
+        })
+      }
+
+      if(!qrUserCode) {
+        return errorPromise({
+          status: 4005,
+          tips: !!code,
+          message: '扫码失败（该二维码无效）'
+        })
       }
 
       storage.session.set('bind_qrcode', qrUserCode)
-      storage.session.set('wx_code', code)
 
       return _http.post('/shopUsers/binding', { qrUserCode, code }).then((response) => {
+        response.message = '扫码失败，请重新扫码！'
         storage.session.set('openId', response.data)
         return response
       })
@@ -930,6 +961,18 @@ const _server = {
     getExpressInfo(orderId = '17') { // 查看物流
       return _http.post('/shopGoods/expressInfo', {
         orderId
+      })
+    },
+    checkAfterSales(formData) {
+      return _http.post('/afterSales/check', formData).then((response) => {
+        !response.data && (response.data = {})
+        return response
+      })
+    },
+    applyAfterSales(formData) {
+      return _http.post('/afterSales/putInFor', formData).then((response) => {
+        !response.data && (response.data = {})
+        return response
       })
     }
   }

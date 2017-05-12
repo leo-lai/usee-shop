@@ -287,7 +287,7 @@ export let utils = {
     return !isNaN( parseFloat(value) ) && isFinite( value )
   },
 	setTitle(title) {
-		document.title = title || 'Usee商城'
+		document.title = title || 'U视一号'
     // 判断是否为ios设备的微信浏览器，加载iframe来刷新title
     if (isWechat && isIphone) {
       let iframe = document.createElement('iframe')
@@ -323,12 +323,19 @@ export let utils = {
         value  = item.substring(splitPos+1)
         args[name] = value
       }
+
+      if(pos2 !== -1) {
+        args['_hash'] = url.substring(pos2+1, url.length)  
+      }
+      
       return args
     },
     setArgs(url, name, value) {
       if(typeof url !== 'string') return ''
+      if(name === undefined) return url
+
       let urlArgs = utils.url.getArgs(url),
-        params = []
+          params = []
 
       if(utils.isPlainObject(name)){
         Object.assign(urlArgs, name)
@@ -339,16 +346,17 @@ export let utils = {
       let hash = ''
       for(let key of Object.keys(urlArgs)){
         let val = urlArgs[key]
-        if(val != undefined && val !== ''){
+        if(val != undefined){
           if(key === '_hash'){
-            hash = val;
+            hash = val
           }else{
             params.push(encodeURIComponent(key) +'=' + encodeURIComponent(val)) 
           }
         }
       }
+
       params.length > 0 && (url = url.split('?')[0] + '?' + params.join('&'))
-      hash && (url += '#'+hash)
+      hash && (url += '#'+ hash)
       
       return url
     },
@@ -398,7 +406,7 @@ export let utils = {
       }
       return src
     },
-    wxHead(src) {
+    wxHead(src, size = 132) {
       if(!src) {
         let avatar = require('assets/images/avatar.jpg')
         return avatar
@@ -407,7 +415,7 @@ export let utils = {
         return src
       }
       // 有0、46、64、96、132数值可选，0代表640*640正方形头像
-      return src.replace(/\/0$/, '/64')
+      return src.replace(/\/0$/, '/' + size)
     }
   },
   toptip(text, ms = 3000) {

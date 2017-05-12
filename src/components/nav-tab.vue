@@ -1,6 +1,6 @@
 <template>
   <nav class="mui-bar l-bar-tab">
-    <router-link class="_item" replace active-class="mui-active" to="/home/guid">
+    <router-link class="_item" replace active-class="mui-active" to="/home" :class="{'mui-active': ($route.path == '/' || $route.path == '/index')}">
       <span class="mui-icon l-icon-home"></span>
       <span class="mui-tab-label">首页</span>
     </router-link>

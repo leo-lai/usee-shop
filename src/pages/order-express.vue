@@ -1,6 +1,6 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
@@ -27,7 +27,7 @@
       </template>
       <!-- 空数据 -->
       <div class="l-data-null" v-if="!expressInfo">
-        <div class="_icon"><i class="l-icon l-text-warn">&#xe64c;</i></div>
+        <div class="_icon"><i class="l-icon l-text-warn">&#xe617;</i></div>
         <p class="_text">商品正等待快递小哥揽收呢~</p>
       </div>
       <!-- 空数据 end-->

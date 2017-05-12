@@ -1,9 +1,8 @@
 <template>
   <div class="l-page">
-    <header class="mui-bar mui-bar-nav l-black" v-if="!$mui.os.wechat">
+    <page-top></page-top>
+    <header class="mui-bar mui-bar-nav l-black" v-if="!$device.isWechat">
       <h1 class="mui-title">{{ $route.meta.title }}</h1>
-      <!-- <a class="mui-icon mui-icon-arrowleft mui-pull-left"></a> -->
-      <!-- <a class="mui-icon mui-icon-bars mui-pull-right"></a> -->
     </header>
     <nav-tab></nav-tab>
     <div class="mui-content">
@@ -29,11 +28,12 @@
   </div>
 </template>
 <script>
+import pageTop from 'components/page-top'
 import navTab from 'components/nav-tab'
 
 export default {
   components: {
-    navTab
+    navTab, pageTop
   },
   data () {
     return {
@@ -59,8 +59,16 @@ export default {
       this.getList()  
     }else{
       this.loading = true
-      this.$server.user.bind().then(({data})=>{
-        !data && this.$mui.alert('扫码失败，请重新扫码！')
+      this.$server.user.bind().then((response)=>{
+        if(!response.data){
+          this.$mui.confirm(response.message, '系统提示', ['取消', '重试'], (e)=>{
+            if(e.index == 1){
+              window.location.replace(this.$server.getGrantUrl(window.location.href))
+            }
+          })
+        }
+      }).catch((error)=>{
+        error.tips && this.$mui.alert(error.message)
       }).finally(()=>{
         this.getList()
       })
