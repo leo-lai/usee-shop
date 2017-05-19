@@ -11,7 +11,7 @@
           <p class="l-fs-xl">{{customerNum}}</p>
         </div>
         <div class="l-padding l-fs-s">
-          说明：客户扫码登录后即可绑定关系，有绑定关系的客户无法再次被绑定。
+          说明：客户扫码后即可绑定关系，有绑定关系的客户无法再次被绑定。
         </div>
         <div class="l-tab-customer l-bg-white">
           <div class="_tit l-border-b l-flex-hvc l-sticky">
@@ -23,19 +23,22 @@
             </div>
           </div>
           <div class="l-customer-list" v-show="tabIndex == 1">
-            <div class="_item l-border-b" v-for="item in list1">
-              <!-- <p>扫码用户：{{item.userName || item.phoneNumber}}</p> -->
-              <p>恭喜您，有一位新用户加入</p>
-              <p>绑定时间：{{item.startDate}}</p>
-              <p>客户来源：{{item.describe}}</p>
+            <div class="_item l-flex-hc l-border-b" v-for="item in list1">
+              <div class="l-avatar l-margin-r" :style="{'background-image': 'url('+ $utils.image.wxHead(item.image) +')'}"></div>
+              <div class="l-rest">
+                <p>绑定时间：{{item.startDate}}</p>
+                <p>客户来源：{{item.describe}}</p>
+              </div>
             </div>
           </div>
           <div class="l-customer-list" v-show="tabIndex == 0">
-            <div class="_item l-border-b" v-for="item in list0">
-              <!-- <p>扫码用户：{{item.userName || item.phoneNumber}}</p> -->
-              <p>绑定失败</p>
-              <p>绑定时间：{{item.startDate}}</p>
-              <p>失败原因：<!-- 该用户已经是其他小U店员的客户 -->{{item.describe}}</p>
+            <div class="_item l-flex-hc l-border-b" v-for="item in list0">
+              <div class="l-avatar l-margin-r" :style="{'background-image': 'url('+ $utils.image.wxHead(item.image) +')'}"></div>
+              <div class="l-rest">
+                <!-- <p>扫码用户：{{item.userName || item.phoneNumber}}</p> -->
+                <p>绑定时间：{{item.startDate}}</p>
+                <p>绑定失败：{{item.describe}}</p>
+              </div>
             </div>
           </div>
         </div>

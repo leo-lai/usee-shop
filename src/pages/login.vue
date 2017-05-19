@@ -52,7 +52,7 @@
       <div class="l-text-center l-fs-m l-text-gray">
         <span class="l-text-gray" @click="register">快速注册</span>
         <span class="l-fs-xs l-margin-s" style="vertical-align:2px;">|</span>
-        <router-link class="l-text-gray" to="/forgot">忘记密码</router-link>
+        <span @click="$link('/forgot', 'page-in')">忘记密码</span>
       </div>
     </div>
   </div>
@@ -112,7 +112,9 @@ export default {
       this.submiting = true
       this.$mui.showWaiting()
       this.$server.login(this.loginType, this.formData).then(({data})=>{
+
         this.$mui.toast('登录成功')
+        this.$storage.local.set('phoneNumber', this.formData.phoneNumber)
         this.$storage.local.set('sessionId', data.sessionId)
         let toUrl = this.$route.query.to || ''
         switch(toUrl){
@@ -126,7 +128,8 @@ export default {
             toUrl = '/home'
             break
         }
-        this.$router.replace(toUrl)
+        
+        this.$router.replace(toUrl)  
       }).finally(()=>{
         this.submiting = false
         this.$mui.hideWaiting()
@@ -135,6 +138,7 @@ export default {
   },
   created() {
     this.$storage.local.remove('sessionId')
+    this.formData.phoneNumber = this.$storage.local.get('phoneNumber')
     // if(this.$device.isWechat && !this.$route.query.code){
     //   this.$mui.toast('微信授权失败')
     //   this.$server.getGrantUrl('/login', this.$route.query)

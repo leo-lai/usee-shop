@@ -29,15 +29,22 @@ export default {
 			isFollow: true
 		}
 	},
+	created() {
+		this.$eventHub.$on('APP-FOLLOW', (isFollow)=>{
+			this.isFollow = isFollow == 0 ? false : true
+		})
+	},
 	mounted() {
 		this.qrcode = this.$server.getWxQrcode()
-		this.$server.user.getInfo(true).then(({data})=>{
-			this.isFollow = data.isFollow == 1 ? true : false
-		})
+		if(this.$storage.session.get('_from') !== 'usee'){
+			setTimeout(()=>{
+				this.isFollow = this.$storage.local.get('_isFollow') == 0 ? false : true
+			}, 1000)
+		}
 	},
   methods: {
   	guanZhu() {
-  		this.visible = !this.visible
+  		this.visible = !this.visible	
   		// this.$link('https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MjM5NDU0Mjk2MQ==&scene=124#wechat_redirect')
   	}
   }
@@ -50,7 +57,7 @@ export default {
 }
 
 .l-guanzhu{
-  position: absolute; top:0; left: 0; right: 0; z-index: 10000;
+  position: absolute; top:0; left: 0; right: 0; z-index: 9000;
   background: rgba(0, 0, 0, 0.8); padding:0.4rem 0.5rem;
   ._text{
     color: #fff; font-size: 0.75rem;

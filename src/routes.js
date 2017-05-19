@@ -24,28 +24,9 @@ import withdrawals    from './pages/withdrawals'
 import payResult      from './pages/pay-result'
 import antifake       from './pages/antifake'
 import about          from './pages/about'
+import pageNotFound   from './pages/404'
 
 const routes = [
-  // { 
-  //   path: '/',
-  //   redirect: '/home/guid'
-  // },
-  // { 
-  //   path: '/index',
-  //   redirect: '/home/guid'
-  // },
-  // { 
-  //   path: '/index/guid',
-  //   redirect: '/home/guid'
-  // },
-  // { 
-  //   path: '/index.html', 
-  //   redirect: '/home/guid'
-  // },
-  // { 
-  //   path: '/home', 
-  //   redirect: '/home/guid'
-  // },
   {
     path: '/',
     meta: { title: '明目舒眼水', mainPage: true, auth: false },
@@ -66,13 +47,9 @@ const routes = [
     meta: { title: '明目舒眼水', mainPage: true, auth: false },
     component: homeGuid
   },
-  // {
-  //   path: '/home',
-  //   meta: { title: '首页', mainPage: true, auth: false },
-  //   component: home
-  // },
   {
     path: '/shop',
+    name: 'shop',
     meta: { title: '商城', mainPage: true, auth: false, wxScope: 'snsapi_base' },
     component: shop
   },
@@ -179,11 +156,11 @@ const routes = [
   {
     path: '/me/account',
     meta: { title: '我的账户'},
-    component: account
+    component: withdrawals
   },
   {
     path: '/me/account/withdrawals',
-    meta: { title: '提现申请'},
+    meta: { title: '提现'},
     component: withdrawals
   },
   {
@@ -200,6 +177,11 @@ const routes = [
     path: '/me/qrcode',
     meta: { title: '我的二维码'},
     component: qrcode
+  },
+  {
+    path: '*',
+    meta: { title: '找不到页面', auth: false },
+    component: pageNotFound
   }
 ]
 

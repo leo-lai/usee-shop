@@ -76,11 +76,17 @@ export default {
       this.direction = data
     })
 
+    this.preventScroll()
+
+    this.$storage.session.set('_from', this.$url.getArgs()['_from'])
     this.$nextTick(()=>{
+      let diffTime = Date.now() - (window.localStorage.getItem('_usee_client_loading_start') || 0)
+      let delay = diffTime > 3000 ? 50 : 3000
+
       let appLoader = document.getElementById('app-loader')
       setTimeout(()=> {
         appLoader && appLoader.classList.add('app-loaded')
-      }, 1000)
+      }, delay)
       setTimeout(() => {
         let appLoaderCss = document.getElementById('app-loader-css')
         if(appLoaderCss){
@@ -89,10 +95,8 @@ export default {
           appLoader = null
           appLoaderCss = null  
         }
-      }, 3000)
+      }, delay + 1500)
     })
-
-    this.preventScroll()
 	},
   updated() {
     this.preventScroll()

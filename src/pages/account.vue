@@ -12,7 +12,7 @@
             <p class="l-fs-xl"><b class="l-icon">&#xe6cb;</b>{{userInfo.account | currency}}</p>
           </div>
           <div>
-            <router-link class="mui-btn l-btn-white _s" style="width:4.5rem;" tag="button" :disabled="userInfo.account <= 0" to="/me/account/withdrawals">提现</router-link>
+            <!-- <router-link class="mui-btn l-btn-white _s" style="width:4.5rem;" tag="button" to="/me/account/withdrawals">我要提现</router-link> -->
           </div>
         </div>
         <div class="l-text-center l-rebate-time l-border-b l-sticky l-bg-white">

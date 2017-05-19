@@ -8,7 +8,7 @@
       <button type="button" class="mui-btn l-btn-main" @click="submit">提交申请</button>
     </footer>
     <div class="mui-content">
-      <div class="l-bg-white l-flex-hc" :class="stepCls">
+      <div class="l-bg-white l-flex-h" :class="stepCls">
         <div class="_step">
           <i class="_icon"></i>
           <p class="_txt">售后申请</p>
@@ -43,7 +43,7 @@
                 <select v-model="formData.afterSalesReason">
                   <option value="">请选择原因</option>
                   <option value="1">产品质量原因</option>
-                  <option value="2">7天无理由退换货</option>
+                  <option value="2" v-if="status < 5">7天无理由退换货</option>
                   <option value="10">其他</option>
                 </select>
               </div>
@@ -118,18 +118,18 @@ export default {
         },
         '4': {
           icon: '_icon-3',
-          title: '该订单还不能申请售后服务',
+          title: '此订单不能申请售后',
           desc: ''
         },
         '5': {
           icon: '_icon-3',
           title: '超出申请时间',
-          desc: '退款退货售后服务必须在7天内提出申请'
+          desc: '退款退货售后服务必须在确认收货后7天内提出申请'
         },
         '6': {
           icon: '_icon-3',
-          title: '超出申请时间',
-          desc: '退款退货售后服务必须在7天内提出申请<br>换货售后服务必须在3个月内提出申请'
+          title: '超出申请售后时间',
+          desc: '您已错过申请售后时间段(确认收货后7天内可退款退货，3个月内可换货)'
         }
       },
       imageCount: 2,
@@ -247,45 +247,6 @@ export default {
   }
 }
 .l-upload-images{margin:0;}
-[class*=l-service-step]{
-  text-align: center; padding: 0.75rem;
-  ._icon{
-    display: block; margin:0.5rem auto; border-radius: 50%; border: 2px solid #ccc; width: 1rem; height: 1rem;
-  }
-  ._line{border-top: 1px solid #eee; margin:0 0 1.15rem;}
-  ._txt{ color: #ccc; font-size: 0.7rem;}
-}
-
-.l-service-step1{
-  ._step:first-child{
-    ._icon{
-      border-color: #ff784e; background: #ff784e;
-    }
-    ._txt{ color: inherit; }
-  }
-}
-.l-service-step2{
-  ._step:nth-child(1), ._step:nth-child(3){
-    ._icon{
-      border-color: #ff784e; background: #ff784e;
-    }
-    ._txt{ color: inherit; }
-  }
-  ._line:nth-child(2){
-    border-color: #ff784e;
-  }
-}
-.l-service-step3{
-  ._step:nth-child(1), ._step:nth-child(3), ._step:nth-child(5){
-    ._icon{
-      border-color: #ff784e; background: #ff784e;
-    }
-    ._txt{ color: inherit; }
-  }
-  ._line:nth-child(2),._line:nth-child(4){
-    border-color: #ff784e;
-  }
-}
 
 .l-message{
   ._icon-1:after{

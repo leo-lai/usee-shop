@@ -174,6 +174,8 @@ export default {
       isAgree: false,
       submiting: false,
       formData: {
+        phoneNumber: '',
+        password: '',
         phoneCode: '',
         code: ''
       }
@@ -233,6 +235,7 @@ export default {
     }
   },
   created() {
+    this.formData.phoneNumber = this.$storage.local.get('phoneNumber')
     // if(this.$device.isWechat && !this.$route.query.code){
     //   this.$mui.alert('微信授权失败')
     //   window.location.replace(this.$server.getGrantUrl('/register', this.$route.query))

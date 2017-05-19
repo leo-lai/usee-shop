@@ -98,7 +98,6 @@ export default {
     }
   },
   created() {
-    // this.$storage.local.remove('qrcode_img')
     this.$server.user.getInfo().then(({data})=>{
       this.userInfo = data
       if(data.agentId == 1){
@@ -109,11 +108,9 @@ export default {
           link: this.$server.getHost() + '/shop?_from=scan&_qruc=' + this.userInfo.userCode,
           imgUrl: this.userInfo.avatar
         }).catch(()=>{
-          this.$mui.confirm('微信分享授权失败，请刷新重试', '', ['返回', '刷新'], (e)=>{
-            if(e.index == 1){
-              this.$url.reload()
-            }
-          })
+          if(!this.$url.getArgs('t')){
+            this.$url.reload()
+          }
         })
 
         if(this.$storage.local.get('qrcode_img')){
@@ -139,8 +136,12 @@ export default {
   ul{padding: 0 0.75rem 0 1.75rem;list-style-type: decimal;}
 }
 .l-qrcode-img{
-  width: 12rem; height: 12rem; margin:0 auto; text-align: center;
-  .canvas{display: none;}   
+  width: 12rem; height: 12rem; margin:0 auto; text-align: center; position: relative; z-index: 1;
+  .canvas{display: none;}
+  img{width: 100%; height: 100%;}
 }
-.l-qrcode-img img{width: 100%; height: 100%;}
+.l-qrcode-img:after{
+  content: '二维码生成中...'; position: absolute; left:0; right: 0; text-align: center; top: 50%; margin-top: -0.3rem;
+  font-size: 0.6rem; color: #999; z-index: -1;
+}
 </style>

@@ -37,7 +37,11 @@ export default {
   data () {
     return {
       submiting: false,
-      formData: { phoneCode: '' }
+      formData: { 
+        phoneNumber: '',
+        password: '',
+        phoneCode: ''
+      }
     }
   },
   methods: {
@@ -74,7 +78,7 @@ export default {
     }
   },
   created() {
-    
+    this.formData.phoneNumber = this.$storage.local.get('phoneNumber')
   },
   mounted() {
     this.$mui('.l-login-form input').input();

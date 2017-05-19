@@ -36,7 +36,7 @@ const _http = {
       data = JSON.stringify(data)
     }
     data.sessionId = storage.local.get('sessionId') || ''
-    data.openId = storage.session.get('openId') || ''
+    data.openId = storage.local.get('openId') || ''
 
     return new Promise((resolve, reject) => {
       mui.ajax(url, {
@@ -58,7 +58,7 @@ const _http = {
               mui.toast(response.message)
               setTimeout(()=>{
                 _server.logout(false)
-              }, 3000)
+              }, 2000)
               reject(response.message)
               break
             case 4008: // 微信授权异常
@@ -66,12 +66,12 @@ const _http = {
                 if(e.index == 1){
                   window.location.replace(_server.getGrantUrl(window.location.href, undefined , 'snsapi_userinfo'))
                 }else{
-                  reject(response.message)    
+                  reject(response.message)
                 }
               })
               break
             default:
-              mui.toast(response.message)
+              mui.alert(response.message)
               reject(response.message)
               break
           }
@@ -138,11 +138,9 @@ const _server = {
   },
   // 获取jssdk授权配置 promise返回一个对象(wx or {})
   getWxConfig(url) {
-    console.log(utils.device)
-
     url = url || (utils.device.isIos && utils.device.isWechat ? storage.session.get('wx_url') : window.location.href)
     url = url.split('#')[0]
-    
+
     const self = this
     let config = {
       debug: false,
@@ -193,7 +191,6 @@ const _server = {
             wx.checkJsApi({
               jsApiList: config.jsApiList,
               success: function(res) {
-                console.log('jsApiList:', res)
                 // 以键值对的形式返回，可用的api值true，不可用为false
                 // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
                 let _configOk = Object.keys(res.checkResult).length >= config.jsApiList.length ? true : false
@@ -236,12 +233,12 @@ const _server = {
         mui.alert('支付失败：订单id不存在')
         return
       }
-      if (storage.session.get('openId')) {
-        formData.openId = storage.session.get('openId')
+      if (storage.local.get('openId')) {
+        formData.openId = storage.local.get('openId')
       }
       _http.post('/shopOrderPay/pay/prepare', formData).then(({ data }) => {
         storage.session.set('buy_become_agent', data.isAgent || 0)
-        storage.session.set('openId', data.openId)
+        storage.local.set('openId', data.openId)
         resolve(data.payInfo)
       }).catch(reject)
     })
@@ -433,14 +430,11 @@ const _server = {
             title: shareInfo.title,             // 分享标题
             desc: shareInfo.desc,
             link: shareInfo.link,               // 分享链接
-            imgUrl: shareInfo.imgUrl,           // 分享图标
-            success: resolve,
-            cancel: reject
+            imgUrl: shareInfo.imgUrl            // 分享图标
           }
           wx.onMenuShareTimeline(_info)
           wx.onMenuShareAppMessage(_info)
           wx.onMenuShareQQ(_info)
-          wx.onMenuShareWeibo(_info)
           wx.onMenuShareQZone(_info)
 
           resolve(wx)
@@ -651,7 +645,7 @@ const _server = {
     })
   },
   clearTempStore() { // 清除临时缓存
-    storage.local.remove('_isFollow')
+    // storage.local.remove('_isFollow')
     storage.local.remove('qrcode_img')
     storage.local.remove('buy_slted_address')
   },
@@ -710,11 +704,39 @@ const _server = {
           _http.post('/shopUsers/refresh').then((response) => {
             !response.data && (response.data = {})
             response.data.avatar = utils.image.wxHead(response.data.image)
-            storage.local.set('_isFollow', response.data.isFollow)
+            storage.local.set('_isFollow', response.data.isFollow || 1)
             storage.local.set('userInfo', response.data, 1000*60*15)
             resolve(response)
           })
         }
+      })
+    },
+    bind(qrUserCode = '', code = '') {
+      qrUserCode = qrUserCode || storage.session.get('bind_qrcode') || ''
+      code = code || storage.session.get('wx_code') || ''
+
+      if(!code) {
+        return errorPromise({
+          status: 4008,
+          tips: false,
+          message: '微信网页授权失败'
+        })
+      }
+
+      if(!qrUserCode) {
+        return errorPromise({
+          status: 4005,
+          tips: !!code,
+          message: '该二维码无法识别'
+        })
+      }
+
+      storage.session.set('bind_qrcode', qrUserCode)
+
+      return _http.post('/shopUsers/binding', { qrUserCode, code }).then((response) => {
+        storage.local.set('_isFollow', response.data.isFollow || 1)
+        storage.local.set('openId', response.data.openId || '')
+        return response
       })
     },
     resetWxInfo(code = '') {
@@ -728,6 +750,12 @@ const _server = {
     },
     getBankInfo() {
       return _http.post('/shopUsers/myBankInfo').then((response) => {
+        !response.data && (response.data = {})
+        return response
+      })
+    },
+    addOrEditBankInfo(formData) {
+      return _http.post('/shopUsers/addOrEditBankInfo', formData).then((response) => {
         !response.data && (response.data = {})
         return response
       })
@@ -764,44 +792,6 @@ const _server = {
         response.data.rows = rows
         return response
       })
-    },
-    bind(qrUserCode = '', code = '') {
-      qrUserCode = qrUserCode || storage.session.get('bind_qrcode') || ''
-      code = code || storage.session.get('wx_code') || ''
-
-      if(!code) {
-        return errorPromise({
-          status: 4008,
-          tips: false,
-          message: '扫码失败（微信网页授权失败）'
-        })
-      }
-
-      if(!qrUserCode) {
-        return errorPromise({
-          status: 4005,
-          tips: !!code,
-          message: '扫码失败（该二维码无效）'
-        })
-      }
-
-      storage.session.set('bind_qrcode', qrUserCode)
-
-      return _http.post('/shopUsers/binding', { qrUserCode, code }).then((response) => {
-        response.message = '扫码失败，请重新扫码！'
-        storage.session.set('openId', response.data)
-        return response
-      })
-
-      // if(!_server.checkLogin()){
-      //   return errorPromise('用户未登录') 
-      // }
-
-      // return _http.post('/shopUsers/bindingCheck', { qrUserCode, code }).then((response) => {
-      //   !response.data && (response.data = {})
-      //   return response
-      // })
-      
     },
     notify(notify = 1) {
       return _http.post('/shopUsers/notify', { notify }).then((response)=>{

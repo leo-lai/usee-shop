@@ -12,6 +12,9 @@
   position: absolute; top: 0; left: 0; width: 100%; z-index: 999; 
   transform: translate3d(100%, 0, 0); visibility: hidden; 
 }
+.page-in-enter-active:after{
+  content: ''; position: absolute; top:0;right: 0;bottom: 0;left: 0; z-index: 2000;
+}
 .page-in-leave-active {
   display: block !important; 
   animation: pageFromCenterToLeft .5s forwards; 

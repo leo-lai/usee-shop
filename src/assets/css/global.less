@@ -250,3 +250,43 @@ input, textarea, select{font-size: 0.85rem;}
 .l-upload-images:after{
   content: ''; display: block; height: 0; clear: both; visibility: hidden;
 }
+
+[class*=l-service-step]{
+  text-align: center; padding: 0.75rem;
+  ._step{max-width: 25%;}
+  ._icon{
+    display: block; margin:0.5rem auto; border-radius: 50%; border: 2px solid #ccc; width: 1rem; height: 1rem;
+  }
+  ._line{border-top: 1px solid #eee; margin:1rem 0 1.15rem;}
+  ._txt{ color: #ccc; font-size: 0.7rem;}
+}
+.l-service-step1{
+  ._step:first-child{
+    ._icon{
+      border-color: #ff784e; background: #ff784e;
+    }
+    ._txt{ color: inherit; }
+  }
+}
+.l-service-step2{
+  ._step:nth-child(1), ._step:nth-child(3){
+    ._icon{
+      border-color: #ff784e; background: #ff784e;
+    }
+    ._txt{ color: inherit; }
+  }
+  ._line:nth-child(2){
+    border-color: #ff784e;
+  }
+}
+.l-service-step3{
+  ._step:nth-child(1), ._step:nth-child(3), ._step:nth-child(5){
+    ._icon{
+      border-color: #ff784e; background: #ff784e;
+    }
+    ._txt{ color: inherit; }
+  }
+  ._line:nth-child(2),._line:nth-child(4){
+    border-color: #ff784e;
+  }
+}

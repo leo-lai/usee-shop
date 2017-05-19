@@ -11,7 +11,7 @@ import routes from './routes'
 import App from './App'
 
 Vue.filter('currency', (value = '')=>{
-  let number = +(value+'').replace(/[^\d.]/g, '')
+  let number = +(value+'').replace(/[^-\d.]/g, '')
   number = isNaN(number) ? 0 : number
   return number.toMoney(2)
 })
@@ -57,9 +57,11 @@ router.beforeEach((to, from, next) => {
       window.location.replace(server.getGrantUrl(to.fullPath, undefined, to.meta.wxScope))
       next(false)
       return
-    }else{
-      storage.session.set('wx_url', window.location.href)  
     }
+  }
+
+  if(code){
+    storage.session.set('wx_url', window.location.href)  
   }
 
   storage.session.set('wx_code', code)
@@ -216,7 +218,6 @@ router.onReady(()=>{
   setTimeout(()=>{
     // 记录微信的Landing Page，用于当前目录地址授权验证
     storage.session.set('wx_url', window.location.href)
-
     mui.init()
     mui(document).on('click', '._nav-back', function(e){
       router.back()
@@ -229,6 +230,7 @@ router.onReady(()=>{
 
 Vue._router = router
 Vue._link = _link
+Vue._eventHub = eventHub
 
 Vue.mixin({
   created() {
@@ -260,7 +262,7 @@ function _pageTo(toPageId, title){
     utils.addClass(toPage, 'page-in-enter-active')
     utils.addClass(fromPage, 'page-in-leave-active')
     
-    clearTimeout(_pageTo.timeid)
+    // clearTimeout(_pageTo.timeid)
     _pageTo.timeid = setTimeout(()=>{
       router.currentRoute.meta.type = ''
       utils.removeClass(fromPage, 'page-in-leave-active')
@@ -278,7 +280,7 @@ function _pageBack(toPageId, title){
     if(title){
       router.currentRoute.meta.title = title
     }
-    clearTimeout(_pageBack.timeid)
+    // clearTimeout(_pageBack.timeid)
     _pageBack.timeid = setTimeout(()=>{
       utils.removeClass(fromPage, 'page-out-leave-active')
       utils.removeClass(toPage, 'page-out-enter-active')

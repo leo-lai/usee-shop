@@ -5,7 +5,7 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <div class="mui-content">
-      <template v-if="expressInfo">
+      <template v-if="expressInfo && expressInfo.code">
         <div class="l-flex-hc l-bg-white l-padding-lr">
           <div class="l-text-warn l-margin-r">
             <i class="l-icon" style="font-size:3rem;">&#xe647;</i>
@@ -26,7 +26,7 @@
         </div>
       </template>
       <!-- 空数据 -->
-      <div class="l-data-null" v-if="!expressInfo">
+      <div class="l-data-null" v-if="expressInfo && !expressInfo.code">
         <div class="_icon"><i class="l-icon l-text-warn">&#xe617;</i></div>
         <p class="_text">商品正等待快递小哥揽收呢~</p>
       </div>
@@ -47,7 +47,7 @@ export default {
   mounted() {
     this.loading = true
     this.$server.order.getExpressInfo(this.$route.params.id).then(({data})=>{
-      this.expressInfo = data
+      this.expressInfo = data || {}
     }).finally(()=>{
       this.loading = false
     })

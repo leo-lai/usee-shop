@@ -16,7 +16,7 @@
               </template>
               <span v-else class="l-link-arrow l-padding" @click="$server.logout(false)">您还没登录</span>
             </div>
-            <div class="l-avatar" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
+            <div class="l-avatar" @click="previewImage" :style="{'background-image': 'url('+ (userInfo.avatar || defaultAvatar) +')'}"></div>
             <div class="_ft l-flex-hc">
               <router-link class="l-rest l-border-r" to="/me/account">账户余额：{{userInfo.account | currency}}</router-link>
               <router-link class="l-rest" to="/me/customer">累计客户：{{userInfo.customerNum || 0}}</router-link>
@@ -119,6 +119,11 @@ export default {
     }
   },
   methods: {
+    previewImage() {
+      if(this.userInfo && this.userInfo.image){
+        this.$server.previewImage([this.userInfo.image], 0)
+      }
+    },
     logout() {
       this.$mui.confirm('是否退出登录？', null, null, (e)=>{
         if(e.index == 1){
