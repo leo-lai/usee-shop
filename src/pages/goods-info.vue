@@ -61,9 +61,9 @@
           <div class="l-evaluate-list">
             <div class="_item l-fs-s l-padding l-border-b" v-for="item in evaluateList">
               <div class="l-flex-hc">
-                <div class="l-avatar" :style="{'background-image': 'url('+ (item.userImage || avatar) +')'}"></div>
+                <div class="l-avatar" :style="{'background-image': 'url('+ $utils.image.wxHead(item.userImage, 64) +')'}"></div>
                 <h4 class="l-text-wrap1 l-rest">{{item.userName}}</h4>
-                <span class="l-fs-xs l-text-gray">{{item.judgegDate}}</span>
+                <span class="l-fs-xs l-text-gray">{{getDate(item.judgegDate)}}</span>
               </div>
               <div class="_cont">{{item.judgegContent}}</div>
               <div class="l-upload-images l-clearfix">
@@ -153,17 +153,15 @@
 </template>
 <script>
 import navTab from 'components/nav-tab'
-import previewImage from 'libs/mui/js/mui.preview-image'
+// import previewImage from 'libs/mui/js/mui.preview-image'
 import infiniteLoading from 'components/vue-infinite-loading'
 
-let avatar = require('assets/images/avatar.jpg')
 export default {
   components: {
     navTab, infiniteLoading
   },
   data () {
     return {
-      avatar,
       tabIndex: 0,
       isShowSupport: false,
       isShowSpec: false,
@@ -181,12 +179,10 @@ export default {
     }
   },
   methods: {
+    getDate(dateStr) {
+      return dateStr ? dateStr.split(' ')[0] : ''
+    },
     onInfinite() {
-      // if(this.tabIndex != 1){
-      //   this.$refs.infinite.$emit('$InfiniteLoading:complete')
-      //   return
-      // }
-
       this.$server.shop.getEvaluate(this.goodsInfo.goodTypeId, this.page, 50)
       .then(({data})=>{
 
@@ -255,7 +251,6 @@ export default {
       this.sltedGoodsColor = color
     },
     sltSpecOk() {
-      // this.$router.push('/shop/order/create')
       if(this.goodsColour && this.goodsColour.length > 0 && !this.sltedGoodsColor.colorId){
         this.$mui.toast('请选择款式')
         return
@@ -314,24 +309,24 @@ export default {
 
         this.sltGoodsColor(this.goodsColour[0])
 
-        this.$nextTick(()=>{
-          this.$mui('.mui-slider').slider({
-            interval: 3000
-          })
+        // this.$nextTick(()=>{
+        //   this.$mui('.mui-slider').slider({
+        //     interval: 3000
+        //   })
 
-          // if(!this.$device.isWechat){
-          //   let detailsImages = Array.from(document.querySelectorAll('.l-goods-details img'))
-          //   detailsImages.forEach(img=>{
-          //     img.setAttribute('data-preview-src', '')
-          //     img.setAttribute('data-preview-group', '1')
-          //   })
+        //   // if(!this.$device.isWechat){
+        //   //   let detailsImages = Array.from(document.querySelectorAll('.l-goods-details img'))
+        //   //   detailsImages.forEach(img=>{
+        //   //     img.setAttribute('data-preview-src', '')
+        //   //     img.setAttribute('data-preview-group', '1')
+        //   //   })
 
-          //   if(detailsImages.length > 0){
-          //     this.$mui.use(previewImage)  
-          //     this._previewImage = this.$mui.previewImage()
-          //   }
-          // }
-        })
+        //   //   if(detailsImages.length > 0){
+        //   //     this.$mui.use(previewImage)  
+        //   //     this._previewImage = this.$mui.previewImage()
+        //   //   }
+        //   // }
+        // })
       }, 600)
     }).catch(()=>{
       this.loading = false

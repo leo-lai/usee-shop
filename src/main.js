@@ -211,7 +211,7 @@ router.afterEach((to) => {
       // 默认第一个展示
       utils.addClass(document.querySelector('.l-page-group .l-page'), '_active')
     }
-  }, 60)
+  }, 90)
 })
 
 router.onReady(()=>{
@@ -225,7 +225,7 @@ router.onReady(()=>{
     mui(document).on('click', '._nav-reload', function(e){
       utils.url.reload()
     })
-  }, 60) 
+  }, 120) 
 })
 
 Vue._router = router

@@ -56,7 +56,7 @@ export default {
           data: self.$server.getHost() + '/shop?_from=scan&_qruc=' + self.userInfo.userCode,
           cellSize: 5,
           correctLevel: 'H',
-          typeNumber: 2,
+          typeNumber: 5,
           foreground: [
             {style: '#ff7809'},
             // outer squares of the positioner

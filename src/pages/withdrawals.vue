@@ -27,7 +27,7 @@
               <button class="mui-btn l-btn-main _m" style="width: 6rem;" @click="txPage">提现</button>
             </div>
           </div>
-          <p class="l-margin l-fs-s l-text-gray l-text-center" style="margin-bottom:0.25rem;">提现历史</p>
+          <p class="l-margin l-fs-s l-text-gray l-text-center" v-show="list.length > 0" style="margin-bottom:0.25rem;">提现历史</p>
           <div class="l-bg-white l-margin-b">
             <div class="l-border-t l-padding" v-for="item in list" @click="viewInfo(item)">
               <p><span class="mui-pull-right l-fs-s">{{withdrawalsState[item.withdrawalsState]}}</span><span class="l-text-hot">{{item.amount | currency}}</span></p>
@@ -39,7 +39,7 @@
           </div>
           <infinite-loading :on-infinite="onInfinite" ref="infinite">
             <div class="l-loading-inline" slot="spinner"><i class="mui-spinner"></i><span class="_txt">正在加载...</span></div>
-            <div class="l-text-gray l-fs-m" slot="no-results">没有相关的数据</div>
+            <div class="l-text-gray l-fs-m" slot="no-results">还没有提现历史记录</div>
             <div class="l-text-gray l-fs-m" slot="no-more">全部数据加载完毕</div>
           </infinite-loading>
         </template>
@@ -77,7 +77,7 @@
           </div>
         </div>
         <div class="l-margin">
-          <button class="mui-btn l-btn-main" :disabled="submiting" @click="submit">提交申请</button>
+          <button class="mui-btn l-btn-main" :disabled="submiting || money.availableAmount <= 0" @click="submit">提交申请</button>
         </div>
       </div>
     </div>

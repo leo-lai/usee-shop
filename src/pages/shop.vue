@@ -76,7 +76,7 @@ export default {
             }
           })
         }else{
-          this.$eventHub.$emit('APP-FOLLOW', response.data.isFollow)
+          this.$eventHub.$emit('APP-FOLLOW', response.data.isFollow)  
         }
       }).catch((error)=>{
         error.tips && this.$mui.alert(error.message)

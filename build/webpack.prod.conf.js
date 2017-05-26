@@ -6,6 +6,8 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+var PrerenderSpaPlugin = require('prerender-spa-plugin')
+// var CopyWebpackPlugin = require('copy-webpack-plugin')
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
   : config.build.env
@@ -27,6 +29,9 @@ var webpackConfig = merge(baseWebpackConfig, {
     })
   },
   plugins: [
+    // new CopyWebpackPlugin([{
+    //   from: 'static'
+    // }]),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
       'process.env': env
@@ -80,6 +85,13 @@ var webpackConfig = merge(baseWebpackConfig, {
       name: 'manifest',
       chunks: ['vendor']
     })
+    // ,
+    // new PrerenderSpaPlugin(
+    //   // Absolute path to compiled SPA
+    //   path.join(__dirname, '../dist'),
+    //   // List of routes to prerender
+    //   [ '/', '/shop']
+    // )
   ]
 })
 

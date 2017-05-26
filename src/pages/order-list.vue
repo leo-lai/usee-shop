@@ -8,19 +8,19 @@
     <div class="mui-content">
       <div class="l-tab-imgtit l-border-b l-flex-hc l-sticky">
         <a class="_item l-rest" :class="{'_active': tabIndex == 0}" @click="tabClick(0)">
-          <p><img class="_icon" src="~assets/images/icon-011.png" alt=""></p>
+          <p><img class="_icon" src="~assets/images/icon-011.png"></p>
           <p class="_txt">全部</p>
         </a>
         <a class="_item l-rest" :class="{'_active': tabIndex == 1}" @click="tabClick(1)">
-          <p><img class="_icon" src="~assets/images/icon-008.png" alt=""></p>
+          <p><img class="_icon" src="~assets/images/icon-008.png"></p>
           <p class="_txt">待付款</p>
         </a>
         <a class="_item l-rest" :class="{'_active': tabIndex == 2}" @click="tabClick(2)">
-          <p><img class="_icon" src="~assets/images/icon-009.png" alt=""></p>
+          <p><img class="_icon" src="~assets/images/icon-009.png"></p>
           <p class="_txt">待收货</p>
         </a>
         <a class="_item l-rest" :class="{'_active': tabIndex == 3}" @click="tabClick(3)">
-          <p><img class="_icon" src="~assets/images/icon-010.png" alt=""></p>
+          <p><img class="_icon" src="~assets/images/icon-010.png"></p>
           <p class="_txt">待评价</p>
         </a>
       </div>
@@ -170,13 +170,5 @@ export default {
 }
 </script>
 <style scoped lang="less">
-.l-tab-imgtit{
-  background: #fff; font-size: 0.75rem; z-index: 10;
-  ._item{
-    width: 10%; text-align: center; color: inherit; padding: 0.5rem 0;
-    ._icon{width: 1.6rem; height: 1.6rem;}
-    ._txt{margin-top: 0.25rem;}
-  }
-  ._active{color: rgba(255, 120, 78, 1);}
-}
+
 </style>

@@ -35,8 +35,15 @@ const _http = {
       // headers['Content-Type'] = 'text/plain'
       data = JSON.stringify(data)
     }
+    let openId = storage.local.get('openId') || ''
+    if(openId && utils.isPlainObject(openId)){
+      openId = openId.openId || ''
+      storage.local.set('openId', openId)
+    }
+
+
     data.sessionId = storage.local.get('sessionId') || ''
-    data.openId = storage.local.get('openId') || ''
+    data.openId = openId
 
     return new Promise((resolve, reject) => {
       mui.ajax(url, {
@@ -44,10 +51,11 @@ const _http = {
         type,
         headers,
         dataType: 'json',
-        timeout: 20000,
+        timeout: 120000,
         success(response, status, xhr) {
           if(response.resultCode === 200){
-            return resolve(response)
+            resolve(response)
+            return
           }
 
           mui.closePopups()
@@ -71,7 +79,7 @@ const _http = {
               })
               break
             default:
-              mui.alert(response.message)
+              mui.alert( response.message  + '(错误码：' + response.resultCode + ')' )
               reject(response.message)
               break
           }
@@ -646,6 +654,7 @@ const _server = {
   },
   clearTempStore() { // 清除临时缓存
     // storage.local.remove('_isFollow')
+    // storage.local.remove('openId')
     storage.local.remove('qrcode_img')
     storage.local.remove('buy_slted_address')
   },
@@ -734,6 +743,7 @@ const _server = {
       storage.session.set('bind_qrcode', qrUserCode)
 
       return _http.post('/shopUsers/binding', { qrUserCode, code }).then((response) => {
+        response.data = response.data || {}
         storage.local.set('_isFollow', response.data.isFollow || 1)
         storage.local.set('openId', response.data.openId || '')
         return response

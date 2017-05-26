@@ -116,9 +116,10 @@ export default {
   ._tit{padding: 0.75rem;}
   ._time{padding: 0.75rem 0;}
   ._date{
+    border-bottom: 1px solid #ff784e;
     input{
-      display: inline-block; width: auto;  margin: auto;
-      border:none; border-bottom: 1px solid #ff784e; border-radius: 0; text-align: center; font-size: 0.7rem;
+      display: inline-block; width: 100%;  margin: auto; padding: 1rem 0;
+      border:none;  border-radius: 0; text-align: center; font-size: 0.7rem;
     }
   }
 }
