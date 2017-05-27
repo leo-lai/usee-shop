@@ -698,6 +698,12 @@ const _server = {
       return response
     })
   },
+  getXiaoUInfo() {
+    return _http.post('/agentInfoU/index').then((response) => {
+      !response.data && (response.data = {})
+      return response
+    })
+  },
   user: {
     getInfo(remote) {
       return new Promise((resolve)=>{

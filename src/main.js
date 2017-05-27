@@ -241,11 +241,17 @@ Vue.mixin({
   }
 })
 
-/* eslint-disable no-new */
 const vm = new Vue({
   router,
   render: h => h(App)
-}).$mount('#app')
+})
+
+document.addEventListener('DOMContentLoaded', function () {
+  vm.$mount('#app')
+})
+
+/* eslint-disable no-new */
+
 
 // 进入内页
 function _pageTo(toPageId, title){

@@ -5,21 +5,21 @@
       <a class="mui-icon mui-icon-arrowleft mui-pull-left _nav-back"></a>
     </header>
     <div class="mui-content">
-      <template v-if="userInfo.agentId == 1">
+      <template v-if="xiaoUInfo.agentId === 1">
         <div class="l-card-count l-text-center">
           <p class="l-fs-s">&nbsp;累计返利(元)</p>  
-          <p style="font-size:2rem; margin: 0.5rem 0;">{{totalAmount | currency}}</p>
+          <p style="font-size:2rem; margin: 0.5rem 0;">{{xiaoUInfo.amount | currency}}</p>
           <p><button style="background: transparent; border-color: #fff;" class="mui-btn l-btn-main _m" @click="$link('/me/rebate', 'page-in')">查看返利流水</button></p>
         </div>
         <div class="l-flex-hc l-bg-white l-text-center" style="padding: 1rem 0;">
           <div class="l-rest" @click="$link('/me/customer', 'page-in')">
             <p class="l-fs-m">客户数量</p>
-            <p class="l-fs-xl">{{userInfo.customerNum}}</p>
+            <p class="l-fs-xl">{{xiaoUInfo.customerNum || 0}}</p>
           </div>
-          <!-- <div class="l-rest">
-            <p>销售套数</p>
-            <p>0</p>
-          </div> -->
+          <div class="l-rest">
+            <p class="l-fs-m">销售套数</p>
+            <p class="l-fs-xl">{{xiaoUInfo.goodsNumber || 0}}</p>
+          </div>
         </div>
         <ul class="mui-table-view mui-table-view-chevron l-margin-t">
           <li class="mui-table-view-cell" @click="notify">
@@ -30,9 +30,8 @@
           </li>
         </ul>
         <div class="l-margin l-fs-s l-text-gray" style="margin-top:0.25rem;">开启消息推送您将收到客户关注及购买返利等微信消息推送</div>
-
       </template>
-      <not-u v-else-if="userInfo.agentId != 1"></not-u>
+      <not-u v-else-if="xiaoUInfo.agentId === 0"></not-u>
       <div class="l-loading-inline" v-if="loading" style="padding: 1.8rem 0;"><i class="mui-spinner"></i></div>
     </div>
   </div>
@@ -49,10 +48,12 @@ export default {
     return {
       isNotice: false,
       loading: false,
-      totalAmount: 0,
-      userInfo: {
-        account: 0,
+      xiaoUInfo: {
+        agentId: '',
+        notify: 1,
+        amount: 0,
         customerNum: 0,
+        goodsNumber: 0,
       }
     }
   },
@@ -74,16 +75,19 @@ export default {
       }).finally(()=>{
         this.$mui.hideWaiting()
       })
+    },
+    getXiaoUInfo() {
+      this.loading = true
+      this.$server.getXiaoUInfo().then(({data})=>{
+        this.isNotice = data.notify == 0 ? false : true
+        this.xiaoUInfo = Object.assign(this.xiaoUInfo, data)
+      }).finally(()=>{
+        this.loading = false
+      })
     }
   },
   created() {
-    this.loading = true
-    this.$server.user.getInfo().then(({data})=>{
-      this.userInfo = data
-      this.isNotice = data.notify == 0 ? false : true
-    }).finally(()=>{
-      this.loading = false
-    })
+    this.getXiaoUInfo()
   }
 }
 </script>
