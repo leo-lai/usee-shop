@@ -29,7 +29,7 @@
             <p class="l-fs-m">{{goodsInfo.goodsBrief}}</p>
             <p class="l-text-warn l-fs-l">
               <span><b class="l-icon">&#xe6cb;</b>{{goodsInfo.price | currency}}</span>&nbsp;
-              <del class="l-text-gray l-fs-s" v-if="goodsInfo.isBindingAgent == 1">原价：<b class="l-icon">&#xe6cb;</b>{{goodsInfo.originalPrice | currency}}</del>
+              <!-- <del class="l-text-gray l-fs-s" v-if="goodsInfo.isBindingAgent == 1">原价：<b class="l-icon">&#xe6cb;</b>{{goodsInfo.originalPrice | currency}}</del> -->
             </p>
           </div>
         </div>

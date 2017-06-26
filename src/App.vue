@@ -1,17 +1,29 @@
 <template>
-  <transition :name="direction">
-    <router-view></router-view>
-  </transition>
+  <div class="l-app">
+    <transition :name="direction">
+      <router-view></router-view>
+    </transition>
+    <div class="l-top-notice" :class="{'_show': showNotice}" @click="hideNotice">
+      <i class="l-icon">&#xe692;</i>
+      尊敬顾客您好！U视一号舒眼喷雾特价活动已结束，6月1日起正式恢复原价299元。
+      <i class="l-icon _close">×</i>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
 	data() {
 		return {
+      showNotice: false,
       direction: 'page',
 		}
 	},
   methods: {
+    hideNotice() {
+      this.$storage.local.set('_noticed', 1, 1000*3600*12)
+      this.showNotice = false
+    },
     preventScroll() {
       this.$nextTick(()=>{
         setTimeout(()=>{
@@ -88,6 +100,13 @@ export default {
         appLoader && appLoader.classList.add('app-loaded')
       }, delay)
       setTimeout(() => {
+        if(this.$storage.local.get('_noticed') !== 1){
+          this.showNotice = true
+          setTimeout(()=>{
+            this.showNotice = false
+          }, 60000)
+        }
+
         let appLoaderCss = document.getElementById('app-loader-css')
         if(appLoaderCss){
           appLoader.parentNode.removeChild(appLoader)
@@ -108,4 +127,16 @@ export default {
 @import '~assets/css/base.less';
 @import '~assets/css/global.less';
 @import '~assets/css/transition.less';
+.l-top-notice{
+  position: absolute; top: 0; left: 0; right: 0; z-index: 20000;
+  background: rgba(245, 172, 0, 0.95); color: #fff;
+  line-height: 1.4; padding:0.5rem 1.75rem 0.5rem 0.75rem; font-size: 0.75rem; 
+  transition: all 0.3s ease; transform: translateY(-100%);
+  ._close{
+    position: absolute; top:0; right: 0; padding: 0.5rem;
+  }
+}
+.l-top-notice._show{
+  transform: translateY(0);
+}
 </style>

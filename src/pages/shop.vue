@@ -17,7 +17,7 @@
             <p class="l-fs-m">{{item.goodsBrief}}</p>
             <p class="l-text-warn l-fs-l">
               <span><b class="l-icon">&#xe6cb;</b>{{item.price | currency}}</span>&nbsp;
-              <del class="l-text-gray l-fs-s" v-if="item.isBindingAgent == 1">原价：<b class="l-icon">&#xe6cb;</b>{{item.originalPrice | currency}}</del>
+              <!-- <del class="l-text-gray l-fs-s" v-if="item.isBindingAgent == 1">原价：<b class="l-icon">&#xe6cb;</b>{{item.originalPrice | currency}}</del> -->
             </p>
           </div>
         </router-link>

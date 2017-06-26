@@ -310,11 +310,10 @@ a.l-link:not([class*='l-flex-']){display: block;}
 .l-toptip {
   position: fixed; top: 0; right: 0; left:0; z-index: 2000;
   padding: 0.5rem; text-align: center; color: #fff; background-color: #F43530; 
-  -webkit-transition: all 0.3s ease; transition: all 0.3s ease;
-  -webkit-transform: translateY(-100%); transform: translateY(-100%);
+  transition: all 0.3s ease; transform: translateY(-100%);
 }
 .l-toptip._show{
-  -webkit-transform: translateY(0); transform: translateY(0);
+  transform: translateY(0);
 }
 .l-toptip._error{
   background-color: #e64340;
